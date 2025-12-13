@@ -1,0 +1,79 @@
+{
+  "agent_id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 67.71229953765868,
+    "avg_latency": 22.570766512552893,
+    "min_latency": 22.085537338256835,
+    "max_latency": 23.231249475479125,
+    "target_latency": 2.0,
+    "turns_met_target": 0,
+    "turns_missed_target": 3,
+    "tts_method": "real"
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "true_latency": 22.085537338256835,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 21.185,
+        "tts_method": "real",
+        "ttfb": 0.174,
+        "system_overhead": 0.9,
+        "true_latency": 22.086,
+        "audio_playback_info": 0.8
+      },
+      "node_id": "2",
+      "node_label": "Greeting",
+      "response_words": 2,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T08:21:33.214049"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "true_latency": 22.395512723922728,
+      "detailed_timing": {
+        "llm_time": 0.061,
+        "tts_generation": 21.435,
+        "tts_method": "real",
+        "ttfb": 0.172,
+        "system_overhead": 0.9,
+        "true_latency": 22.396,
+        "audio_playback_info": 7.2
+      },
+      "node_id": "1763159750250",
+      "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+      "response_words": 18,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T08:21:54.709733"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "true_latency": 23.231249475479125,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 22.331,
+        "tts_method": "real",
+        "ttfb": 0.193,
+        "system_overhead": 0.9,
+        "true_latency": 23.231,
+        "audio_playback_info": 21.6
+      },
+      "node_id": "1763161849799",
+      "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+      "response_words": 54,
+      "has_ssml": true,
+      "met_target": false,
+      "timestamp": "2025-11-24T08:22:17.041274"
+    }
+  ]
+}

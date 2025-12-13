@@ -1,0 +1,104 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-12-03T22:20:22.222456"
+  },
+  "detailed_results": [
+    {
+      "test": "Authentication",
+      "status": "PASS",
+      "details": "Successfully authenticated with webhook test credentials",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-03T22:20:08.265630"
+    },
+    {
+      "test": "Webhook Endpoint Availability",
+      "status": "PASS",
+      "details": "Webhook-test endpoint is accessible and functional",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-03T22:20:11.229204"
+    },
+    {
+      "test": "JSON Schema Format Detection",
+      "status": "PASS",
+      "details": "Webhook correctly sent actual values: {'amPm': 'PM', 'scheduleTime': 'Tuesday 6pm', 'timeZone': 'EST'}",
+      "expected": {
+        "amPm": "PM",
+        "timeZone": "EST",
+        "scheduleTime": "Tuesday 6pm"
+      },
+      "actual": {
+        "amPm": "PM",
+        "scheduleTime": "Tuesday 6pm",
+        "timeZone": "EST"
+      },
+      "timestamp": "2025-12-03T22:20:12.503086"
+    },
+    {
+      "test": "Template Format Support",
+      "status": "PASS",
+      "details": "Webhook correctly sent template data with {{variables}}: Hello {{name}}, your appointment is at {{time}}",
+      "expected": {
+        "message": "Hello {{name}}, your appointment is at {{time}}",
+        "template_vars": {
+          "name": "John",
+          "time": "3:00 PM"
+        }
+      },
+      "actual": {
+        "message": "Hello {{name}}, your appointment is at {{time}}",
+        "template_vars": {
+          "name": "John",
+          "time": "3:00 PM"
+        }
+      },
+      "timestamp": "2025-12-03T22:20:13.897028"
+    },
+    {
+      "test": "Webhook Proxy - POST Request",
+      "status": "PASS",
+      "details": "Proxy successfully handled POST Request (status: 200)",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-03T22:20:14.829358"
+    },
+    {
+      "test": "Webhook Proxy - GET Request",
+      "status": "PASS",
+      "details": "Proxy successfully handled GET Request (status: 200)",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-03T22:20:22.109557"
+    },
+    {
+      "test": "Error Handling - Missing URL",
+      "status": "PASS",
+      "details": "Correctly handled error: URL is required",
+      "expected": "Contains 'URL is required'",
+      "actual": "URL is required",
+      "timestamp": "2025-12-03T22:20:22.163504"
+    },
+    {
+      "test": "Error Handling - Invalid URL",
+      "status": "PASS",
+      "details": "Correctly handled error: Request failed: Request URL is missing an 'http://' or 'https://' protocol.",
+      "expected": "Contains 'Request failed'",
+      "actual": "Request failed: Request URL is missing an 'http://' or 'https://' protocol.",
+      "timestamp": "2025-12-03T22:20:22.194543"
+    },
+    {
+      "test": "Error Handling - Unsupported Method",
+      "status": "PASS",
+      "details": "Correctly handled error: Unsupported method: PATCH",
+      "expected": "Contains 'Unsupported method'",
+      "actual": "Unsupported method: PATCH",
+      "timestamp": "2025-12-03T22:20:22.222155"
+    }
+  ]
+}

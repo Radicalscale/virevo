@@ -1,0 +1,75 @@
+{
+  "agent_id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 9.020714006423951,
+    "avg_latency": 3.0069046688079837,
+    "min_latency": 1.9800667572021484,
+    "max_latency": 4.360114917755127,
+    "target_latency": 2.0,
+    "turns_met_target": 1,
+    "turns_missed_target": 2
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "backend_latency": 6.723403930664062e-05,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 1.08,
+        "system_overhead": 0.9,
+        "time_to_first_audio": 1.98,
+        "audio_playback": 0.8,
+        "total_turn_time": 2.78
+      },
+      "node_id": "2",
+      "node_label": "Greeting",
+      "response_words": 2,
+      "has_ssml": false,
+      "met_target": true,
+      "timestamp": "2025-11-24T07:42:20.915740"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "backend_latency": 0.06053280830383301,
+      "detailed_timing": {
+        "llm_time": 0.061,
+        "tts_generation": 1.72,
+        "system_overhead": 0.9,
+        "time_to_first_audio": 2.681,
+        "audio_playback": 7.2,
+        "total_turn_time": 9.881
+      },
+      "node_id": "1763159750250",
+      "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+      "response_words": 18,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:42:20.976409"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "backend_latency": 0.00011515617370605469,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 3.46,
+        "system_overhead": 0.9,
+        "time_to_first_audio": 4.36,
+        "audio_playback": 21.6,
+        "total_turn_time": 25.96
+      },
+      "node_id": "1763161849799",
+      "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+      "response_words": 54,
+      "has_ssml": true,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:42:20.976641"
+    }
+  ]
+}

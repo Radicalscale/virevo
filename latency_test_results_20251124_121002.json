@@ -1,0 +1,460 @@
+{
+  "timestamp": "2025-11-24T12:10:02.803487",
+  "agent_id": "f251b2d9-aa56-4872-ac66-9a28accd42bb",
+  "agent_name": "JK First Caller-copy-copy",
+  "system_prompt_length": 4885,
+  "call_flow_nodes": 51,
+  "overall_stats": {
+    "avg_latency_ms": 1584.6509398246299,
+    "min_latency_ms": 0.06198883056640625,
+    "max_latency_ms": 5904.975652694702,
+    "total_messages": 49,
+    "total_errors": 0,
+    "target_latency_ms": 1500,
+    "meets_target": false
+  },
+  "scenarios": [
+    {
+      "scenario": "Deep Objection Handling - Time Objection",
+      "messages": [
+        {
+          "user_message": "Hello",
+          "agent_response": "{'text': '{{customer_name}}?', 'latency': 6.270408630371094e-05, 'end_call': False}",
+          "latency_ms": 0.06961822509765625,
+          "node_id": "2",
+          "node_label": "Greeting"
+        },
+        {
+          "user_message": "My name is John",
+          "agent_response": "{'text': 'This is Jake. I was just, um, wondering if you could possibly help me out for a moment?', 'latency': 0.9748022556304932, 'end_call': False}",
+          "latency_ms": 974.8058319091797,
+          "node_id": "1763159750250",
+          "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)"
+        },
+        {
+          "user_message": "I don't have time for this",
+          "agent_response": "{'text': '<speak>Well, uh<break time=\"300ms\"/> I don\\'t know if you could yet, but, I\\'m calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I\\'m reaching out today specifically?</prosody></speak>', 'latency': 0.00011491775512695312, 'end_call': False}",
+          "latency_ms": 0.1239776611328125,
+          "node_id": "1763161849799",
+          "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic"
+        },
+        {
+          "user_message": "What is this even about?",
+          "agent_response": "{'text': 'Okay, John. In a nutshell, we set up passive income websites that produce income for you by ranking on Google for local services. What questions come to mind right away?', 'latency': 1.5238726139068604, 'end_call': False}",
+          "latency_ms": 1523.876428604126,
+          "node_id": "1763163400676",
+          "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive"
+        },
+        {
+          "user_message": "I'm still not interested",
+          "agent_response": "{'text': 'Just so I understand, is generating new income not a priority right now, or was it my explanation?', 'latency': 0.9893829822540283, 'end_call': False}",
+          "latency_ms": 989.3889427185059,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Why should I care?",
+          "agent_response": "{'text': \"It's about creating real freedom, John. Each site we build ranks on Google for local leads, earning $500-$2,000 a month passively. Most students start with 10 sites. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?\", 'latency': 4.69782018661499, 'end_call': False}",
+          "latency_ms": 4697.826147079468,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "I need to think about it",
+          "agent_response": "{'text': \"Fair point, John. What's the one thing holding you back right now?\", 'latency': 2.864154815673828, 'end_call': False}",
+          "latency_ms": 2864.1605377197266,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Can you call me back later?",
+          "agent_response": "{'text': \"Sure, John. When's a good time today that works for you?\", 'latency': 1.3672046661376953, 'end_call': False}",
+          "latency_ms": 1367.210865020752,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Actually, tell me more about the income potential",
+          "agent_response": "{'text': \"John, most sites earn $500 to $2,000 a month once ranked on Google for local leads. Students aiming for $20k+ typically run 10 or more sites passively. Does hitting that kind of extra income excite you, or what's your target?\", 'latency': 1.6822919845581055, 'end_call': False}",
+          "latency_ms": 1682.298183441162,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        }
+      ],
+      "total_latency": 14099.76053237915,
+      "avg_latency": 1566.640059153239,
+      "nodes_visited": [
+        "Greeting",
+        "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+        "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+        "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "Deep Objection Handling - Not Interested Path",
+      "messages": [
+        {
+          "user_message": "Hello",
+          "agent_response": "{'text': '{{customer_name}}?', 'latency': 6.67572021484375e-05, 'end_call': False}",
+          "latency_ms": 0.07104873657226562,
+          "node_id": "2",
+          "node_label": "Greeting"
+        },
+        {
+          "user_message": "I'm David",
+          "agent_response": "{'text': 'This is Jake. I was just, um, wondering if you could possibly help me out for a moment?', 'latency': 0.6281485557556152, 'end_call': False}",
+          "latency_ms": 628.15260887146,
+          "node_id": "1763159750250",
+          "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)"
+        },
+        {
+          "user_message": "I'm not interested",
+          "agent_response": "{'text': '<speak>Well, uh<break time=\"300ms\"/> I don\\'t know if you could yet, but, I\\'m calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I\\'m reaching out today specifically?</prosody></speak>', 'latency': 9.584426879882812e-05, 'end_call': False}",
+          "latency_ms": 0.1049041748046875,
+          "node_id": "1763161849799",
+          "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic"
+        },
+        {
+          "user_message": "What would this cost me?",
+          "agent_response": "{'text': \"That's what the call with Kendrick figures out. Not fair to quote without checking fit, would it?\", 'latency': 1.2165181636810303, 'end_call': False}",
+          "latency_ms": 1216.5217399597168,
+          "node_id": "1763163400676",
+          "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive"
+        },
+        {
+          "user_message": "That's too expensive",
+          "agent_response": "{'text': 'Okay. What monthly return would make this a smart move?', 'latency': 0.8079257011413574, 'end_call': False}",
+          "latency_ms": 807.9321384429932,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "I don't think this is for me",
+          "agent_response": "{'text': 'Fair. Usually one key point. What aspect are you weighing?', 'latency': 5.904970169067383, 'end_call': False}",
+          "latency_ms": 5904.975652694702,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Why are you calling me?",
+          "agent_response": "{'text': 'You filled out a Facebook ad about stacking income without stacking hours. Does that ring a <emphasis>bell</emphasis>?', 'latency': 3.6706414222717285, 'end_call': False}",
+          "latency_ms": 3670.647621154785,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "I already have something similar",
+          "agent_response": "{'text': 'Makes sense. What kind of results are you getting from it each month?', 'latency': 4.546218633651733, 'end_call': False}",
+          "latency_ms": 4546.2377071380615,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Okay, maybe I'll hear you out",
+          "agent_response": "{'text': 'Great. So to put some numbers on it, each site you build can bring in anywhere from five hundred to two thousand a month passively. Most students aim for about ten sites to start. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?', 'latency': 2.7954697608947754, 'end_call': False}",
+          "latency_ms": 2795.475721359253,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Tell me about the requirements",
+          "agent_response": "{'text': \"It's pretty straightforward. You need a computer, internet, and about 5-10 hours a week to start. We handle the tech setup and training. Does that sound manageable for you?\", 'latency': 2.295413017272949, 'end_call': False}",
+          "latency_ms": 2295.419216156006,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        }
+      ],
+      "total_latency": 21865.538358688354,
+      "avg_latency": 2186.5538358688354,
+      "nodes_visited": [
+        "Greeting",
+        "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+        "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+        "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "Deep Objection Handling - Skeptical Path",
+      "messages": [
+        {
+          "user_message": "Hello",
+          "agent_response": "{'text': '{{customer_name}}?', 'latency': 6.103515625e-05, 'end_call': False}",
+          "latency_ms": 0.06556510925292969,
+          "node_id": "2",
+          "node_label": "Greeting"
+        },
+        {
+          "user_message": "This is Sarah",
+          "agent_response": "{'text': 'This is Jake. I was just, um, wondering if you could possibly help me out for a moment?', 'latency': 0.47304654121398926, 'end_call': False}",
+          "latency_ms": 473.0503559112549,
+          "node_id": "1763159750250",
+          "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)"
+        },
+        {
+          "user_message": "This sounds like a scam",
+          "agent_response": "{'text': '<speak>Well, uh<break time=\"300ms\"/> I don\\'t know if you could yet, but, I\\'m calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I\\'m reaching out today specifically?</prosody></speak>', 'latency': 9.965896606445312e-05, 'end_call': False}",
+          "latency_ms": 0.10800361633300781,
+          "node_id": "1763161849799",
+          "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic"
+        },
+        {
+          "user_message": "How do I know this is real?",
+          "agent_response": "{'text': \"I get that concern completely\u2014plenty of people feel the same way at first. We've helped over 7,500 students build real Google lead gen sites averaging $1,500 a month per site. What specifically would help put your mind at ease?\", 'latency': 1.5541164875030518, 'end_call': False}",
+          "latency_ms": 1554.1200637817383,
+          "node_id": "1763161961589",
+          "node_label": "Node ID: N003B_DeframeInitialObjection_V7_GoalOriented"
+        },
+        {
+          "user_message": "Do you have any proof this works?",
+          "agent_response": "{'text': \"Absolutely, and that's a smart question. We've got over 7,500 students in our Facebook group sharing real results\u2014like sites pulling in $1,000 to $3,000 a month passively from Google leads. What would convince you this is legit?\", 'latency': 2.4786198139190674, 'end_call': False}",
+          "latency_ms": 2478.6252975463867,
+          "node_id": "1763163400676",
+          "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive"
+        },
+        {
+          "user_message": "I've been burned before",
+          "agent_response": "{'text': \"I hear you\u2014that's exactly why we focus on real results with over 7,500 students who've built proven Google lead gen sites. To put numbers on it, each site earns $500 to $2,000 monthly passively, and most aim for 10+ to start. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?\", 'latency': 1.8831408023834229, 'end_call': False}",
+          "latency_ms": 1883.1470012664795,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Why should I trust you?",
+          "agent_response": "{'text': \"I totally get being cautious after getting burned. We've got thousands of real student results in our public Facebook group\u2014sites earning $1k-$3k/month passively from Google leads. What one thing from there would help build your trust?\", 'latency': 2.0045323371887207, 'end_call': False}",
+          "latency_ms": 2004.5380592346191,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "What's the catch?",
+          "agent_response": "{'text': \"No catch\u2014it's straightforward work building Google lead sites that local businesses pay monthly for exclusive leads. We've got over 7,500 students doing it, averaging $1,500 per site. So, are you working for someone right now or running your own thing?\", 'latency': 1.719224452972412, 'end_call': False}",
+          "latency_ms": 1719.2308902740479,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Tell me about the success stories",
+          "agent_response": "{'text': \"Sure, one standout is a teacher who built 12 sites in her spare time, now pulling $18k a month passively from Google leads\u2014quit her job last year. We've got tons more like that in our public Facebook group with over 7,500 students. So, are you currently working a traditional job, or more on the entrepreneurial side?\", 'latency': 1.6455419063568115, 'end_call': False}",
+          "latency_ms": 1645.5483436584473,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Alright, I'm listening",
+          "agent_response": "{'text': 'Alright, love that! So, are you working for someone right now or do you run your own business?', 'latency': 1.4743852615356445, 'end_call': False}",
+          "latency_ms": 1474.3914604187012,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        }
+      ],
+      "total_latency": 13232.82504081726,
+      "avg_latency": 1323.282504081726,
+      "nodes_visited": [
+        "Greeting",
+        "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+        "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+        "Node ID: N003B_DeframeInitialObjection_V7_GoalOriented",
+        "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "Rapid-Fire Mixed Objections",
+      "messages": [
+        {
+          "user_message": "Hello",
+          "agent_response": "{'text': '{{customer_name}}?', 'latency': 7.462501525878906e-05, 'end_call': False}",
+          "latency_ms": 0.07939338684082031,
+          "node_id": "2",
+          "node_label": "Greeting"
+        },
+        {
+          "user_message": "I'm Mike",
+          "agent_response": "{'text': 'This is Jake. I was just, um, wondering if you could possibly help me out for a moment?', 'latency': 0.445559024810791, 'end_call': False}",
+          "latency_ms": 445.56331634521484,
+          "node_id": "1763159750250",
+          "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)"
+        },
+        {
+          "user_message": "I'm busy right now",
+          "agent_response": "{'text': '<speak>Well, uh<break time=\"300ms\"/> I don\\'t know if you could yet, but, I\\'m calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I\\'m reaching out today specifically?</prosody></speak>', 'latency': 0.00011372566223144531, 'end_call': False}",
+          "latency_ms": 0.12254714965820312,
+          "node_id": "1763161849799",
+          "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic"
+        },
+        {
+          "user_message": "And I don't have money",
+          "agent_response": "{'text': 'Okay. What monthly return would make this a smart move?', 'latency': 1.1143081188201904, 'end_call': False}",
+          "latency_ms": 1114.3114566802979,
+          "node_id": "1763162118466",
+          "node_label": "N_Obj_EarlyDismiss_AskShareBackground_V7"
+        },
+        {
+          "user_message": "Plus I don't trust these things",
+          "agent_response": "{'text': '<speak><prosody rate=\"95%\">I get it, it sounds too good to be true. That\\'s exactly why I lead with it.</prosody> <break time=\"300ms\"/> To be clear, we\\'ve taught over 7,500 people this exact model.</speak>', 'latency': 1.8197317123413086, 'end_call': False}",
+          "latency_ms": 1819.7379112243652,
+          "node_id": "1763164359290",
+          "node_label": "N_Obj_EarlyDismiss_DirectValueChallenge_V9_EscalationEnabled"
+        },
+        {
+          "user_message": "What even is this?",
+          "agent_response": "{'text': \"That's the right question. It all starts with the massive number of searches on Google every single minute. Have you ever thought about how that traffic could be turned into income?\", 'latency': 0.7286875247955322, 'end_call': False}",
+          "latency_ms": 728.6932468414307,
+          "node_id": "1763165003393",
+          "node_label": "N_Obj_EarlyDismiss_ConnectToCurrentCall_V5_LeadOut"
+        },
+        {
+          "user_message": "Sounds complicated",
+          "agent_response": "{'text': \"It's actually dead simple. We build basic sites that rank on Google for local services, and they pay you for the leads. Does that sound more doable?\", 'latency': 0.8292250633239746, 'end_call': False}",
+          "latency_ms": 829.2310237884521,
+          "node_id": "1763163400676",
+          "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive"
+        },
+        {
+          "user_message": "I'm not qualified",
+          "agent_response": "{'text': \"That's common to feel. Nobody starts qualified\u2014we teach you the whole process step-by-step, no tech skills needed. To put numbers on it, each site brings in $500 to $2,000 a month passively. Most aim for 10 sites to start. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?\", 'latency': 1.2274322509765625, 'end_call': False}",
+          "latency_ms": 1227.43821144104,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Why me?",
+          "agent_response": "{'text': \"Because you took action by filling out that Facebook ad, which shows you're serious about extra income. So, are you working for someone right now or do you run your own business?\", 'latency': 2.920226573944092, 'end_call': False}",
+          "latency_ms": 2920.2332496643066,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Give me the quick version",
+          "agent_response": "{'text': 'Quick version: We build simple Google-ranking sites for local services. They generate $500-$2k/month passively per site. We teach you everything, no experience needed. Sound worth 15 minutes with my partner Kendrick to see your fit?', 'latency': 1.539954662322998, 'end_call': False}",
+          "latency_ms": 1539.9608612060547,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        }
+      ],
+      "total_latency": 10625.371217727661,
+      "avg_latency": 1062.537121772766,
+      "nodes_visited": [
+        "Greeting",
+        "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+        "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+        "N_Obj_EarlyDismiss_AskShareBackground_V7",
+        "N_Obj_EarlyDismiss_DirectValueChallenge_V9_EscalationEnabled",
+        "N_Obj_EarlyDismiss_ConnectToCurrentCall_V5_LeadOut",
+        "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "Positive Engagement After Objections",
+      "messages": [
+        {
+          "user_message": "Hello",
+          "agent_response": "{'text': '{{customer_name}}?', 'latency': 5.7697296142578125e-05, 'end_call': False}",
+          "latency_ms": 0.06198883056640625,
+          "node_id": "2",
+          "node_label": "Greeting"
+        },
+        {
+          "user_message": "This is Jennifer",
+          "agent_response": "{'text': 'This is Jake. I was just, um, wondering if you could possibly help me out for a moment?', 'latency': 0.45453572273254395, 'end_call': False}",
+          "latency_ms": 454.5397758483887,
+          "node_id": "1763159750250",
+          "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)"
+        },
+        {
+          "user_message": "I'm not sure about this",
+          "agent_response": "{'text': '<speak>Well, uh<break time=\"300ms\"/> I don\\'t know if you could yet, but, I\\'m calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I\\'m reaching out today specifically?</prosody></speak>', 'latency': 0.00010156631469726562, 'end_call': False}",
+          "latency_ms": 0.110626220703125,
+          "node_id": "1763161849799",
+          "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic"
+        },
+        {
+          "user_message": "What are the requirements?",
+          "agent_response": "{'text': 'Great question. The main requirements are just a computer with internet and a few hours a week to get started\u2014no tech skills needed, we handle the setup. What part of that stands out to you?', 'latency': 1.512948751449585, 'end_call': False}",
+          "latency_ms": 1512.9520893096924,
+          "node_id": "1763163400676",
+          "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive"
+        },
+        {
+          "user_message": "I'm employed",
+          "agent_response": "{'text': \"Perfect. This is designed for employed folks exactly like you\u2014build sites in your spare time for passive income on top of your job. Does that fit what you're looking for?\", 'latency': 1.1594939231872559, 'end_call': False}",
+          "latency_ms": 1159.5001220703125,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "I make around 75k per year",
+          "agent_response": "{'text': \"Got it, Jennifer\u2014that's solid. Many of our students start right there and add on with this. To give you the full picture, each site we help you build can pull in $500 to $2,000 a month passively. Most aim for about 10 sites to start. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?\", 'latency': 5.1486828327178955, 'end_call': False}",
+          "latency_ms": 5148.688554763794,
+          "node_id": "1763206946898",
+          "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive"
+        },
+        {
+          "user_message": "Yes, I have a vehicle",
+          "agent_response": "{'text': \"Got it. So you're working for someone right now, or do you run your own thing on the side?\", 'latency': 5.407834053039551, 'end_call': False}",
+          "latency_ms": 5407.840251922607,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "I do have some capital available",
+          "agent_response": "{'text': \"That's awesome, Jennifer\u2014having capital ready puts you ahead. So, is your main income from a steady paycheck, or are you running your own business?\", 'latency': 1.5309100151062012, 'end_call': False}",
+          "latency_ms": 1530.916452407837,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "When would this start?",
+          "agent_response": "{'text': \"Great question, Jennifer. We can kick things off as soon as your call with Kendrick this week\u2014he'll walk you through the exact timeline based on your setup. Does tomorrow at 11 AM or Thursday at 2 PM work better for you?\", 'latency': 1.4087188243865967, 'end_call': False}",
+          "latency_ms": 1408.724308013916,
+          "node_id": "1763175810279",
+          "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive"
+        },
+        {
+          "user_message": "Okay, I'm interested in learning more",
+          "agent_response": "{'text': \"Perfect, Jennifer. Let's get you on with Kendrick\u2014he's the one who maps this out exactly for your situation. Tomorrow at 11 AM or Thursday at 2 PM\u2014which works better?\", 'latency': 1.2010607719421387, 'end_call': False}",
+          "latency_ms": 1201.0667324066162,
+          "node_id": "1763176007632",
+          "node_label": "N201A_Employed_AskYearlyIncome_V8_Adaptive"
+        }
+      ],
+      "total_latency": 17824.400901794434,
+      "avg_latency": 1782.4400901794434,
+      "nodes_visited": [
+        "Greeting",
+        "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+        "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+        "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+        "N201A_Employed_AskYearlyIncome_V8_Adaptive"
+      ],
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "agent_id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+  "metrics": {
+    "total_turns": 8,
+    "total_latency": 36.39105516433716,
+    "avg_latency": 4.548881895542145,
+    "min_latency": 1.9800677108764648,
+    "max_latency": 6.672176666259766,
+    "target_latency": 2.0,
+    "turns_met_target": 1,
+    "turns_missed_target": 7
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "true_latency": 1.9800677108764648,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 1.08,
+        "system_overhead": 0.9,
+        "true_latency": 1.98,
+        "audio_playback_info": 0.8
+      },
+      "node_id": "2",
+      "node_label": "Greeting",
+      "response_words": 2,
+      "has_ssml": false,
+      "met_target": true,
+      "timestamp": "2025-11-24T07:45:51.785144"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure, what do you need?",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "true_latency": 2.6802350234985353,
+      "detailed_timing": {
+        "llm_time": 0.06,
+        "tts_generation": 1.72,
+        "system_overhead": 0.9,
+        "true_latency": 2.68,
+        "audio_playback_info": 7.2
+      },
+      "node_id": "1763159750250",
+      "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+      "response_words": 18,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:51.845507"
+    },
+    {
+      "turn": 3,
+      "user_message": "Okay, go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "true_latency": 4.360115871429444,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_generation": 3.46,
+        "system_overhead": 0.9,
+        "true_latency": 4.36,
+        "audio_playback_info": 21.6
+      },
+      "node_id": "1763161849799",
+      "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+      "response_words": 54,
+      "has_ssml": true,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:51.845720"
+    },
+    {
+      "turn": 4,
+      "user_message": "Sounds like a pyramid scheme to me",
+      "agent_response": "Okay, that's a completely fair concern. It sounds like you've seen a lot of programs that might overpromise. What's your biggest fear when you hear about an opportunity like this one?",
+      "true_latency": 4.670614852905274,
+      "detailed_timing": {
+        "llm_time": 1.531,
+        "tts_generation": 2.24,
+        "system_overhead": 0.9,
+        "true_latency": 4.671,
+        "audio_playback_info": 12.4
+      },
+      "node_id": "1763161961589",
+      "node_label": "Node ID: N003B_DeframeInitialObjection_V7_GoalOriented",
+      "response_words": 31,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:53.376467"
+    },
+    {
+      "turn": 5,
+      "user_message": "I've heard this stuff before. Why should I believe you?",
+      "agent_response": "I get it, Mike\u2014plenty of hype out there doesn't deliver. We've actually helped over 7,500 students build real Google lead gen sites averaging $1,500 a month each in passive income. What part of that specifically makes you skeptical?",
+      "true_latency": 5.31547848701477,
+      "detailed_timing": {
+        "llm_time": 1.895,
+        "tts_generation": 2.52,
+        "system_overhead": 0.9,
+        "true_latency": 5.315,
+        "audio_playback_info": 15.2
+      },
+      "node_id": "1763161961589",
+      "node_label": "Node ID: N003B_DeframeInitialObjection_V7_GoalOriented",
+      "response_words": 38,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:55.272086"
+    },
+    {
+      "turn": 6,
+      "user_message": "Fine, I'll listen but make it quick",
+      "agent_response": "Got it, Mike\u2014quick and to the point. In a nutshell, we set up passive income websites that rank on Google for local services, and they produce income for you from the leads. What questions come to mind right away?",
+      "true_latency": 5.23871060371399,
+      "detailed_timing": {
+        "llm_time": 1.779,
+        "tts_generation": 2.56,
+        "system_overhead": 0.9,
+        "true_latency": 5.239,
+        "audio_playback_info": 15.6
+      },
+      "node_id": "1763163400676",
+      "node_label": "N_IntroduceModel_And_AskQuestions_V3_Adaptive",
+      "response_words": 39,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:57.050940"
+    },
+    {
+      "turn": 7,
+      "user_message": "Yeah, I wouldn't mind extra money I guess",
+      "agent_response": "Perfect, Mike. So to put some numbers on it for you, each site you build can bring in anywhere from five hundred to two thousand a month passively. Most of our students aim for about ten sites to start. With that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?",
+      "true_latency": 5.473655948638916,
+      "detailed_timing": {
+        "llm_time": 1.214,
+        "tts_generation": 3.36,
+        "system_overhead": 0.9,
+        "true_latency": 5.474,
+        "audio_playback_info": 23.6
+      },
+      "node_id": "1763206946898",
+      "node_label": "N_KB_Q&A_With_StrategicNarrative_V3_Adaptive",
+      "response_words": 59,
+      "has_ssml": false,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:45:58.264745"
+    },
+    {
+      "turn": 8,
+      "user_message": "I work full time as a sales manager",
+      "agent_response": "<speak><prosody rate=\"110%\" pitch=\"+5st\">Alright, love that!</prosody> <break time=\"300ms\"/> So as a sales manager, are you looking to add this on the side, or eventually go full-time with multiple sites?</speak>",
+      "true_latency": 6.672176666259766,
+      "detailed_timing": {
+        "llm_time": 3.352,
+        "tts_generation": 2.42,
+        "system_overhead": 0.9,
+        "true_latency": 6.672,
+        "audio_playback_info": 11.2
+      },
+      "node_id": "1763175810279",
+      "node_label": "N200_Super_WorkAndIncomeBackground_V3_Adaptive",
+      "response_words": 28,
+      "has_ssml": true,
+      "met_target": false,
+      "timestamp": "2025-11-24T07:46:01.617057"
+    }
+  ]
+}

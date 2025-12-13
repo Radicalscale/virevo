@@ -1,0 +1,113 @@
+{
+  "agent": {
+    "id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+    "name": "JK First Caller-copy",
+    "type": "call_flow"
+  },
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 13.291853666305542,
+    "avg_latency": 4.430617888768514,
+    "target_latency": 3.0,
+    "llm_calls": 3,
+    "tts_generations": 3,
+    "webhook_triggers": 6
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "node_id": "2",
+      "latency": 0.571791410446167,
+      "breakdown": {
+        "turn": 1,
+        "stt_simulation": 0.09023404121398926,
+        "message_processing": 0.0005033016204833984,
+        "llm_call": 0.0005033016204833984,
+        "tts_generation": 0.14,
+        "total": 0.571791410446167,
+        "node": "2"
+      },
+      "audio_file": null,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:21:30.526036"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "node_id": "1763159750250",
+      "latency": 3.326606512069702,
+      "breakdown": {
+        "turn": 2,
+        "stt_simulation": 0.060175418853759766,
+        "message_processing": 0.06301999092102051,
+        "llm_call": 0.06301999092102051,
+        "tts_generation": 0.45999999999999996,
+        "total": 3.326606512069702,
+        "node": "1763159750250"
+      },
+      "audio_file": null,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:21:33.852765"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "node_id": "1763161849799",
+      "latency": 9.393455743789673,
+      "breakdown": {
+        "turn": 3,
+        "stt_simulation": 0.07017302513122559,
+        "message_processing": 0.0007314682006835938,
+        "llm_call": 0.0007314682006835938,
+        "tts_generation": 1.1800000000000002,
+        "total": 9.393455743789673,
+        "node": "1763161849799"
+      },
+      "audio_file": null,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:21:43.246335"
+    }
+  ],
+  "profiling": {
+    "stt_simulation": [
+      0.09023404121398926,
+      0.060175418853759766,
+      0.07017302513122559
+    ],
+    "message_processing": [
+      0.0005033016204833984,
+      0.06301999092102051,
+      0.0007314682006835938
+    ],
+    "llm_call": [
+      0.0005033016204833984,
+      0.06301999092102051,
+      0.0007314682006835938
+    ],
+    "tts_generation": [
+      0.14,
+      0.45999999999999996,
+      1.1800000000000002
+    ],
+    "webhook_processing": [
+      0.020154714584350586,
+      0.02015972137451172,
+      0.020130395889282227,
+      0.020139694213867188,
+      0.020127534866333008,
+      0.020114660263061523
+    ],
+    "node_transition": [],
+    "variable_extraction": [],
+    "total_turn": [
+      0.571791410446167,
+      3.326606512069702,
+      9.393455743789673
+    ]
+  },
+  "audio_files": []
+}

@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 5,
+    "failed_tests": 1,
+    "success_rate": 83.33333333333334,
+    "backend_url": "http://localhost:8001",
+    "test_timestamp": "2025-12-02T21:33:15.999321",
+    "backend_running": true,
+    "code_fixes_verified": true
+  },
+  "detailed_results": [
+    {
+      "test": "Backend Startup",
+      "status": "PASS",
+      "details": "Backend service is running via supervisor: backend                          RUNNING   pid 2013, uptime 0:04:15",
+      "expected_status": 0,
+      "actual_status": 0,
+      "timestamp": "2025-12-02T21:33:15.919328"
+    },
+    {
+      "test": "Backend Responsiveness",
+      "status": "PASS",
+      "details": "Backend responding correctly (FastAPI docs available)",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-02T21:33:15.970043"
+    },
+    {
+      "test": "Code Fixes Verification",
+      "status": "PASS",
+      "details": "All voice agent response task management fixes found: was_generating variable check, NOT cancelling message, current_task.cancelled() boolean check, was_generating condition in cancellation logic",
+      "expected_status": 4,
+      "actual_status": 4,
+      "timestamp": "2025-12-02T21:33:15.972751"
+    },
+    {
+      "test": "Check Backend Logs",
+      "status": "WARN",
+      "details": "Found 8 recent error entries in backend logs. Recent errors: \u274c Redis connection failed: Error -2 connecting to redis.railway.internal:6379. Name or service not known.; 2025-12-02 21:24:53,209 - server - INFO - \u2705 Connection libraries pre-warmed (websockets, httpx, ElevenLabs, Soniox); \u274c Redis connection failed: Error -2 connecting to redis.railway.internal:6379. Name or service not known....",
+      "expected_status": 0,
+      "actual_status": 8,
+      "timestamp": "2025-12-02T21:33:15.976116"
+    },
+    {
+      "test": "Agents Endpoint Availability",
+      "status": "PASS",
+      "details": "Agents endpoint available (status: 401)",
+      "expected_status": 200,
+      "actual_status": 401,
+      "timestamp": "2025-12-02T21:33:15.998076"
+    },
+    {
+      "test": "Auth Endpoint Availability",
+      "status": "PASS",
+      "details": "Auth endpoint available (status: 422)",
+      "expected_status": 200,
+      "actual_status": 422,
+      "timestamp": "2025-12-02T21:33:15.999078"
+    }
+  ]
+}

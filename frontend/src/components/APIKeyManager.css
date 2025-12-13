@@ -1,0 +1,273 @@
+.api-keys-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.api-keys-header {
+  margin-bottom: 32px;
+}
+
+.api-keys-header h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a202c;
+}
+
+.subtitle {
+  color: #718096;
+  font-size: 16px;
+}
+
+.message {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.message-success {
+  background-color: #c6f6d5;
+  color: #22543d;
+  border: 1px solid #9ae6b4;
+}
+
+.message-error {
+  background-color: #fed7d7;
+  color: #742a2a;
+  border: 1px solid #fc8181;
+}
+
+.api-keys-info {
+  background-color: #fff5e1;
+  border: 1px solid #ffd966;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.api-keys-info h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #b45309;
+  font-size: 18px;
+}
+
+.api-keys-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.api-keys-info li {
+  margin-bottom: 8px;
+  color: #92400e;
+}
+
+.api-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.api-service-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s;
+}
+
+.api-service-card.required {
+  border-color: #3182ce;
+}
+
+.api-service-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.service-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.required-badge {
+  background: #3182ce;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.service-description {
+  color: #718096;
+  font-size: 14px;
+  margin: 0;
+}
+
+.status-indicator {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-indicator.active {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.status-indicator.inactive {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+.key-input-section {
+  margin-top: 16px;
+}
+
+.key-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-family: monospace;
+}
+
+.key-input:focus {
+  outline: none;
+  border-color: #3182ce;
+}
+
+.key-input:disabled {
+  background: #f7fafc;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.key-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #3182ce;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2c5282;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #cbd5e0;
+}
+
+.btn-danger {
+  background: #fc8181;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #f56565;
+}
+
+.btn-link {
+  background: transparent;
+  color: #3182ce;
+  padding: 10px 12px;
+}
+
+.btn-link:hover {
+  background: #ebf8ff;
+}
+
+.api-keys-help {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.api-keys-help h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #2d3748;
+  font-size: 18px;
+}
+
+.api-keys-help ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.api-keys-help li {
+  margin-bottom: 12px;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .api-services-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .service-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .key-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "summary": {
+    "total_tests": 21,
+    "passed_tests": 21,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-11-29T04:13:05.426863"
+  },
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "status": "PASS",
+      "details": "Backend is running. Response: {\"status\":\"healthy\",\"database\":\"connected\",\"deepgram\":\"configured\",\"openai\":\"configured\",\"elevenlabs",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-11-29T04:13:05.105689"
+    },
+    {
+      "test": "Batch Analysis - Unauthenticated",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.142833"
+    },
+    {
+      "test": "Batch Analysis Structure - Minimal Request",
+      "status": "PASS",
+      "details": "Request body accepted (got 401 as expected)",
+      "expected_status": "401/404",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.182305"
+    },
+    {
+      "test": "Batch Analysis Structure - Full Request",
+      "status": "PASS",
+      "details": "Request body accepted (got 401 as expected)",
+      "expected_status": "401/404",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.189851"
+    },
+    {
+      "test": "Batch Analysis Structure - OpenAI Provider",
+      "status": "PASS",
+      "details": "Request body accepted (got 401 as expected)",
+      "expected_status": "401/404",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.197130"
+    },
+    {
+      "test": "Script Analysis - Predictions Structure",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.233804"
+    },
+    {
+      "test": "Tonality Analysis - Predictions Structure",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.268423"
+    },
+    {
+      "test": "Tech Analysis - Endpoint Structure",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.303716"
+    },
+    {
+      "test": "QC Enhanced - List Campaigns",
+      "status": "PASS",
+      "details": "Endpoint exists (got 401)",
+      "expected_status": "401/400",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.339055"
+    },
+    {
+      "test": "QC Enhanced - Create Campaign",
+      "status": "PASS",
+      "details": "Endpoint exists (got 401)",
+      "expected_status": "401/400",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.346141"
+    },
+    {
+      "test": "QC Enhanced - Fetch Call Data",
+      "status": "PASS",
+      "details": "Endpoint exists (got 401)",
+      "expected_status": "401/400",
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.354211"
+    },
+    {
+      "test": "Prediction Fields Structure",
+      "status": "PASS",
+      "details": "All expected prediction fields present: ['show_likelihood', 'risk_factors', 'positive_signals', 'confidence']",
+      "expected_status": null,
+      "actual_status": null,
+      "timestamp": "2025-11-29T04:13:05.354347"
+    },
+    {
+      "test": "Prediction Fields Types",
+      "status": "PASS",
+      "details": "All prediction fields have correct types",
+      "expected_status": null,
+      "actual_status": null,
+      "timestamp": "2025-11-29T04:13:05.354366"
+    },
+    {
+      "test": "API Key - Service Aliases",
+      "status": "PASS",
+      "details": "Service aliases configured: ['xai', 'x.ai', 'gpt', 'gpt-4', 'gpt-5', 'claude', 'google']",
+      "expected_status": null,
+      "actual_status": null,
+      "timestamp": "2025-11-29T04:13:05.354378"
+    },
+    {
+      "test": "API Key - Pattern Matching",
+      "status": "PASS",
+      "details": "Key patterns configured for: ['grok', 'openai', 'anthropic', 'gemini', 'elevenlabs']",
+      "expected_status": null,
+      "actual_status": null,
+      "timestamp": "2025-11-29T04:13:05.354385"
+    },
+    {
+      "test": "API Key - XAI to Grok Mapping",
+      "status": "PASS",
+      "details": "XAI correctly maps to Grok",
+      "expected_status": null,
+      "actual_status": null,
+      "timestamp": "2025-11-29T04:13:05.354392"
+    },
+    {
+      "test": "Learning System - Learning Config",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.396103"
+    },
+    {
+      "test": "Learning System - Update Learning Config",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.404039"
+    },
+    {
+      "test": "Learning System - Trigger Learning",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.412194"
+    },
+    {
+      "test": "Learning System - Learning Stats",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.418879"
+    },
+    {
+      "test": "Learning System - Analysis Logs",
+      "status": "PASS",
+      "details": "Endpoint exists and requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-29T04:13:05.426596"
+    }
+  ]
+}

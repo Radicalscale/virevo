@@ -1,0 +1,20 @@
+BUILD VERIFICATION FILE
+======================
+
+This file helps verify Netlify is deploying latest code.
+
+Build Date: 2025-11-13
+Build Time: 12:30 UTC
+Change Made: Removed /api from api.js Line 4
+Test Added: Red banner in App.js showing build timestamp
+
+If you can read this file at https://li-ai.org/BUILD_INFO.txt
+then Netlify IS deploying from GitHub.
+
+If this file doesn't exist or shows old date,
+then Netlify is NOT deploying latest code!
+
+Expected behavior after this deploy:
+- Red banner at top of page with current date/time
+- Browser console shows: "API baseURL: https://api.li-ai.org" (no /api)
+- Network requests go to: /api/settings/api-keys (single /api, not double)

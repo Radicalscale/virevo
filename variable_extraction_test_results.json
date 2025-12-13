@@ -1,0 +1,125 @@
+{
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 4,
+    "failed_tests": 10,
+    "success_rate": 28.57142857142857,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "agent_id": "bbeda238-e8d9-4d8c-b93b-1b7694581adb",
+    "test_timestamp": "2025-12-08T14:17:54.986554"
+  },
+  "detailed_results": [
+    {
+      "test": "Authentication - Login",
+      "status": "PASS",
+      "details": "Successfully logged in with agent owner account: kendrickbowman9@gmail.com",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-08T14:17:41.728434"
+    },
+    {
+      "test": "Agent Exists",
+      "status": "PASS",
+      "details": "Agent found: JK First Caller-optimizer3 with 65 flow nodes",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-08T14:17:41.930295"
+    },
+    {
+      "test": "Start Test Session",
+      "status": "PASS",
+      "details": "Test session started: 4c2dcb26...",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-08T14:17:42.081630"
+    },
+    {
+      "test": "Income Extraction (60k) - Message 1",
+      "status": "FAIL",
+      "details": "Incorrect or missing employed_yearly_income extraction",
+      "expected": 60000,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:42.216415"
+    },
+    {
+      "test": "Income Extraction (60k) - Message 2",
+      "status": "FAIL",
+      "details": "Incorrect or missing employed_yearly_income extraction",
+      "expected": 60000,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:43.442211"
+    },
+    {
+      "test": "Income Extraction (60k) - Message 3",
+      "status": "FAIL",
+      "details": "Incorrect or missing employed_yearly_income extraction",
+      "expected": 60000,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:45.794776"
+    },
+    {
+      "test": "Income Extraction (60k) - Message 4",
+      "status": "FAIL",
+      "details": "Incorrect or missing employed_yearly_income extraction",
+      "expected": 60000,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:47.706194"
+    },
+    {
+      "test": "Logic Split Evaluation",
+      "status": "FAIL",
+      "details": "amount_reference not set correctly for logic split test",
+      "expected": 5000,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:47.941262"
+    },
+    {
+      "test": "Income Format Test 1",
+      "status": "FAIL",
+      "details": "'I make 50k' extraction/calculation failed",
+      "expected": "yearly: 50000, monthly: 4167",
+      "actual": "yearly: None, monthly: None",
+      "timestamp": "2025-12-08T14:17:50.396798"
+    },
+    {
+      "test": "Income Format Test 2",
+      "status": "FAIL",
+      "details": "'My income is $75,000 annually' extraction/calculation failed",
+      "expected": "yearly: 75000, monthly: 6250",
+      "actual": "yearly: None, monthly: None",
+      "timestamp": "2025-12-08T14:17:51.908345"
+    },
+    {
+      "test": "Income Format Test 3",
+      "status": "FAIL",
+      "details": "'I earn about eighty thousand per year' extraction/calculation failed",
+      "expected": "yearly: 80000, monthly: 6667",
+      "actual": "yearly: None, monthly: None",
+      "timestamp": "2025-12-08T14:17:53.337202"
+    },
+    {
+      "test": "Income Format Test 4",
+      "status": "FAIL",
+      "details": "'My salary is 45000' extraction/calculation failed",
+      "expected": "yearly: 45000, monthly: 3750",
+      "actual": "yearly: None, monthly: None",
+      "timestamp": "2025-12-08T14:17:54.901687"
+    },
+    {
+      "test": "Various Income Formats - Overall",
+      "status": "FAIL",
+      "details": "Only 0/4 income format tests passed",
+      "expected": 4,
+      "actual": 0,
+      "timestamp": "2025-12-08T14:17:54.901815"
+    },
+    {
+      "test": "Session Cleanup",
+      "status": "PASS",
+      "details": "Test session 4c2dcb26... cleaned up",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-12-08T14:17:54.986281"
+    }
+  ]
+}

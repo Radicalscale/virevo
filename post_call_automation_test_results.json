@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 6,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-12-03T08:51:01.613580"
+  },
+  "detailed_results": [
+    {
+      "test": "MongoDB Setup",
+      "status": "PASS",
+      "details": "Connected to MongoDB database: test_database",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-12-03T08:51:00.732868"
+    },
+    {
+      "test": "Authentication",
+      "status": "PASS",
+      "details": "Successfully authenticated as kendrickbowman9@gmail.com",
+      "expected": 200,
+      "actual": 200,
+      "timestamp": "2025-12-03T08:51:01.129854"
+    },
+    {
+      "test": "Debug Endpoint - QC Enabled Call",
+      "status": "PASS",
+      "details": "All required steps present: ['find_call', 'check_agent_qc_settings', 'trigger_campaign_qc', 'trigger_crm_update'], Status: success",
+      "expected": "success",
+      "actual": "success",
+      "timestamp": "2025-12-03T08:51:01.376786"
+    },
+    {
+      "test": "QC Automation Verification",
+      "status": "PASS",
+      "details": "All QC fields verified: auto_analyzed=True, tech_qc has overall_performance, script_qc has 6 analyses, tonality_qc has 6 analyses",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-12-03T08:51:01.433799"
+    },
+    {
+      "test": "CRM Lead Verification",
+      "status": "PASS",
+      "details": "Lead verified: total_calls=6, last_contact=2025-12-03 08:51:01.402000, source=outbound_call",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-12-03T08:51:01.470736"
+    },
+    {
+      "test": "Debug Endpoint - No Auto-QC Call",
+      "status": "PASS",
+      "details": "Correct behavior: find_call=success, auto_qc_enabled=false, campaign_qc=skipped, crm_update=triggered",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-12-03T08:51:01.613242"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-11-30T17:46:42.659194"
+  },
+  "detailed_results": [
+    {
+      "test": "Authentication",
+      "status": "PASS",
+      "details": "Logged in with test@preview.emergentagent.com",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:46:42.408133"
+    },
+    {
+      "test": "List Agents",
+      "status": "PASS",
+      "details": "Found 3 agents",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:46:42.486591"
+    },
+    {
+      "test": "Find Suitable Agent",
+      "status": "PASS",
+      "details": "Agent 'Transitioner Strawbanana' has 5 nodes, 3 with transitions",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:46:42.487448"
+    },
+    {
+      "test": "Start Session with Node",
+      "status": "PASS",
+      "details": "Session started with start_node_id: 2",
+      "expected": "2",
+      "actual": "2",
+      "timestamp": "2025-11-30T17:46:42.611464"
+    },
+    {
+      "test": "Response from Next Node (not start)",
+      "status": "PASS",
+      "details": "Response came from Banana Path, not start node",
+      "expected": "Not 2",
+      "actual": "3",
+      "timestamp": "2025-11-30T17:46:42.658856"
+    },
+    {
+      "test": "Current Node ID Correct",
+      "status": "PASS",
+      "details": "Transitioned to expected node Banana Path",
+      "expected": "3",
+      "actual": "3",
+      "timestamp": "2025-11-30T17:46:42.658870"
+    },
+    {
+      "test": "Transition Test Result Correct",
+      "status": "PASS",
+      "details": "Transition test shows FROM Greeting TO Banana Path",
+      "expected": "FROM 2 TO 3",
+      "actual": "FROM 2 TO 3",
+      "timestamp": "2025-11-30T17:46:42.658879"
+    },
+    {
+      "test": "Transition Success Flag",
+      "status": "PASS",
+      "details": "Transition marked as successful",
+      "expected": "True",
+      "actual": "True",
+      "timestamp": "2025-11-30T17:46:42.658887"
+    },
+    {
+      "test": "Conversation History Node Correct",
+      "status": "PASS",
+      "details": "Last conversation turn shows correct node: Banana Path",
+      "expected": "3",
+      "actual": "3",
+      "timestamp": "2025-11-30T17:46:42.658896"
+    }
+  ]
+}

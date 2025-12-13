@@ -1,0 +1,236 @@
+import React, { useState, useEffect } from 'react';
+import { Settings, Key, Save, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+const APIKeyManager = () => {
+  const [apiKeys, setApiKeys] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState({});
+  const [testing, setTesting] = useState({});
+  const [testResults, setTestResults] = useState({});
+  
+  const services = [
+    { name: 'openai', label: 'OpenAI', description: 'GPT models for conversation' },
+    { name: 'deepgram', label: 'Deepgram', description: 'Speech-to-text transcription' },
+    { name: 'elevenlabs', label: 'ElevenLabs', description: 'Text-to-speech voice synthesis' },
+    { name: 'cartesia', label: 'Cartesia Sonic', description: 'Ultra-low latency TTS (40-90ms TTFB)' },
+    { name: 'grok', label: 'Grok (xAI)', description: 'Alternative LLM provider' },
+    { name: 'hume', label: 'Hume AI', description: 'Emotional voice synthesis' },
+  ];
+  
+  const [keyInputs, setKeyInputs] = useState(
+    services.reduce((acc, service) => ({ ...acc, [service.name]: '' }), {})
+  );
+
+  useEffect(() => {
+    fetchAPIKeys();
+  }, []);
+
+  const fetchAPIKeys = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/settings/api-keys`);
+      const data = await response.json();
+      setApiKeys(data);
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+    }
+    setLoading(false);
+  };
+
+  const saveAPIKey = async (serviceName) => {
+    const apiKey = keyInputs[serviceName];
+    if (!apiKey || !apiKey.trim()) {
+      alert('Please enter an API key');
+      return;
+    }
+
+    setSaving({ ...saving, [serviceName]: true });
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/settings/api-keys`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_name: serviceName,
+          api_key: apiKey.trim()
+        })
+      });
+      
+      if (response.ok) {
+        await fetchAPIKeys();
+        setKeyInputs({ ...keyInputs, [serviceName]: '' });
+        alert(`API key for ${serviceName} saved successfully!`);
+      } else {
+        alert('Failed to save API key');
+      }
+    } catch (error) {
+      console.error('Error saving API key:', error);
+      alert('Error saving API key');
+    }
+    setSaving({ ...saving, [serviceName]: false });
+  };
+
+  const testAPIKey = async (serviceName) => {
+    setTesting({ ...testing, [serviceName]: true });
+    setTestResults({ ...testResults, [serviceName]: null });
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/settings/api-keys/test/${serviceName}`, {
+        method: 'POST'
+      });
+      const result = await response.json();
+      setTestResults({ ...testResults, [serviceName]: result });
+    } catch (error) {
+      console.error('Error testing API key:', error);
+      setTestResults({ ...testResults, [serviceName]: { valid: false, error: error.message } });
+    }
+    setTesting({ ...testing, [serviceName]: false });
+  };
+
+  const deleteAPIKey = async (serviceName) => {
+    if (!window.confirm(`Are you sure you want to delete the API key for ${serviceName}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/settings/api-keys/${serviceName}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await fetchAPIKeys();
+        setTestResults({ ...testResults, [serviceName]: null });
+        alert(`API key for ${serviceName} deleted`);
+      }
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      alert('Error deleting API key');
+    }
+  };
+
+  const hasKey = (serviceName) => {
+    return apiKeys.some(key => key.service_name === serviceName && key.has_key);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <Settings className="w-6 h-6" />
+          API Key Management
+        </h2>
+        <p className="text-gray-600 mt-2">
+          Manage API keys for different services. Keys are stored securely and used across all agents.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {services.map((service) => (
+            <div key={service.name} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <Key className="w-5 h-5" />
+                    {service.label}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                </div>
+                {hasKey(service.name) && (
+                  <span className="flex items-center gap-1 text-green-600 text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    Configured
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    placeholder={hasKey(service.name) ? "Enter new key to update" : "Enter API key"}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={keyInputs[service.name]}
+                    onChange={(e) => setKeyInputs({ ...keyInputs, [service.name]: e.target.value })}
+                  />
+                  <button
+                    onClick={() => saveAPIKey(service.name)}
+                    disabled={saving[service.name]}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 flex items-center gap-2"
+                  >
+                    {saving[service.name] ? (
+                      <Loader className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    {hasKey(service.name) ? 'Update' : 'Save'}
+                  </button>
+                </div>
+
+                {hasKey(service.name) && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => testAPIKey(service.name)}
+                      disabled={testing[service.name]}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:bg-gray-50 flex items-center gap-2"
+                    >
+                      {testing[service.name] ? (
+                        <Loader className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4" />
+                      )}
+                      Test Key
+                    </button>
+                    <button
+                      onClick={() => deleteAPIKey(service.name)}
+                      className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 flex items-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                )}
+
+                {testResults[service.name] && (
+                  <div className={`p-3 rounded-lg flex items-center gap-2 ${
+                    testResults[service.name].valid 
+                      ? 'bg-green-50 text-green-800' 
+                      : 'bg-red-50 text-red-800'
+                  }`}>
+                    {testResults[service.name].valid ? (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        <span>{testResults[service.name].message}</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-5 h-5" />
+                        <span>Invalid: {testResults[service.name].error}</span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h4 className="font-semibold text-yellow-800 mb-2">Security Note</h4>
+        <p className="text-sm text-yellow-700">
+          API keys are stored in the database. In production, ensure your database is properly secured 
+          and consider encrypting sensitive data. Keys stored here are used as defaults but can be 
+          overridden in agent-specific settings if needed.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default APIKeyManager;

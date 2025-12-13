@@ -1,0 +1,252 @@
+[
+  {
+    "test": "objection_on_questions_node",
+    "passed": false,
+    "repeated": false,
+    "handled_objection": false,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Hello, this is [Your Company] calling. How can I assist you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Yes, go ahead",
+        "agent": "Well, uh... I don't know if you could yet, but I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?",
+        "node": "4",
+        "node_type": "conversation"
+      },
+      {
+        "user": "I don't know, what is this some kind of marketing scam?",
+        "agent": "I totally get why you'd think that\u2014cold calls can feel sketchy sometimes. What's your biggest worry about this being a scam?",
+        "node": "7",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "objection_at_introduce_model",
+    "passed": true,
+    "repeated": false,
+    "repeated_script": false,
+    "current_node": "7",
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Hello, this is [Your Name] from [Company]. How can I assist you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Yeah, tell me",
+        "agent": "Well, uh... I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?",
+        "node": "4",
+        "node_type": "conversation"
+      },
+      {
+        "user": "I don't know, what is this some kind of marketing scam? Hello?",
+        "agent": "I get why you'd think that\u2014cold calls can feel sketchy sometimes. What's your biggest worry here, that it might not be legit or something else?",
+        "node": "7",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "vague_response",
+    "passed": true,
+    "repeated": false,
+    "sought_clarification": true,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Hello, TestUser. How can I help you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Yes",
+        "agent": "Well, uh... I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?",
+        "node": "4",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Hmm, I'm not sure",
+        "agent": "I totally get the hesitation\u2014cold calls can feel random. In a nutshell, we set up passive income websites that generate revenue for you through ads and affiliates once they're running, without you needing to clock in extra hours. What questions come to mind right away when you hear that?",
+        "node": "5",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "off_topic_response",
+    "passed": true,
+    "repeated": false,
+    "redirected": true,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Great, thanks for confirming. How can I assist you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "Thanks, I appreciate that. I was just, um, wondering if you could possibly help me out for a moment?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Yes",
+        "agent": "Well, uh... I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?",
+        "node": "4",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Is this about timeshares?",
+        "agent": "No, not about timeshares at all. In a nutshell, we set up passive income websites that generate earnings for you through ads and affiliates once they're running\u2014no ongoing hours required. What questions come to mind when you hear something like that?",
+        "node": "5",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "multiple_objections_sequence",
+    "passed": true,
+    "repeated": false,
+    "handled_time_objection": false,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Great, thanks for confirming. How can I help you this early morning?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "Well, I appreciate that. It's about a quick issue with my account\u2014mind if I give you a bit more detail?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Yes",
+        "agent": "Well, uh... I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?",
+        "node": "4",
+        "node_type": "conversation"
+      },
+      {
+        "user": "This sounds like a scam",
+        "agent": "I totally get why it might feel that way\u2014cold calls can be sketchy sometimes. What's your biggest worry here, like is it about how we got your info or something else?",
+        "node": "7",
+        "node_type": "conversation"
+      },
+      {
+        "user": "I don't have time for this",
+        "agent": "I respect that\u2014sounds like this isn't a good fit right now. Just so I understand, is it that you're not looking to increase income at the moment, or is there something specific about this that doesn't work for you?",
+        "node": "8",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "flow_order",
+    "passed": false,
+    "consecutive_same_node": true,
+    "nodes_visited": [
+      "2",
+      "100",
+      "100",
+      "100"
+    ],
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Great, thanks for confirming. How can I help you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure, what's up",
+        "agent": "My apologies, it seems I have the wrong number. Have a good day.",
+        "node": "100",
+        "node_type": "ending"
+      },
+      {
+        "user": "Yes, go ahead",
+        "agent": "My apologies, it seems I have the wrong number. Have a good day.",
+        "node": "100",
+        "node_type": "ending"
+      },
+      {
+        "user": "How does it work?",
+        "agent": "My apologies, it seems I have the wrong number. Have a good day.",
+        "node": "100",
+        "node_type": "ending"
+      }
+    ]
+  },
+  {
+    "test": "no_recall_objection",
+    "passed": true,
+    "repeated": false,
+    "handled_no_recall": true,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Hi, this is [Your Name] from [Company]. How can I help you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "Sure",
+        "agent": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+        "node": "3",
+        "node_type": "conversation"
+      },
+      {
+        "user": "I don't remember clicking any ad",
+        "agent": "No problem - it's about building income without working more hours. Is that something you're focused on?",
+        "node": "4",
+        "node_type": "conversation"
+      }
+    ]
+  },
+  {
+    "test": "not_interested",
+    "passed": true,
+    "repeated": false,
+    "attempted_recovery": false,
+    "conversation": [
+      {
+        "user": "Yes",
+        "agent": "Great, thanks for confirming. How can I help you today?",
+        "node": "2",
+        "node_type": "conversation"
+      },
+      {
+        "user": "I'm not interested",
+        "agent": "Oh, no worries at all. Have a good one!",
+        "node": "3",
+        "node_type": "conversation"
+      }
+    ]
+  }
+]

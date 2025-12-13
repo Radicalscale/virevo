@@ -1,0 +1,1333 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Card } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { agentAPI } from '../services/api';
+import { useToast } from '../hooks/use-toast';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+const WebCaller = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const [agent, setAgent] = useState(null);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+  const [callDuration, setCallDuration] = useState(0);
+  const [transcript, setTranscript] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Refs for WebSocket and audio
+  const deepgramWsRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const processorNodeRef = useRef(null);
+  const isCallActiveRef = useRef(false);
+  const sessionRef = useRef(null);
+  const audioQueueRef = useRef([]);
+  const isPlayingRef = useRef(false);
+
+  useEffect(() => {
+    fetchAgent();
+    return () => {
+      endCall();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    let interval;
+    if (isCallActive) {
+      interval = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isCallActive]);
+
+  const fetchAgent = async () => {
+    try {
+      const response = await agentAPI.get(id);
+      setAgent(response.data);
+    } catch (error) {
+      console.error('Error fetching agent:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load agent",
+        variant: "destructive"
+      });
+    }
+  };
+
+
+  const startCall = async () => {
+    try {
+      console.log('📞 Starting WebSocket-based call...');
+      
+      // Create session with backend
+      const sessionResponse = await fetch(`${BACKEND_URL}/api/agents/${id}/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: '' }) // Initial session
+      });
+      
+      if (!sessionResponse.ok) {
+        throw new Error('Failed to create session');
+      }
+      
+      const sessionData = await sessionResponse.json();
+      sessionRef.current = sessionData.session_id;
+      
+      setIsCallActive(true);
+      isCallActiveRef.current = true;
+      
+      // Get initial greeting if agent speaks first
+      if (sessionData.text) {
+        addTranscript('agent', sessionData.text);
+        await playAudioResponse(sessionData.text);
+      }
+      
+      // Request microphone access
+      console.log('🎤 Requesting microphone access...');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          sampleRate: 16000,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+      
+      console.log('✅ Microphone access granted!');
+      mediaStreamRef.current = stream;
+      
+      // Connect to Deepgram WebSocket for real-time transcription
+      const wsUrl = `${BACKEND_URL.replace('http', 'ws')}/api/deepgram-live`;
+      const ws = new WebSocket(wsUrl);
+      deepgramWsRef.current = ws;
+      
+      ws.onopen = () => {
+        console.log('✅ Connected to Deepgram WebSocket');
+        
+        // Start sending audio stream
+        const audioContext = new AudioContext({ sampleRate: 16000 });
+        audioContextRef.current = audioContext;
+        
+        const source = audioContext.createMediaStreamSource(stream);
+        const processor = audioContext.createScriptProcessor(4096, 1, 1);
+        processorNodeRef.current = processor;
+        
+        source.connect(processor);
+        processor.connect(audioContext.destination);
+        
+        processor.onaudioprocess = (e) => {
+          if (ws.readyState === WebSocket.OPEN && !isMuted) {
+            const inputData = e.inputBuffer.getChannelData(0);
+            // Convert Float32Array to Int16Array for Deepgram
+            const int16Data = new Int16Array(inputData.length);
+            for (let i = 0; i < inputData.length; i++) {
+              int16Data[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+            }
+            ws.send(int16Data.buffer);
+          }
+        };
+      };
+      
+      ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'config') {
+          console.log('⚙️ Deepgram config:', data.config);
+          return;
+        }
+        
+        // Handle transcription results
+        if (data.channel && data.channel.alternatives && data.channel.alternatives[0]) {
+          const transcript_text = data.channel.alternatives[0].transcript;
+          const is_final = data.is_final;
+          const speech_final = data.speech_final;
+          
+          if (speech_final && transcript_text) {
+            console.log('💬 Final transcript:', transcript_text);
+            addTranscript('user', transcript_text);
+            
+            // Get AI response
+            await getAIResponse(transcript_text);
+          }
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('❌ WebSocket error:', error);
+      };
+      
+      ws.onclose = () => {
+        console.log('🔌 Deepgram WebSocket closed');
+      };
+      
+      toast({
+        title: "Call Active! 🎙️",
+        description: "Speak naturally - AI will respond in real-time"
+      });
+      
+    } catch (error) {
+      console.error('Error starting call:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start call",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const addTranscript = (speaker, text) => {
+    setTranscript(prev => [...prev, {
+      speaker,
+      text,
+      timestamp: new Date()
+    }]);
+  };
+  
+  const getAIResponse = async (userText) => {
+    if (!userText || isProcessing) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/agents/${id}/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userText,
+          session_id: sessionRef.current
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+      
+      const data = await response.json();
+      
+      if (data.text) {
+        addTranscript('agent', data.text);
+        await playAudioResponse(data.text);
+      }
+      
+      // Check if call should end
+      if (data.should_end_call) {
+        console.log('📞 AI requested call end');
+        setTimeout(() => endCall(), 2000);
+      }
+      
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const playAudioResponse = async (text) => {
+    try {
+      // Generate TTS audio
+      const response = await fetch(`${BACKEND_URL}/api/text-to-speech`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, agent_id: id })
+      });
+      
+      if (!response.ok) {
+        console.error('TTS generation failed');
+        return;
+      }
+      
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Play audio
+      const audio = new Audio(audioUrl);
+      audio.volume = isSpeakerOn ? 1.0 : 0.0;
+      
+      await audio.play();
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
+  };
+
+  const endCall = () => {
+    console.log('📞 Ending call...');
+    
+    isCallActiveRef.current = false;
+    setIsCallActive(false);
+    
+    // Close WebSocket
+    if (deepgramWsRef.current) {
+      deepgramWsRef.current.close();
+      deepgramWsRef.current = null;
+    }
+    
+    // Stop microphone
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+    
+    // Stop audio context
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    
+    if (processorNodeRef.current) {
+      processorNodeRef.current.disconnect();
+      processorNodeRef.current = null;
+    }
+    
+    setCallDuration(0);
+    sessionRef.current = null;
+    
+    toast({
+      title: "Call Ended",
+      description: "Call has been terminated"
+    });
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    toast({
+      title: isMuted ? "Microphone On" : "Microphone Muted",
+      description: isMuted ? "You can speak now" : "Your microphone is muted"
+    });
+  };
+
+  const toggleSpeaker = () => {
+    setIsSpeakerOn(!isSpeakerOn);
+  };
+
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-950">
+      {/* Header */}
+      <div className="border-b border-gray-800 bg-gray-900 p-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/agents')}
+              className="text-gray-400 hover:text-white"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-white">{agent?.name || 'Agent'}</h1>
+              <p className="text-sm text-gray-400">Web Call Tester</p>
+            </div>
+          </div>
+          <Badge variant={isCallActive ? "default" : "secondary"} className="bg-green-600 text-white">
+            {isCallActive ? 'Active' : 'Ready'}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full p-6">
+        {/* Call Controls */}
+        <Card className="bg-gray-900 border-gray-800 p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-4">
+              {!isCallActive ? (
+                <Button
+                  size="lg"
+                  onClick={startCall}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  disabled={!agent}
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  Start Call
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    size="lg"
+                    onClick={endCall}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <PhoneOff className="w-5 h-5 mr-2" />
+                    End Call
+                  </Button>
+                  <Button
+                    variant={isMuted ? "destructive" : "secondary"}
+                    size="lg"
+                    onClick={toggleMute}
+                  >
+                    {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </Button>
+                  <Button
+                    variant={isSpeakerOn ? "secondary" : "destructive"}
+                    size="lg"
+                    onClick={toggleSpeaker}
+                  >
+                    {isSpeakerOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                  </Button>
+                </>
+              )}
+            </div>
+            
+            {isCallActive && (
+              <div className="text-right">
+                <div className="text-2xl font-mono text-white">{formatDuration(callDuration)}</div>
+                <div className="text-sm text-gray-400">Duration</div>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Transcript */}
+        <Card className="bg-gray-900 border-gray-800 flex-1 p-6 overflow-auto">
+          <h2 className="text-lg font-semibold text-white mb-4">Conversation</h2>
+          <div className="space-y-4">
+            {transcript.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">
+                {isCallActive ? 'Listening...' : 'Start a call to begin conversation'}
+              </p>
+            ) : (
+              transcript.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`flex ${msg.speaker === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[70%] p-3 rounded-lg ${
+                      msg.speaker === 'user'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-100'
+                    }`}
+                  >
+                    <div className="text-xs opacity-70 mb-1">
+                      {msg.speaker === 'user' ? 'You' : agent?.name || 'Agent'}
+                    </div>
+                    <div>{msg.text}</div>
+                    <div className="text-xs opacity-50 mt-1">
+                      {msg.timestamp.toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default WebCaller;
+
+      setIsCallActive(true);
+      isCallActiveRef.current = true;
+      isEndingRef.current = false; // Reset ending flag for new call
+      
+      // Initialize voice recording
+      console.log('🎤 Requesting microphone access...');
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            channelCount: 1,
+            sampleRate: 16000,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
+        
+        console.log('✅ Microphone access granted!');
+        mediaStreamRef.current = stream;
+        
+        // Start MediaRecorder for voice activity
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus'
+        });
+        
+        mediaRecorderRef.current = mediaRecorder;
+        let audioChunks = [];
+        let silenceTimeout = null;
+        let isRecording = false;
+        
+        // Simple VAD using volume detection
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+        
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        // Get VAD settings from agent configuration
+        const speechThreshold = agent.settings?.vad_speech_threshold || 20;
+        const silenceThreshold = agent.settings?.vad_silence_threshold || 15;
+        const silenceTimeoutMs = agent.settings?.vad_silence_timeout || 500;
+        
+        console.log('🎚️ [VAD SETTINGS]');
+        console.log('  ├─ Speech threshold:', speechThreshold);
+        console.log('  ├─ Silence threshold:', silenceThreshold);
+        console.log('  └─ Silence timeout:', silenceTimeoutMs, 'ms');
+        
+        let speechStartTime = null;
+        let silenceStartTime = null;
+        
+        const checkAudioLevel = () => {
+          if (!isCallActiveRef.current) return;
+          
+          analyser.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          
+          // Speech detected
+          if (average > speechThreshold && !isRecording) {
+            speechStartTime = Date.now();
+            console.log('🎤 [SPEECH DETECTED] Volume:', average.toFixed(2), '| Threshold:', speechThreshold);
+            isRecording = true;
+            audioChunks = [];
+            mediaRecorder.start(100);
+            
+            setTranscript(prev => [...prev, {
+              speaker: 'user',
+              text: '🎤 Listening...',
+              timestamp: new Date(),
+              isTemp: true
+            }]);
+            
+            clearTimeout(silenceTimeout);
+            silenceStartTime = null;
+          }
+          
+          // Silence detected
+          if (average < silenceThreshold && isRecording) {
+            if (!silenceStartTime) {
+              silenceStartTime = Date.now();
+              console.log('🔇 [SILENCE STARTED] Volume:', average.toFixed(2), '| Waiting', silenceTimeoutMs, 'ms...');
+            }
+            
+            clearTimeout(silenceTimeout);
+            silenceTimeout = setTimeout(() => {
+              if (isRecording) {
+                const speechDuration = ((Date.now() - speechStartTime) / 1000).toFixed(2);
+                console.log('⏹️ [STOPPING RECORDING] Speech duration:', speechDuration, 's');
+                isRecording = false;
+                mediaRecorder.stop();
+              }
+            }, silenceTimeoutMs);
+          }
+          
+          requestAnimationFrame(checkAudioLevel);
+        };
+        
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+        
+        mediaRecorder.onstop = async () => {
+          const stopTime = Date.now();
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+          console.log('📦 [RECORDING STOPPED]');
+          console.log('  └─ Audio size:', audioBlob.size, 'bytes');
+          console.log('  └─ Chunks collected:', audioChunks.length);
+          
+          if (audioBlob.size > 1000) {
+            console.log('✅ [PROCESSING AUDIO] Starting pipeline...');
+            // Remove listening indicator
+            setTranscript(prev => prev.filter(t => !t.isTemp));
+            
+            // Process the audio
+            await processAudioMessage(audioBlob);
+          } else {
+            console.warn('⚠️ [AUDIO TOO SMALL] Size:', audioBlob.size, 'bytes - skipping');
+          }
+        };
+        
+        checkAudioLevel();
+        
+        toast({
+          title: "Voice Active!",
+          description: "Speak naturally - AI will respond automatically"
+        });
+        
+      } catch (err) {
+        console.error('❌ Microphone error:', err);
+        
+        let errorMsg = "Microphone not available. You can still use text chat.";
+        
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          errorMsg = "Microphone permission denied. Please allow microphone access and reload.";
+        } else if (err.name === 'NotFoundError') {
+          errorMsg = "No microphone found. Please connect a microphone.";
+        } else if (err.name === 'NotReadableError') {
+          errorMsg = "Microphone is being used by another application.";
+        }
+        
+        toast({
+          title: "Microphone Error",
+          description: errorMsg,
+          variant: "destructive"
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error starting call:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start call",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const processTextMessage = async (userText) => {
+    if (!userText || userText.trim().length === 0 || isProcessing) return;
+    
+    // Block processing if call is ending
+    if (isEndingRef.current) {
+      console.log('⛔ Message blocked - call is ending');
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    try {
+      const startTime = Date.now();
+      
+      // Get AI response
+      // Convert transcript to backend format
+      const conversationHistory = transcript
+        .filter(t => !t.isTemp)
+        .map(t => ({
+          role: t.speaker === 'user' ? 'user' : 'assistant',
+          content: t.text
+        }));
+      
+      console.log('📜 Sending conversation history:', conversationHistory);
+      
+      const llmResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/agents/${id}/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userText,
+          conversation_history: conversationHistory
+        })
+      });
+      
+      if (!llmResponse.ok) {
+        throw new Error(`LLM API error: ${llmResponse.status}`);
+      }
+      
+      const llmData = await llmResponse.json();
+      const agentText = llmData.response;
+      const shouldEndCall = llmData.should_end_call || false;
+      
+      console.log('📨 API Response:', { agentText: agentText.substring(0, 50), shouldEndCall });
+      
+      // Add agent response to transcript
+      setTranscript(prev => {
+        const updated = [...prev, {
+          speaker: 'agent',
+          text: agentText,
+          timestamp: new Date()
+        }];
+        transcriptRef.current = updated; // Keep ref in sync
+        console.log('💾 [SAVED AGENT RESPONSE] New transcript length:', updated.length);
+        return updated;
+      });
+      
+      const responseLatency = ((Date.now() - startTime) / 1000).toFixed(2);
+      setLatency(responseLatency);
+      console.log('⏱️ Response latency:', responseLatency, 's');
+      
+      // Check if call should end (e.g., ending node reached)
+      if (shouldEndCall) {
+        console.log('🛑 End call signal received from backend');
+        isEndingRef.current = true; // Block further message processing
+        
+        toast({
+          title: "Call Ending",
+          description: "The conversation has reached its conclusion.",
+        });
+        // End call after a brief delay to allow final message to be heard
+        setTimeout(async () => {
+          console.log('⏰ 3 seconds elapsed - ending call now');
+          try {
+            await endCall();
+            console.log('✅ Call ended successfully');
+          } catch (error) {
+            console.error('❌ Error ending call:', error);
+            // Force end call even if API fails
+            setIsCallActive(false);
+            isCallActiveRef.current = false;
+          }
+        }, 3000);
+        // Don't play TTS if call is ending
+        return;
+      }
+      
+      // Convert response to speech
+      const ttsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/text-to-speech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: agentText,
+          voice: agent.voice || 'Rachel'
+        })
+      });
+      
+      if (ttsResponse.ok) {
+        const audioArrayBuffer = await ttsResponse.arrayBuffer();
+        const ttsAudioBlob = new Blob([audioArrayBuffer], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(ttsAudioBlob);
+        
+        if (audioElementRef.current) {
+          audioElementRef.current.src = audioUrl;
+          try {
+            await audioElementRef.current.play();
+            console.log('✅ Audio playing');
+          } catch (playError) {
+            console.warn('⚠️ Audio playback failed:', playError);
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error processing message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process message",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const endCall = async () => {
+    setIsCallActive(false);
+    isCallActiveRef.current = false;
+    
+    // Stop all media
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+    
+    if (currentCall) {
+      try {
+        await callAPI.end(currentCall.id, {
+          duration: callDuration,
+          latency: parseFloat(latency) || 0,
+          sentiment: 'neutral',
+          transcript: transcript.filter(t => !t.isTemp)
+        });
+      } catch (error) {
+        console.error('Error ending call:', error);
+      }
+    }
+    
+    setCallDuration(0);
+    setCurrentCall(null);
+    setTranscript([]);
+  };
+
+  const startRecording = () => {
+    if (!mediaRecorderRef.current) {
+      console.error('❌ MediaRecorder not initialized!');
+      toast({
+        title: "Microphone Not Ready",
+        description: "Please ensure microphone permission was granted",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (isRecording) {
+      console.warn('⚠️ Already recording!');
+      return;
+    }
+    
+    console.log('🔴 Manual recording started');
+    console.log('MediaRecorder state:', mediaRecorderRef.current.state);
+    console.log('MediaRecorder mimeType:', mediaRecorderRef.current.mimeType);
+    
+    setIsRecording(true);
+    const chunks = [];
+    
+    const recorder = mediaRecorderRef.current;
+    
+    recorder.ondataavailable = (event) => {
+      console.log('📦 Data available:', event.data.size, 'bytes');
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+    
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: recorder.mimeType });
+      console.log('🛑 Recording stopped');
+      console.log('📊 Total chunks:', chunks.length);
+      console.log('📦 Final blob size:', blob.size, 'bytes');
+      console.log('📦 Blob type:', blob.type);
+      
+      setIsRecording(false);
+      
+      if (blob.size > 1000) {
+        console.log('✅ Blob size OK, processing...');
+        processAudioMessage(blob);
+      } else {
+        console.error('❌ Blob too small:', blob.size, 'bytes');
+        toast({
+          title: "Recording Too Short",
+          description: "Please speak louder or longer",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    try {
+      recorder.start();
+      console.log('🎙️ Recording started successfully');
+      
+      // Auto-stop after 3 seconds
+      setTimeout(() => {
+        console.log('⏰ 3 seconds elapsed, stopping...');
+        if (recorder.state === 'recording') {
+          recorder.stop();
+        } else {
+          console.warn('⚠️ Recorder not in recording state:', recorder.state);
+        }
+      }, 3000);
+    } catch (error) {
+      console.error('❌ Error starting recorder:', error);
+      toast({
+        title: "Recording Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const startRecordingOld = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await processAudioMessage(audioBlob);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setIsMuted(false);
+      
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        title: "Microphone Error",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const processAudioMessage = async (audioBlob) => {
+    // Prevent duplicate processing
+    if (isProcessing) {
+      console.warn('⚠️ Already processing a message, skipping...');
+      return;
+    }
+    
+    // Block processing if call is ending
+    if (isEndingRef.current) {
+      console.log('⛔ Audio message blocked - call is ending');
+      return;
+    }
+    
+    setIsProcessing(true);
+    const pipelineStartTime = Date.now();
+    
+    console.log('='.repeat(80));
+    console.log('🔄 [AUDIO PROCESSING PIPELINE STARTED]');
+    console.log('='.repeat(80));
+    console.log('🔍 [DEBUG] Transcript at START of processAudioMessage:', transcript);
+    console.log('🔍 [DEBUG] Transcript length:', transcript.length);
+    console.log('📊 Audio blob size:', audioBlob.size, 'bytes');
+    console.log('📊 Audio blob type:', audioBlob.type);
+    
+    try {
+      const startTime = Date.now();
+      
+      // STEP 1: Convert audio to text using Deepgram
+      console.log('📤 [STEP 1/4] Sending audio to Deepgram STT...');
+      const sttStartTime = Date.now();
+      
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const sttResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/speech-to-text`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const sttTime = ((Date.now() - sttStartTime) / 1000).toFixed(2);
+      console.log(`✅ [STT COMPLETE] Time: ${sttTime}s | Status: ${sttResponse.status}`);
+      
+      if (!sttResponse.ok) {
+        const errorText = await sttResponse.text();
+        console.error('❌ STT error:', errorText);
+        throw new Error(`STT failed: ${sttResponse.status}`);
+      }
+      
+      const sttData = await sttResponse.json();
+      const userText = sttData.transcript;
+      console.log(`📝 [TRANSCRIPT] "${userText}"`);
+      
+      if (!userText || userText.trim().length === 0) {
+        console.warn('⚠️ [NO SPEECH] Empty transcript received');
+        toast({
+          title: "No Speech Detected",
+          description: "Please try speaking again",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
+      // STEP 2: Get AI response
+      console.log('🤖 [STEP 2/4] Sending to AI (GPT-4.1)...');
+      const llmStartTime = Date.now();
+      
+      // Build conversation history from current transcript (before adding current message)
+      // Use transcriptRef to get the LATEST value, not stale closure
+      const currentTranscript = transcriptRef.current;
+      console.log('📋 [RAW TRANSCRIPT from REF]', currentTranscript);
+      console.log('📋 [TRANSCRIPT LENGTH]', currentTranscript.length);
+      
+      const conversationHistory = currentTranscript
+        .filter(t => !t.isTemp)
+        .map(t => ({
+          role: t.speaker === 'user' ? 'user' : 'assistant',
+          content: t.text
+        }));
+      
+      console.log('📜 [CONVERSATION HISTORY]', conversationHistory);
+      console.log('📜 [HISTORY LENGTH]', conversationHistory.length);
+      
+      // Now add user message to transcript for UI
+      setTranscript(prev => {
+        const updated = [...prev, {
+          speaker: 'user',
+          text: userText,
+          timestamp: new Date()
+        }];
+        transcriptRef.current = updated; // Keep ref in sync
+        return updated;
+      });
+      
+      const llmResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/agents/${id}/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userText,
+          conversation_history: conversationHistory
+        })
+      });
+      
+      const llmTime = ((Date.now() - llmStartTime) / 1000).toFixed(2);
+      console.log(`✅ [AI COMPLETE] Time: ${llmTime}s | Status: ${llmResponse.status}`);
+      
+      if (!llmResponse.ok) {
+        throw new Error(`LLM API error: ${llmResponse.status}`);
+      }
+      
+      const llmData = await llmResponse.json();
+      const agentText = llmData.response;
+      const shouldEndCall = llmData.should_end_call || false;
+      
+      console.log('📨 [API RESPONSE]', { agentText: agentText.substring(0, 50), shouldEndCall });
+      console.log(`💬 [AI RESPONSE] "${agentText.substring(0, 100)}${agentText.length > 100 ? '...' : ''}"`);
+      console.log(`  └─ Length: ${agentText.length} characters`);
+      
+      // Add agent response to transcript
+      setTranscript(prev => {
+        const updated = [...prev, {
+          speaker: 'agent',
+          text: agentText,
+          timestamp: new Date()
+        }];
+        transcriptRef.current = updated; // Keep ref in sync
+        console.log('💾 [SAVED AGENT RESPONSE] New transcript length:', updated.length);
+        return updated;
+      });
+      
+      // Check if call should end (e.g., ending node reached)
+      if (shouldEndCall) {
+        console.log('🛑 End call signal received from backend (audio path)');
+        isEndingRef.current = true; // Block further message processing
+        
+        toast({
+          title: "Call Ending",
+          description: "The conversation has reached its conclusion.",
+        });
+        
+        // End call after a brief delay to allow final message to be heard
+        setTimeout(async () => {
+          console.log('⏰ 3 seconds elapsed - ending call now');
+          try {
+            await endCall();
+            console.log('✅ Call ended successfully');
+          } catch (error) {
+            console.error('❌ Error ending call:', error);
+            // Force end call even if API fails
+            setIsCallActive(false);
+            isCallActiveRef.current = false;
+          }
+        }, 3000);
+        
+        // Play the final TTS message before ending
+      }
+      
+      // STEP 3: Convert response to speech
+      console.log('🔊 [STEP 3/4] Generating speech with ElevenLabs...');
+      const ttsStartTime = Date.now();
+      
+      const ttsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/text-to-speech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: agentText,
+          voice: agent.voice || 'Rachel'
+        })
+      });
+      
+      const ttsTime = ((Date.now() - ttsStartTime) / 1000).toFixed(2);
+      console.log(`✅ [TTS COMPLETE] Time: ${ttsTime}s | Status: ${ttsResponse.status}`);
+      
+      if (!ttsResponse.ok) {
+        console.warn('⚠️ TTS failed, continuing without audio...');
+        setIsProcessing(false);
+        const responseLatency = ((Date.now() - startTime) / 1000).toFixed(2);
+        setLatency(responseLatency);
+        return;
+      }
+      
+      const audioArrayBuffer = await ttsResponse.arrayBuffer();
+      console.log(`  └─ Audio size: ${audioArrayBuffer.byteLength} bytes`);
+      
+      // STEP 4: Play the audio
+      console.log('🔊 [STEP 4/4] Playing audio...');
+      const playStartTime = Date.now();
+      
+      const ttsAudioBlob = new Blob([audioArrayBuffer], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(ttsAudioBlob);
+      
+      if (audioElementRef.current) {
+        audioElementRef.current.src = audioUrl;
+        try {
+          await audioElementRef.current.play();
+          const playTime = ((Date.now() - playStartTime) / 1000).toFixed(2);
+          console.log(`✅ [AUDIO PLAYING] Setup time: ${playTime}s`);
+        } catch (playError) {
+          console.error('❌ Audio play error:', playError);
+        }
+      }
+      
+      // Final summary
+      const totalLatency = ((Date.now() - pipelineStartTime) / 1000).toFixed(2);
+      setLatency(totalLatency);
+      
+      console.log('='.repeat(80));
+      console.log('📊 [PIPELINE COMPLETE] Total time:', totalLatency, 's');
+      console.log('  ├─ STT (Deepgram):', sttTime, 's');
+      console.log('  ├─ LLM (GPT):', llmTime, 's');
+      console.log('  ├─ TTS (ElevenLabs):', ttsTime, 's');
+      console.log('  └─ Total:', totalLatency, 's');
+      console.log('='.repeat(80));
+      
+    } catch (error) {
+      console.error('Error processing audio message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process voice message",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isProcessing) return;
+    
+    const userMsg = inputMessage;
+    setInputMessage('');
+    
+    // Add user message to transcript
+    setTranscript(prev => [...prev, {
+      speaker: 'user',
+      text: userMsg,
+      timestamp: new Date()
+    }]);
+    
+    // Process the message using the same logic as voice
+    await processTextMessage(userMsg);
+  };
+
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 p-8">
+      {/* Hidden audio element for TTS playback */}
+      <audio ref={audioElementRef} style={{ display: 'none' }} />
+      
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            onClick={() => navigate('/agents')}
+            variant="ghost"
+            className="text-gray-400 hover:text-white"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {agent ? agent.name : 'Test Agent'}
+            </h1>
+            <p className="text-gray-400">
+              {agent ? agent.description : 'Make a test call to your AI agent'}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Call Interface */}
+          <Card className="lg:col-span-2 bg-gray-800 border-gray-700 p-8">
+            <div className="text-center">
+              <div className="mb-8">
+                <div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center ${
+                  isCallActive
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse'
+                    : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                }`}>
+                  <Phone size={48} className="text-white" />
+                </div>
+                {isCallActive && (
+                  <div className="mt-4">
+                    <Badge className="bg-green-500/20 text-green-400 px-4 py-2">
+                      Call Active
+                    </Badge>
+                    <p className="text-3xl font-bold text-white mt-2">{formatDuration(callDuration)}</p>
+                    <p className="text-gray-400 text-sm mt-1">Latency: {latency}s</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-center gap-4 flex-wrap">
+                {!isCallActive ? (
+                  <Button
+                    onClick={startCall}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-6 text-lg"
+                  >
+                    <Phone size={24} className="mr-2" />
+                    Start Voice Call
+                  </Button>
+                ) : (
+                  <>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className={`flex items-center gap-3 px-6 py-4 rounded-lg border-2 ${
+                        isProcessing
+                          ? 'bg-yellow-600/20 border-yellow-500'
+                          : 'bg-green-600/20 border-green-500'
+                      }`}>
+                        <Mic size={24} className={isProcessing ? 'text-yellow-400' : 'text-green-400 animate-pulse'} />
+                        <div className="text-left">
+                          <div className="font-semibold text-white">
+                            {isProcessing ? '⏳ AI Processing...' : '👂 Voice Active'}
+                          </div>
+                          <div className="text-sm text-gray-300">
+                            {isProcessing ? 'Getting AI response' : 'Speak anytime - Deepgram is listening'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        onClick={endCall}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <PhoneOff size={20} className="mr-2" />
+                        End Call
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* Call Stats */}
+          <Card className="bg-gray-800 border-gray-700 p-6">
+            <h3 className="text-white font-semibold mb-4">Call Metrics</h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-gray-400 text-sm">Duration</p>
+                <p className="text-white font-semibold">{formatDuration(callDuration)}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Latency</p>
+                <p className={`font-semibold ${
+                  latency < 2 ? 'text-green-400' : 'text-yellow-400'
+                }`}>{latency}s</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Status</p>
+                <p className={`font-semibold ${
+                  isCallActive ? 'text-green-400' : 'text-gray-400'
+                }`}>{isCallActive ? 'Connected' : 'Disconnected'}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Audio</p>
+                <p className="text-white font-semibold">
+                  {isMuted ? 'Muted' : 'Unmuted'} / {isSpeakerOn ? 'Speaker On' : 'Speaker Off'}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Transcript */}
+          <Card className="lg:col-span-3 bg-gray-800 border-gray-700 p-6">
+            <h3 className="text-white font-semibold mb-4">Live Transcript</h3>
+            <div className="space-y-3 max-h-96 overflow-y-auto mb-4">
+              {transcript.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">Start a call to see the transcript</p>
+              ) : (
+                <>
+                  {transcript.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg ${
+                        item.speaker === 'agent'
+                          ? 'bg-blue-600/20 border border-blue-500/30'
+                          : 'bg-gray-700/50 border border-gray-600'
+                      }`}
+                    >
+                      <p className="text-xs text-gray-400 mb-1">
+                        {item.speaker === 'agent' ? 'AI Agent' : 'You'}
+                      </p>
+                      <p className="text-white">{item.text}</p>
+                    </div>
+                  ))}
+                  {isProcessing && (
+                    <div className="p-3 rounded-lg bg-gray-700/50 border border-gray-600">
+                      <p className="text-xs text-gray-400 mb-1">AI Agent</p>
+                      <p className="text-white">Processing...</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            
+            {/* Message Input */}
+            {isCallActive && (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Type your message..."
+                    className="bg-gray-900 border-gray-700 text-white flex-1"
+                    disabled={!isCallActive}
+                  />
+                  <Button
+                    onClick={sendMessage}
+                    disabled={!inputMessage.trim() || !isCallActive || isProcessing}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Send size={20} />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded ${
+                    mediaRecorderRef.current ? 'bg-green-900/30 text-green-400' : 'bg-gray-900/30 text-gray-400'
+                  }`}>
+                    <span className={mediaRecorderRef.current ? '🟢' : '⚪'}></span>
+                    <span>Voice: {mediaRecorderRef.current ? 'Active' : 'Inactive'}</span>
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded ${
+                    mediaStreamRef.current ? 'bg-blue-900/30 text-blue-400' : 'bg-gray-900/30 text-gray-400'
+                  }`}>
+                    <span>Mic: {mediaStreamRef.current ? 'Connected' : 'Disconnected'}</span>
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded ${
+                    isProcessing ? 'bg-yellow-900/30 text-yellow-400' : 'bg-gray-900/30 text-gray-400'
+                  }`}>
+                    <span>AI: {isProcessing ? '⏳ Processing' : '✓ Ready'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WebCaller;

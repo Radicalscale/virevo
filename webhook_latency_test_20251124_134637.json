@@ -1,0 +1,231 @@
+{
+  "timestamp": "2025-11-24T13:46:37.041112",
+  "agent_id": "e1f8ec18-fa7a-4da3-aa2b-3deb7723abb4",
+  "agent_name": "JK First Caller-optimizer",
+  "system_prompt_length": 8518,
+  "backend_url": "http://localhost:8001",
+  "overall_stats": {
+    "avg_latency_ms": 2309.1389756453664,
+    "min_latency_ms": 252.98500061035156,
+    "max_latency_ms": 12734.354734420776,
+    "target_latency_ms": 1500,
+    "meets_target": false,
+    "total_messages": 19
+  },
+  "conversations": [
+    {
+      "name": "Objection Handling Flow",
+      "session_id": "test_1763991947",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 1630.1698684692383,
+          "llm_ms": 0.07867813110351562,
+          "tts_ms": 1630.0833225250244,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 17181
+        },
+        {
+          "message": "My name is John",
+          "latency_ms": 1466.806411743164,
+          "llm_ms": 1057.4016571044922,
+          "tts_ms": 409.3973636627197,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 81547
+        },
+        {
+          "message": "I don't have time for this",
+          "latency_ms": 1002.0709037780762,
+          "llm_ms": 0.4088878631591797,
+          "tts_ms": 1001.655101776123,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 291362
+        },
+        {
+          "message": "What is this about?",
+          "latency_ms": 2397.3515033721924,
+          "llm_ms": 1615.0321960449219,
+          "tts_ms": 782.313346862793,
+          "response": "That's the perfect question. In a nutshell, we set up passive income websites that rank on Google for local services, and you get paid for the leads they generate. What questions come to mind when you hear that?",
+          "current_node": "1763163400676",
+          "response_length": 211,
+          "tts_audio_size": 254582
+        },
+        {
+          "message": "I'm still not interested",
+          "latency_ms": 1618.1883811950684,
+          "llm_ms": 1062.9940032958984,
+          "tts_ms": 555.1881790161133,
+          "response": "Just so I understand, is the idea of generating new income not a priority right now, or was it just how I explained it?",
+          "current_node": "1763206946898",
+          "response_length": 119,
+          "tts_audio_size": 119581
+        },
+        {
+          "message": "Why should I care?",
+          "latency_ms": 3193.9384937286377,
+          "llm_ms": 2219.405174255371,
+          "tts_ms": 974.52712059021,
+          "response": "I hear you. Because if this fits, one site alone averages $1,500 a month passive, scaling to whatever income goal you have in mind. What kind of extra monthly income would make this worth exploring?",
+          "current_node": "1763175810279",
+          "response_length": 198,
+          "tts_audio_size": 288018
+        },
+        {
+          "message": "I need to think about it",
+          "latency_ms": 2180.2961826324463,
+          "llm_ms": 1522.4063396453857,
+          "tts_ms": 657.8831672668457,
+          "response": "That's fair. Usually when someone says 'think about it,' there's one key point they're weighing. What specific aspect is that for you?",
+          "current_node": "1763175810279",
+          "response_length": 134,
+          "tts_audio_size": 127522
+        },
+        {
+          "message": "Actually tell me more",
+          "latency_ms": 2972.659111022949,
+          "llm_ms": 1733.9444160461426,
+          "tts_ms": 1238.7080192565918,
+          "response": "Great, glad you're curious. We've helped over 7,500 students build these Google lead gen sites, each pulling in $500 to $2,000 a month passively once ranked. So, are you working for someone right now or do you run your own business?",
+          "current_node": "1763175810279",
+          "response_length": 232,
+          "tts_audio_size": 271718
+        }
+      ],
+      "total_latency": 16461.480855941772,
+      "avg_latency": 2057.6851069927216
+    },
+    {
+      "name": "Qualification Flow",
+      "session_id": "test_1763991965",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 252.98500061035156,
+          "llm_ms": 0.2715587615966797,
+          "tts_ms": 252.70795822143555,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 20525
+        },
+        {
+          "message": "I'm Sarah",
+          "latency_ms": 1190.925121307373,
+          "llm_ms": 789.7186279296875,
+          "tts_ms": 401.1993408203125,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 71098
+        },
+        {
+          "message": "What are the requirements?",
+          "latency_ms": 1043.9157485961914,
+          "llm_ms": 0.3726482391357422,
+          "tts_ms": 1043.5364246368408,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 243715
+        },
+        {
+          "message": "I'm employed",
+          "latency_ms": 12734.354734420776,
+          "llm_ms": 1631.9565773010254,
+          "tts_ms": 11102.392435073853,
+          "response": "Got it, being employed is great. But when you say that, is it because your job already gives you all the financial security and free time you want?",
+          "current_node": "1763161961589",
+          "response_length": 147,
+          "tts_audio_size": 130030
+        },
+        {
+          "message": "I make 70k per year",
+          "latency_ms": 2411.710023880005,
+          "llm_ms": 1639.4460201263428,
+          "tts_ms": 772.2575664520264,
+          "response": "That's solid income, Sarah. But if you're open to stacking on an extra $1,500 a month passively from Google sites without adding hours to your week, does that sound worth 25 seconds to hear?",
+          "current_node": "1763163400676",
+          "response_length": 190,
+          "tts_audio_size": 175169
+        },
+        {
+          "message": "Yes I have a vehicle",
+          "latency_ms": 2183.338165283203,
+          "llm_ms": 1293.398380279541,
+          "tts_ms": 889.9333477020264,
+          "response": "Perfect. Each site generates $500 to $2,000 a month passively once ranked. Most students build 10+ sites to hit that scale.\n\nWith that in mind, would you honestly be upset if you had an extra twenty thousand a month coming in?",
+          "current_node": "1763206946898",
+          "response_length": 226,
+          "tts_audio_size": 251238
+        }
+      ],
+      "total_latency": 19817.2287940979,
+      "avg_latency": 3302.8714656829834
+    },
+    {
+      "name": "Skeptical Prospect",
+      "session_id": "test_1763991987",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 304.4779300689697,
+          "llm_ms": 0.2658367156982422,
+          "tts_ms": 304.20589447021484,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 17599
+        },
+        {
+          "message": "This is Mike",
+          "latency_ms": 1296.2465286254883,
+          "llm_ms": 858.3569526672363,
+          "tts_ms": 437.8836154937744,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 74859
+        },
+        {
+          "message": "This sounds like a scam",
+          "latency_ms": 896.564245223999,
+          "llm_ms": 0.3604888916015625,
+          "tts_ms": 896.1968421936035,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 261269
+        },
+        {
+          "message": "How do I know this is real?",
+          "latency_ms": 2670.905828475952,
+          "llm_ms": 1736.6459369659424,
+          "tts_ms": 934.2520236968994,
+          "response": "I get why you're cautious\u2014plenty of people are. We've helped over 7,500 students build real Google leed gen sites averaging $1,500 a month per site. What specific part of this raises a concern for you?",
+          "current_node": "1763161961589",
+          "response_length": 201,
+          "tts_audio_size": 277151
+        },
+        {
+          "message": "Do you have proof?",
+          "latency_ms": 2426.736354827881,
+          "llm_ms": 1548.4588146209717,
+          "tts_ms": 878.270149230957,
+          "response": "Absolutely, and that's a smart question. We've got over 7,500 students in our Facebook group posting real results from their Google leed gen sites\u2014what kind of proof would help put you at ease right now?",
+          "current_node": "1763161961589",
+          "response_length": 203,
+          "tts_audio_size": 214040
+        }
+      ],
+      "total_latency": 7594.93088722229,
+      "avg_latency": 1518.986177444458
+    }
+  ]
+}

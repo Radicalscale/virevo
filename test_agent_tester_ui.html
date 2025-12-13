@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Tester UI Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .chat-container { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; margin: 10px 0; }
+        .message { margin: 5px 0; padding: 8px; border-radius: 8px; }
+        .user-message { background-color: #007bff; color: white; text-align: right; }
+        .agent-message { background-color: #f8f9fa; color: #333; }
+        .metrics { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        button { margin: 5px; padding: 10px 15px; }
+        input { width: 300px; padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Agent Tester UI Simulation</h1>
+    <p>Simulating the Agent Tester UI functionality for agent: <strong>JK First Caller-copy</strong></p>
+    
+    <div class="metrics">
+        <h3>Metrics</h3>
+        <div>Total Turns: <span id="totalTurns">0</span></div>
+        <div>Avg Latency: <span id="avgLatency">0s</span></div>
+        <div>Current Node: <span id="currentNode">Not started</span></div>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="info">No messages yet. Start typing to test the agent!</div>
+    </div>
+    
+    <div>
+        <input type="text" id="messageInput" placeholder="Type your message..." />
+        <button onclick="sendMessage()" id="sendBtn">Send</button>
+        <button onclick="resetSession()" id="resetBtn">Reset</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const BACKEND_URL = 'https://tts-guardian.preview.emergentagent.com';
+        const AGENT_ID = 'b6b1d141-75a2-43d8-80b8-3decae5c0a92';
+        
+        let sessionId = null;
+        let conversation = [];
+        let metrics = { total_turns: 0, avg_latency: 0 };
+        let currentNodeId = null;
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function updateMetrics() {
+            document.getElementById('totalTurns').textContent = metrics.total_turns;
+            document.getElementById('avgLatency').textContent = metrics.avg_latency ? `${metrics.avg_latency.toFixed(2)}s` : '0s';
+            document.getElementById('currentNode').textContent = currentNodeId || 'Not started';
+        }
+        
+        function addMessageToChat(role, message, latency = null) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Clear "no messages" text if this is the first message
+            if (conversation.length === 0) {
+                chatContainer.innerHTML = '';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            
+            let content = `<strong>${role === 'user' ? 'You' : 'Agent'}:</strong> ${message}`;
+            if (latency) {
+                content += ` <small>(${latency.toFixed(2)}s)</small>`;
+            }
+            
+            messageDiv.innerHTML = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        async function startSession() {
+            addResult('Starting test session...', 'info');
+            
+            try {
+                // Simulate the API call that would normally be made
+                // In real scenario, this would call the backend
+                const mockResponse = {
+                    session_id: 'mock-session-' + Date.now(),
+                    agent_id: AGENT_ID,
+                    agent_name: 'JK First Caller-copy',
+                    agent_type: 'call_flow',
+                    message: 'Test session started'
+                };
+                
+                sessionId = mockResponse.session_id;
+                addResult(`✅ Session started: ${sessionId}`, 'success');
+                return true;
+                
+            } catch (error) {
+                addResult(`❌ Failed to start session: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Start session if not already started
+            if (!sessionId) {
+                const started = await startSession();
+                if (!started) return;
+            }
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            conversation.push({ role: 'user', message, timestamp: new Date().toISOString() });
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Disable send button while processing
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            
+            addResult(`Sending message: "${message}"`, 'info');
+            
+            try {
+                // Simulate API call to send message
+                const startTime = Date.now();
+                
+                // Mock response based on the message content
+                let mockResponse;
+                if (message.toLowerCase().includes('john')) {
+                    mockResponse = {
+                        agent_response: "Great! Hi John, I'm here to help you today. What can I assist you with?",
+                        latency: 1.2,
+                        current_node_id: 'greeting_node',
+                        should_end_call: false,
+                        metrics: { total_turns: 1, avg_latency: 1.2 }
+                    };
+                } else if (message.toLowerCase().includes('help')) {
+                    mockResponse = {
+                        agent_response: "I'd be happy to help you! I can assist with various topics. What specifically do you need help with?",
+                        latency: 0.9,
+                        current_node_id: 'help_node',
+                        should_end_call: false,
+                        metrics: { total_turns: 2, avg_latency: 1.05 }
+                    };
+                } else if (message.toLowerCase().includes('goodbye') || message.toLowerCase().includes('done')) {
+                    mockResponse = {
+                        agent_response: "Thank you for chatting with me today! Have a great day!",
+                        latency: 0.8,
+                        current_node_id: 'ending_node',
+                        should_end_call: true,
+                        metrics: { total_turns: 3, avg_latency: 0.97 }
+                    };
+                } else {
+                    mockResponse = {
+                        agent_response: "I understand. Could you tell me more about that?",
+                        latency: 1.1,
+                        current_node_id: 'conversation_node',
+                        should_end_call: false,
+                        metrics: { total_turns: conversation.length, avg_latency: 1.0 }
+                    };
+                }
+                
+                // Add agent response to chat
+                addMessageToChat('agent', mockResponse.agent_response, mockResponse.latency);
+                conversation.push({ 
+                    role: 'agent', 
+                    message: mockResponse.agent_response, 
+                    timestamp: new Date().toISOString(),
+                    latency: mockResponse.latency,
+                    node_id: mockResponse.current_node_id
+                });
+                
+                // Update metrics
+                metrics = mockResponse.metrics;
+                currentNodeId = mockResponse.current_node_id;
+                updateMetrics();
+                
+                addResult(`✅ Agent responded (${mockResponse.latency}s): "${mockResponse.agent_response.substring(0, 50)}..."`, 'success');
+                
+                if (mockResponse.should_end_call) {
+                    addResult('⚠️ Agent indicated call should end', 'info');
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = 'Call Ended';
+                    return;
+                }
+                
+            } catch (error) {
+                addResult(`❌ Error sending message: ${error.message}`, 'error');
+            } finally {
+                // Re-enable send button
+                if (!sendBtn.textContent.includes('Ended')) {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'Send';
+                }
+            }
+        }
+        
+        async function resetSession() {
+            addResult('Resetting session...', 'info');
+            
+            // Clear UI
+            document.getElementById('chatContainer').innerHTML = '<div class="info">No messages yet. Start typing to test the agent!</div>';
+            conversation = [];
+            metrics = { total_turns: 0, avg_latency: 0 };
+            currentNodeId = null;
+            sessionId = null;
+            
+            updateMetrics();
+            
+            // Re-enable send button
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+            
+            addResult('✅ Session reset successfully', 'success');
+        }
+        
+        // Allow Enter key to send message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initialize
+        updateMetrics();
+        addResult('Agent Tester UI simulation ready. Type a message to start!', 'info');
+    </script>
+</body>
+</html>

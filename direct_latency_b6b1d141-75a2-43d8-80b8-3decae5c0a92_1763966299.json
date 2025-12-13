@@ -1,0 +1,42 @@
+{
+  "agent_id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 0.0629725456237793,
+    "avg_latency": 0.020990848541259766,
+    "min_latency": 7.2479248046875e-05,
+    "max_latency": 0.06276178359985352,
+    "target_latency": 2.0,
+    "turns_met_target": 3,
+    "turns_missed_target": 0
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "true_latency": 7.2479248046875e-05,
+      "node_id": "2",
+      "met_target": true,
+      "timestamp": "2025-11-24T06:38:19.648887"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "true_latency": 0.06276178359985352,
+      "node_id": "1763159750250",
+      "met_target": true,
+      "timestamp": "2025-11-24T06:38:19.711752"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "true_latency": 0.00013828277587890625,
+      "node_id": "1763161849799",
+      "met_target": true,
+      "timestamp": "2025-11-24T06:38:19.711947"
+    }
+  ]
+}

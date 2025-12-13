@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Netlify Build Debug</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+        }
+        .section {
+            background: #000;
+            border: 1px solid #0f0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .warning { color: #ff0; }
+        h2 { color: #0ff; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Netlify Build Debug Info</h1>
+    
+    <div class="section">
+        <h2>1. Environment Variable (Build Time)</h2>
+        <p>REACT_APP_BACKEND_URL: <span id="backendUrl" class="warning">Loading...</span></p>
+        <p>Expected: <span class="success">https://api.li-ai.org</span></p>
+    </div>
+
+    <div class="section">
+        <h2>2. Calculated API Base URL</h2>
+        <p>API baseURL: <span id="apiBase" class="warning">Loading...</span></p>
+        <p>Expected: <span class="success">https://api.li-ai.org/api</span></p>
+    </div>
+
+    <div class="section">
+        <h2>3. Test API Call Construction</h2>
+        <p>Test path: /settings/api-keys</p>
+        <p>Final URL would be: <span id="finalUrl" class="warning">Loading...</span></p>
+        <p>Expected: <span class="success">https://api.li-ai.org/api/settings/api-keys</span></p>
+    </div>
+
+    <div class="section">
+        <h2>4. Diagnosis</h2>
+        <p id="diagnosis" class="warning">Analyzing...</p>
+    </div>
+
+    <script>
+        // This script will show what was baked into the build
+        const BACKEND_URL = '%REACT_APP_BACKEND_URL%';
+        const API_BASE = BACKEND_URL + '/api';
+        const TEST_PATH = '/settings/api-keys';
+        const FINAL_URL = API_BASE + TEST_PATH;
+
+        document.getElementById('backendUrl').textContent = BACKEND_URL;
+        document.getElementById('apiBase').textContent = API_BASE;
+        document.getElementById('finalUrl').textContent = FINAL_URL;
+
+        // Diagnose
+        let diagnosis = '';
+        let className = 'success';
+
+        if (BACKEND_URL === '%' + 'REACT_APP_BACKEND_URL' + '%') {
+            diagnosis = '❌ ERROR: Environment variable not replaced during build! REACT_APP_BACKEND_URL was not set.';
+            className = 'error';
+        } else if (BACKEND_URL.endsWith('/api')) {
+            diagnosis = '❌ ERROR: BACKEND_URL ends with /api! This causes double /api/api/ in URLs. Fix: Remove /api from REACT_APP_BACKEND_URL';
+            className = 'error';
+        } else if (FINAL_URL === 'https://api.li-ai.org/api/settings/api-keys') {
+            diagnosis = '✅ SUCCESS: URL construction is correct! If you still see /api/api/, check deployed JavaScript bundle.';
+            className = 'success';
+        } else {
+            diagnosis = '⚠️ WARNING: Unexpected URL format. Check environment variable value.';
+            className = 'warning';
+        }
+
+        const diagElement = document.getElementById('diagnosis');
+        diagElement.textContent = diagnosis;
+        diagElement.className = className;
+
+        // Log to console as well
+        console.log('='.repeat(60));
+        console.log('🔍 NETLIFY BUILD DEBUG');
+        console.log('='.repeat(60));
+        console.log('BACKEND_URL:', BACKEND_URL);
+        console.log('API_BASE:', API_BASE);
+        console.log('FINAL_URL:', FINAL_URL);
+        console.log('Diagnosis:', diagnosis);
+        console.log('='.repeat(60));
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 5,
+    "failed_tests": 1,
+    "success_rate": 83.33333333333334,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-12-01T20:44:57.331972",
+    "auth_token_obtained": true,
+    "campaign_id": "b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8"
+  },
+  "detailed_results": [
+    {
+      "test": "Login Authentication",
+      "status": "PASS",
+      "details": "Successfully logged in with kendrickbowman9@gmail.com and obtained auth token",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T20:44:56.907088"
+    },
+    {
+      "test": "List Campaigns",
+      "status": "PASS",
+      "details": "Found 1 campaigns. Using campaign 'Test %' (ID: b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8) for testing",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T20:44:57.044511"
+    },
+    {
+      "test": "Generate Campaign Report",
+      "status": "PASS",
+      "details": "Campaign report generated successfully. Campaign: Test %, Generated at: 2025-12-01T20:44:57.269350, Summary keys: ['total_calls_analyzed', 'total_conversation_turns', 'average_quality_score', 'quality_distribution', 'efficiency_distribution'], Patterns count: 3, Recommendations count: 2",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T20:44:57.273181"
+    },
+    {
+      "test": "Check Backend Logs",
+      "status": "WARN",
+      "details": "Found 8 recent error entries in backend logs. Recent errors: 2025-12-01 20:39:36,055 - comfort_noise - ERROR - Error generating comfort noise: [Errno 2] No such file or directory: 'ffmpeg'; \u274c Redis connection failed: Error 99 connecting to localhost:6379. Cannot assign requested address.; 2025-12-01 20:40:03,453 - comfort_noise - ERROR - Error generating comfort noise: [Errno 2] No such file or directory: 'ffmpeg'...",
+      "expected_status": 0,
+      "actual_status": 8,
+      "timestamp": "2025-12-01T20:44:57.277376"
+    },
+    {
+      "test": "Endpoint Security Verification",
+      "status": "PASS",
+      "details": "Campaign report endpoint properly secured - returns 401 without authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-12-01T20:44:57.319440"
+    },
+    {
+      "test": "Campaigns List Security",
+      "status": "PASS",
+      "details": "Campaigns list endpoint properly secured - returns 401 without authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-12-01T20:44:57.330927"
+    }
+  ]
+}

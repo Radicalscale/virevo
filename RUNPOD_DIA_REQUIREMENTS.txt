@@ -1,0 +1,27 @@
+# Dia TTS RunPod Server Requirements
+# Install with: pip install -r requirements.txt
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+
+# ML & Audio
+torch>=2.1.0
+torchaudio>=2.1.0
+transformers>=4.36.0
+accelerate>=0.25.0
+
+# Dia TTS specific (if needed)
+# The main model is loaded from HuggingFace transformers
+
+# Audio processing
+soundfile>=0.12.1
+librosa>=0.10.1
+
+# Utilities
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Optional but recommended for faster inference
+# xformers>=0.0.23  # Uncomment if using CUDA

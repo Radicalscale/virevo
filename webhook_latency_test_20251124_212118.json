@@ -1,0 +1,231 @@
+{
+  "timestamp": "2025-11-24T21:21:18.196296",
+  "agent_id": "e1f8ec18-fa7a-4da3-aa2b-3deb7723abb4",
+  "agent_name": "JK First Caller-optimizer",
+  "system_prompt_length": 8518,
+  "backend_url": "http://localhost:8001",
+  "overall_stats": {
+    "avg_latency_ms": 1078.114622517636,
+    "min_latency_ms": 0.2841949462890625,
+    "max_latency_ms": 1921.7512607574463,
+    "target_latency_ms": 1500,
+    "meets_target": true,
+    "total_messages": 19
+  },
+  "conversations": [
+    {
+      "name": "Objection Handling Flow",
+      "session_id": "test_1764019251",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 1611.4754676818848,
+          "llm_ms": 0.06556510925292969,
+          "tts_ms": 1611.402988433838,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 18435
+        },
+        {
+          "message": "My name is John",
+          "latency_ms": 1319.4069862365723,
+          "llm_ms": 916.7859554290771,
+          "tts_ms": 402.61316299438477,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 72769
+        },
+        {
+          "message": "I don't have time for this",
+          "latency_ms": 879.9242973327637,
+          "llm_ms": 0.3864765167236328,
+          "tts_ms": 879.5313835144043,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 268792
+        },
+        {
+          "message": "What is this about?",
+          "latency_ms": 1887.3722553253174,
+          "llm_ms": 1657.5610637664795,
+          "tts_ms": 229.80976104736328,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "I'm still not interested",
+          "latency_ms": 1701.7028331756592,
+          "llm_ms": 1701.6711235046387,
+          "tts_ms": 0.030517578125,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "Why should I care?",
+          "latency_ms": 1680.2682876586914,
+          "llm_ms": 1680.2399158477783,
+          "tts_ms": 0.027179718017578125,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "I need to think about it",
+          "latency_ms": 1738.7900352478027,
+          "llm_ms": 1738.757610321045,
+          "tts_ms": 0.030994415283203125,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "Actually tell me more",
+          "latency_ms": 1686.7327690124512,
+          "llm_ms": 1686.7046356201172,
+          "tts_ms": 0.027179718017578125,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        }
+      ],
+      "total_latency": 12505.672931671143,
+      "avg_latency": 1563.2091164588928
+    },
+    {
+      "name": "Qualification Flow",
+      "session_id": "test_1764019266",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 0.28896331787109375,
+          "llm_ms": 0.2627372741699219,
+          "tts_ms": 0.020742416381835938,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 18435
+        },
+        {
+          "message": "I'm Sarah",
+          "latency_ms": 1921.7512607574463,
+          "llm_ms": 1921.715497970581,
+          "tts_ms": 0.02956390380859375,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 72769
+        },
+        {
+          "message": "What are the requirements?",
+          "latency_ms": 0.39076805114746094,
+          "llm_ms": 0.3707408905029297,
+          "tts_ms": 0.015735626220703125,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 268792
+        },
+        {
+          "message": "I'm employed",
+          "latency_ms": 656.5754413604736,
+          "llm_ms": 656.5356254577637,
+          "tts_ms": 0.03790855407714844,
+          "response": "[No response]",
+          "current_node": "1763161961589",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "I make 70k per year",
+          "latency_ms": 1683.2995414733887,
+          "llm_ms": 1683.2704544067383,
+          "tts_ms": 0.027894973754882812,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "Yes I have a vehicle",
+          "latency_ms": 418.25389862060547,
+          "llm_ms": 418.2250499725342,
+          "tts_ms": 0.028133392333984375,
+          "response": "[No response]",
+          "current_node": "1763163400676",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        }
+      ],
+      "total_latency": 4680.559873580933,
+      "avg_latency": 780.0933122634888
+    },
+    {
+      "name": "Skeptical Prospect",
+      "session_id": "test_1764019272",
+      "messages": [
+        {
+          "message": "Hello",
+          "latency_ms": 0.2841949462890625,
+          "llm_ms": 0.25844573974609375,
+          "tts_ms": 0.020265579223632812,
+          "response": "{{customer_name}}?",
+          "current_node": "2",
+          "response_length": 18,
+          "tts_audio_size": 18435
+        },
+        {
+          "message": "This is Mike",
+          "latency_ms": 1914.1898155212402,
+          "llm_ms": 1914.1559600830078,
+          "tts_ms": 0.02765655517578125,
+          "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+          "current_node": "1763159750250",
+          "response_length": 87,
+          "tts_audio_size": 72769
+        },
+        {
+          "message": "This sounds like a scam",
+          "latency_ms": 0.4475116729736328,
+          "llm_ms": 0.4246234893798828,
+          "tts_ms": 0.018358230590820312,
+          "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+          "current_node": "1763161849799",
+          "response_length": 347,
+          "tts_audio_size": 268792
+        },
+        {
+          "message": "How do I know this is real?",
+          "latency_ms": 596.4460372924805,
+          "llm_ms": 596.4171886444092,
+          "tts_ms": 0.028133392333984375,
+          "response": "[No response]",
+          "current_node": "1763161961589",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        },
+        {
+          "message": "Do you have proof?",
+          "latency_ms": 786.5774631500244,
+          "llm_ms": 786.5476608276367,
+          "tts_ms": 0.029087066650390625,
+          "response": "[No response]",
+          "current_node": "1763161961589",
+          "response_length": 13,
+          "tts_audio_size": 16345
+        }
+      ],
+      "total_latency": 3297.945022583008,
+      "avg_latency": 659.5890045166016
+    }
+  ]
+}

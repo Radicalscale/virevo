@@ -1,0 +1,194 @@
+{
+  "timestamp": "2025-11-24T23:57:07.035692",
+  "agent_id": "bbeda238-e8d9-4d8c-b93b-1b7694581adb",
+  "results": [
+    {
+      "scenario": "Trust Objection (Slow Node)",
+      "regular": {
+        "results": [
+          {
+            "message": "Hello",
+            "response": "{{customer_name}}?",
+            "latency_ms": 0,
+            "current_node": "2"
+          },
+          {
+            "message": "I'm John",
+            "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+            "latency_ms": 1619,
+            "current_node": "1763159750250"
+          },
+          {
+            "message": "This sounds like a scam",
+            "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+            "latency_ms": 0,
+            "current_node": "1763161849799"
+          },
+          {
+            "message": "How do I know this is real?",
+            "response": "I get why you'd ask that\u2014trust is everything. We've helped over 7,500 students with this exact Google lead gen model, including folks trained directly by owners Dan and Ippei. What specific part concerns you?",
+            "latency_ms": 2744,
+            "current_node": "1763163400676"
+          }
+        ],
+        "avg_latency_ms": 2181.5
+      },
+      "parallel": {
+        "results": [
+          {
+            "message": "Hello",
+            "response": "",
+            "latency_ms": 612,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 454,
+              "master_synthesis_ms": 158,
+              "total_ms": 612
+            }
+          },
+          {
+            "message": "I'm John",
+            "response": "",
+            "latency_ms": 306,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 227,
+              "master_synthesis_ms": 79,
+              "total_ms": 306
+            }
+          },
+          {
+            "message": "This sounds like a scam",
+            "response": "",
+            "latency_ms": 283,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 160,
+              "master_synthesis_ms": 123,
+              "total_ms": 283
+            }
+          },
+          {
+            "message": "How do I know this is real?",
+            "response": "",
+            "latency_ms": 265,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 205,
+              "master_synthesis_ms": 60,
+              "total_ms": 265
+            }
+          }
+        ],
+        "avg_latency_ms": 366.5
+      }
+    },
+    {
+      "scenario": "Side Hustle Question (Slow Node)",
+      "regular": {
+        "results": [
+          {
+            "message": "Hello",
+            "response": "{{customer_name}}?",
+            "latency_ms": 0,
+            "current_node": "2"
+          },
+          {
+            "message": "I'm Sarah",
+            "response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+            "latency_ms": 450,
+            "current_node": "1763159750250"
+          },
+          {
+            "message": "I'm employed",
+            "response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+            "latency_ms": 0,
+            "current_node": "1763161849799"
+          },
+          {
+            "message": "I make 75k per year",
+            "response": "Got it, Sarah\u201475k yearly is solid. But stacking on extra income without adding hours, does that sound like something worth exploring?",
+            "latency_ms": 1612,
+            "current_node": "1763161961589"
+          },
+          {
+            "message": "Do I need a side hustle?",
+            "response": "That's a fair question. Many of our top earners started employed just like you, adding $5k a month passively on top. Does that kind of boost make sense for your goals?",
+            "latency_ms": 4699,
+            "current_node": "1763163400676"
+          }
+        ],
+        "avg_latency_ms": 2253.6666666666665
+      },
+      "parallel": {
+        "results": [
+          {
+            "message": "Hello",
+            "response": "",
+            "latency_ms": 690,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 605,
+              "master_synthesis_ms": 85,
+              "total_ms": 690
+            }
+          },
+          {
+            "message": "I'm Sarah",
+            "response": "",
+            "latency_ms": 291,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 217,
+              "master_synthesis_ms": 74,
+              "total_ms": 291
+            }
+          },
+          {
+            "message": "I'm employed",
+            "response": "",
+            "latency_ms": 242,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 156,
+              "master_synthesis_ms": 86,
+              "total_ms": 242
+            }
+          },
+          {
+            "message": "I make 75k per year",
+            "response": "",
+            "latency_ms": 271,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 203,
+              "master_synthesis_ms": 68,
+              "total_ms": 271
+            }
+          },
+          {
+            "message": "Do I need a side hustle?",
+            "response": "",
+            "latency_ms": 240,
+            "current_node": "2",
+            "next_node": "",
+            "breakdown": {
+              "parallel_specialists_ms": 171,
+              "master_synthesis_ms": 68,
+              "total_ms": 240
+            }
+          }
+        ],
+        "avg_latency_ms": 346.8
+      }
+    }
+  ]
+}

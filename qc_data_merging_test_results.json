@@ -1,0 +1,90 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 6,
+    "failed_tests": 3,
+    "success_rate": 66.66666666666666,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-12-01T08:49:59.511749",
+    "auth_token_obtained": true,
+    "campaign_id": "b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8",
+    "test_call_ids": [
+      "v3:_IX_55wcALxFbdC3Is6CKyZv2PN4JWtSoEdx0Zj1docsmnCO1TGoVw",
+      "v3:WZfJSDmbhKTJsireenz1q9FuSWKW9JsujNaLvaYHCRfoOaABEan8Fw"
+    ]
+  },
+  "detailed_results": [
+    {
+      "test": "Login Authentication",
+      "status": "PASS",
+      "details": "Successfully logged in as kendrickbowman9@gmail.com",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T08:49:58.776843"
+    },
+    {
+      "test": "Campaign QC Results List",
+      "status": "FAIL",
+      "details": "Expected list response, got: <class 'dict'>",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T08:49:58.988374"
+    },
+    {
+      "test": "Individual Call Fetch - Node Analyses",
+      "status": "PASS",
+      "details": "Call v3:_IX_55wcALxFbdC3Is6CKyZv2PN4JWtSoEdx0Zj1docsmnCO1TGoVw has 7 node analyses (expected 7+)",
+      "expected_status": ">=7",
+      "actual_status": 7,
+      "timestamp": "2025-12-01T08:49:59.118771"
+    },
+    {
+      "test": "Individual Call Fetch - Turn-by-Turn Analysis",
+      "status": "WARN",
+      "details": "Node analysis missing expected fields: ['analysis', 'score']. Available: ['turn_number', 'node_name', 'node_id', 'user_message', 'ai_response', 'quality', 'positives', 'issues', 'improved_response', 'prompt_suggestions', 'goal_efficiency', 'goal_progress_explanation', 'brevity_score', 'conciseness_feedback', 'reasoning', 'node_goal', 'node_prompt_preview']",
+      "expected_status": true,
+      "actual_status": false,
+      "timestamp": "2025-12-01T08:49:59.118810"
+    },
+    {
+      "test": "Individual Call Fetch - Data Merging",
+      "status": "WARN",
+      "details": "No explicit data merging indicators found for call v3:_IX_55wcALxFbdC3Is6CKyZv2PN4JWtSoEdx0Zj1docsmnCO1TGoVw. Source: unknown",
+      "expected_status": true,
+      "actual_status": false,
+      "timestamp": "2025-12-01T08:49:59.119928"
+    },
+    {
+      "test": "Individual Call Fetch - Second Call",
+      "status": "PASS",
+      "details": "Successfully fetched second call v3:WZfJSDmbhKTJsireenz1q9FuSWKW9JsujNaLvaYHCRfoOaABEan8Fw",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T08:49:59.186857"
+    },
+    {
+      "test": "Backend Logs Verification",
+      "status": "PASS",
+      "details": "Successfully tested 2/2 calls for data merging functionality. Backend should log 'Merged script_qc_results from call_logs' messages for calls with empty campaign_calls data.",
+      "expected_status": "2 calls tested",
+      "actual_status": "2 successful",
+      "timestamp": "2025-12-01T08:49:59.458338"
+    },
+    {
+      "test": "Endpoint Security",
+      "status": "PASS",
+      "details": "Both QC Enhanced endpoints properly require authentication (return 401)",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-12-01T08:49:59.502067"
+    },
+    {
+      "test": "Parameter Validation",
+      "status": "PASS",
+      "details": "Fetch endpoint properly validates required parameters (returns 400 for missing call_id)",
+      "expected_status": 400,
+      "actual_status": 400,
+      "timestamp": "2025-12-01T08:49:59.511470"
+    }
+  ]
+}

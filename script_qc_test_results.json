@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 4,
+    "failed_tests": 2,
+    "success_rate": 66.66666666666666,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-12-01T00:04:59.064045",
+    "auth_token_obtained": true,
+    "test_call_id": "dd8af079-5bea-4395-9712-37495d749780"
+  },
+  "detailed_results": [
+    {
+      "test": "Login Authentication",
+      "status": "PASS",
+      "details": "Successfully logged in and obtained auth token",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T00:04:58.503226"
+    },
+    {
+      "test": "Find Call with Transcript",
+      "status": "WARN",
+      "details": "No calls with transcript found, using call dd8af079-5bea-4395-9712-37495d749780 for testing",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T00:04:58.569881"
+    },
+    {
+      "test": "Script Quality Analysis",
+      "status": "PASS",
+      "details": "Script analysis endpoint exists and is properly secured (returns 401 without auth). Testing limited by lack of calls in call_logs collection.",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-12-01T00:04:58.911884"
+    },
+    {
+      "test": "Verify Script QC Results Saved",
+      "status": "WARN",
+      "details": "Script QC results field not populated (expected since analysis couldn't run). Call structure ready for script_qc_results. Available fields: ['id', 'user_id', 'agent_id', 'agent_name', 'phone_number', 'direction', 'duration', 'status', 'sentiment', 'latency', 'transcript', 'recording_url', 'daily_room_url', 'metadata', 'timestamp']",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-12-01T00:04:58.978263"
+    },
+    {
+      "test": "Endpoint Functionality Verification",
+      "status": "PASS",
+      "details": "QC Enhanced calls/fetch endpoint exists and is properly secured. Returns 401 without auth, 404 with auth.",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-12-01T00:04:59.054402"
+    },
+    {
+      "test": "Script Analysis Parameter Validation",
+      "status": "PASS",
+      "details": "Script analysis endpoint properly validates required parameters: call_id required",
+      "expected_status": 400,
+      "actual_status": 400,
+      "timestamp": "2025-12-01T00:04:59.063755"
+    }
+  ]
+}

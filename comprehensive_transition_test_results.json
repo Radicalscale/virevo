@@ -1,0 +1,220 @@
+{
+  "summary": {
+    "total_tests": 26,
+    "passed_tests": 24,
+    "failed_tests": 2,
+    "success_rate": 92.3076923076923,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-11-30T17:47:49.232911"
+  },
+  "detailed_results": [
+    {
+      "test": "Authentication",
+      "status": "PASS",
+      "details": "Logged in successfully",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:36.876342"
+    },
+    {
+      "test": "List Agents",
+      "status": "PASS",
+      "details": "Found 3 agents",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:36.946576"
+    },
+    {
+      "test": "Analyze Agent Structures",
+      "status": "PASS",
+      "details": "Found 3 agents with transitions",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:36.947408"
+    },
+    {
+      "test": "Transition Greeting->Banana Path - Correct Transition",
+      "status": "PASS",
+      "details": "Successfully transitioned from Greeting to Banana Path",
+      "expected": "3",
+      "actual": "3",
+      "timestamp": "2025-11-30T17:47:38.631714"
+    },
+    {
+      "test": "Transition Greeting->Banana Path - Transition Test Success",
+      "status": "PASS",
+      "details": "Transition test marked as successful",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:38.631743"
+    },
+    {
+      "test": "Transition Greeting->Banana Path - Response Structure",
+      "status": "PASS",
+      "details": "All required fields present in response",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:38.631752"
+    },
+    {
+      "test": "Transition Greeting->Strawberry Path - Correct Transition",
+      "status": "FAIL",
+      "details": "Expected Strawberry Path but got Banana Path",
+      "expected": "4",
+      "actual": "3",
+      "timestamp": "2025-11-30T17:47:40.298862"
+    },
+    {
+      "test": "Transition Banana Path->Ending - Correct Transition",
+      "status": "PASS",
+      "details": "Successfully transitioned from Banana Path to Ending",
+      "expected": "5",
+      "actual": "5",
+      "timestamp": "2025-11-30T17:47:40.416851"
+    },
+    {
+      "test": "Transition Banana Path->Ending - Transition Test Success",
+      "status": "PASS",
+      "details": "Transition test marked as successful",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.416879"
+    },
+    {
+      "test": "Transition Banana Path->Ending - Response Structure",
+      "status": "PASS",
+      "details": "All required fields present in response",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.416888"
+    },
+    {
+      "test": "Invalid Start Node Handling",
+      "status": "PASS",
+      "details": "System handled invalid start node gracefully",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.488835"
+    },
+    {
+      "test": "Invalid Session ID Handling",
+      "status": "PASS",
+      "details": "Correctly returned 404 for invalid session ID",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.526856"
+    },
+    {
+      "test": "Transition Collect Message->Message Check - Correct Transition",
+      "status": "FAIL",
+      "details": "Expected Message Check but got Other",
+      "expected": "3",
+      "actual": "5",
+      "timestamp": "2025-11-30T17:47:40.630884"
+    },
+    {
+      "test": "Invalid Start Node Handling",
+      "status": "PASS",
+      "details": "System handled invalid start node gracefully",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.700456"
+    },
+    {
+      "test": "Invalid Session ID Handling",
+      "status": "PASS",
+      "details": "Correctly returned 404 for invalid session ID",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:40.737711"
+    },
+    {
+      "test": "Transition Greeting->converter - Correct Transition",
+      "status": "PASS",
+      "details": "Successfully transitioned from Greeting to converter",
+      "expected": "1761644423247",
+      "actual": "1761644423247",
+      "timestamp": "2025-11-30T17:47:45.646304"
+    },
+    {
+      "test": "Transition Greeting->converter - Transition Test Success",
+      "status": "PASS",
+      "details": "Transition test marked as successful",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:45.646335"
+    },
+    {
+      "test": "Transition Greeting->converter - Response Structure",
+      "status": "PASS",
+      "details": "All required fields present in response",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:45.646344"
+    },
+    {
+      "test": "Transition Scheduler->Conversation - Correct Transition",
+      "status": "PASS",
+      "details": "Successfully transitioned from Scheduler to Conversation",
+      "expected": "1761570673073",
+      "actual": "1761570673073",
+      "timestamp": "2025-11-30T17:47:49.017883"
+    },
+    {
+      "test": "Transition Scheduler->Conversation - Transition Test Success",
+      "status": "PASS",
+      "details": "Transition test marked as successful",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.017913"
+    },
+    {
+      "test": "Transition Scheduler->Conversation - Response Structure",
+      "status": "PASS",
+      "details": "All required fields present in response",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.017922"
+    },
+    {
+      "test": "Transition Conversation->Ending - Correct Transition",
+      "status": "PASS",
+      "details": "Successfully transitioned from Conversation to Ending",
+      "expected": "1761570685164",
+      "actual": "1761570685164",
+      "timestamp": "2025-11-30T17:47:49.125749"
+    },
+    {
+      "test": "Transition Conversation->Ending - Transition Test Success",
+      "status": "PASS",
+      "details": "Transition test marked as successful",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.125778"
+    },
+    {
+      "test": "Transition Conversation->Ending - Response Structure",
+      "status": "PASS",
+      "details": "All required fields present in response",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.125786"
+    },
+    {
+      "test": "Invalid Start Node Handling",
+      "status": "PASS",
+      "details": "System handled invalid start node gracefully",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.198624"
+    },
+    {
+      "test": "Invalid Session ID Handling",
+      "status": "PASS",
+      "details": "Correctly returned 404 for invalid session ID",
+      "expected": null,
+      "actual": null,
+      "timestamp": "2025-11-30T17:47:49.232617"
+    }
+  ]
+}

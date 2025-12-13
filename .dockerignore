@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.mypy_cache
+
+# Frontend
+frontend/node_modules
+frontend/build
+frontend/.env
+frontend/yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.production
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testing
+test_*.py
+tests/
+.coverage
+
+# Documentation
+*.md
+!README.md
+
+# Data (ChromaDB will be created at runtime)
+data/*
+
+# Misc
+.DS_Store
+*.bak
+*.tmp

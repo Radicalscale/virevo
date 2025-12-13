@@ -1,0 +1,21 @@
+[build]
+  base = "frontend"
+  command = "yarn build"
+  publish = "build"
+  
+[build.environment]
+  NODE_VERSION = "20"
+  REACT_APP_BACKEND_URL = "https://api.li-ai.org"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

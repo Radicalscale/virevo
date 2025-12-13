@@ -1,0 +1,125 @@
+{
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 14,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_agent_id": "test-agent-123",
+    "test_timestamp": "2025-11-28T11:37:37.473201"
+  },
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "status": "PASS",
+      "details": "Backend is running. Response: {\"status\":\"healthy\",\"database\":\"connected\",\"deepgram\":\"configured\",\"openai\":\"configured\",\"elevenlabs",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-11-28T11:37:37.195749"
+    },
+    {
+      "test": "Playbook - Get current playbook",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.237534"
+    },
+    {
+      "test": "Playbook - Update playbook",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.245283"
+    },
+    {
+      "test": "Playbook - Get version history",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.256910"
+    },
+    {
+      "test": "Playbook - Restore version",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.263671"
+    },
+    {
+      "test": "Learning Control - Get learning config",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.305880"
+    },
+    {
+      "test": "Learning Control - Update config",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.316597"
+    },
+    {
+      "test": "Learning Control - Trigger learning",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.322678"
+    },
+    {
+      "test": "Learning Control - Get learning stats",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.328307"
+    },
+    {
+      "test": "Analysis Logs - Get analysis logs",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.368604"
+    },
+    {
+      "test": "Analysis Logs - Update log outcome",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.381681"
+    },
+    {
+      "test": "Patterns - Get patterns",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.424260"
+    },
+    {
+      "test": "Patterns - Delete pattern",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.430975"
+    },
+    {
+      "test": "Sessions - Get learning sessions",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-28T11:37:37.472913"
+    }
+  ]
+}

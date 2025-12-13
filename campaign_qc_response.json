@@ -1,0 +1,56 @@
+{
+  "campaign_id": "b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8",
+  "campaign_name": "Test %",
+  "summary": {
+    "total_calls": 2,
+    "analyzed": 2,
+    "pending": 0,
+    "failed": 0,
+    "tech_analyzed": 1,
+    "script_analyzed": 1,
+    "tonality_analyzed": 2
+  },
+  "calls": [
+    {
+      "call_id": "v3:_IX_55wcALxFbdC3Is6CKyZv2PN4JWtSoEdx0Zj1docsmnCO1TGoVw",
+      "analysis_status": "completed",
+      "analysis_error": null,
+      "updated_at": "2025-12-01T08:08:27.360000",
+      "has_tech_qc": true,
+      "has_script_qc": true,
+      "has_tonality_qc": true,
+      "has_audio_tonality": false,
+      "script_summary": {
+        "total_turns": 7,
+        "good_quality": 2,
+        "needs_improvement": 5,
+        "poor_quality": 0
+      },
+      "tech_summary": {
+        "avg_latency": 0,
+        "nodes_analyzed": 0
+      },
+      "tonality_summary": {
+        "overall": "unknown",
+        "sentiment": "unknown"
+      }
+    },
+    {
+      "call_id": "v3:WZfJSDmbhKTJsireenz1q9FuSWKW9JsujNaLvaYHCRfoOaABEan8Fw",
+      "analysis_status": "completed",
+      "analysis_error": null,
+      "updated_at": "2025-12-01T08:08:29.827000",
+      "has_tech_qc": false,
+      "has_script_qc": false,
+      "has_tonality_qc": false,
+      "has_audio_tonality": false,
+      "tonality_summary": {
+        "overall": "unknown",
+        "sentiment": "unknown"
+      }
+    }
+  ],
+  "batch_analysis_status": "completed",
+  "batch_analysis_completed": 2,
+  "batch_analysis_total": 2
+}

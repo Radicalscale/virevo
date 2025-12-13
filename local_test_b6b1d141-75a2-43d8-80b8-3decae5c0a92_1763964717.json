@@ -1,0 +1,50 @@
+{
+  "agent": {
+    "id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+    "name": "JK First Caller-copy",
+    "type": "call_flow"
+  },
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 0.06238245964050293,
+    "llm_calls": 3,
+    "node_transitions": 0
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "node_id": "2",
+      "latency": 9.012222290039062e-05,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:11:57.681920"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "node_id": "1763159750250",
+      "latency": 0.062163352966308594,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:11:57.744157"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "node_id": "1763161849799",
+      "latency": 0.0001289844512939453,
+      "should_end": false,
+      "timestamp": "2025-11-24T06:11:57.744334"
+    }
+  ],
+  "profiling": {
+    "total_turn": [
+      0.0001289844512939453
+    ],
+    "process_input": [
+      0.00011944770812988281
+    ]
+  }
+}

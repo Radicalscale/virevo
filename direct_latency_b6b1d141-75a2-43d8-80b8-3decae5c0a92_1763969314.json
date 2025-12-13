@@ -1,0 +1,63 @@
+{
+  "agent_id": "b6b1d141-75a2-43d8-80b8-3decae5c0a92",
+  "metrics": {
+    "total_turns": 3,
+    "total_latency": 0.09338808059692383,
+    "avg_latency": 0.03112936019897461,
+    "min_latency": 7.748603820800781e-05,
+    "max_latency": 0.09319281578063965,
+    "target_latency": 2.0,
+    "turns_met_target": 3,
+    "turns_missed_target": 0
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user_message": "Yeah, this is Mike",
+      "agent_response": "Mike Rodriguez?",
+      "true_latency": 7.748603820800781e-05,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_estimate": 0.24,
+        "total_turn_time": 0.0
+      },
+      "node_id": "2",
+      "node_label": "Greeting",
+      "response_words": 2,
+      "met_target": true,
+      "timestamp": "2025-11-24T07:28:34.575790"
+    },
+    {
+      "turn": 2,
+      "user_message": "Sure",
+      "agent_response": "This is Jake. I was just, um, wondering if you could possibly help me out for a moment?",
+      "true_latency": 0.09319281578063965,
+      "detailed_timing": {
+        "llm_time": 0.093,
+        "tts_estimate": 0.56,
+        "total_turn_time": 0.093
+      },
+      "node_id": "1763159750250",
+      "node_label": "Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)",
+      "response_words": 18,
+      "met_target": true,
+      "timestamp": "2025-11-24T07:28:34.669089"
+    },
+    {
+      "turn": 3,
+      "user_message": "Go ahead",
+      "agent_response": "<speak>Well, uh<break time=\"300ms\"/> I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. <break time=\"500ms\"/> <prosody rate=\"90%\">I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?</prosody></speak>",
+      "true_latency": 0.00011777877807617188,
+      "detailed_timing": {
+        "llm_time": 0.0,
+        "tts_estimate": 1.28,
+        "total_turn_time": 0.0
+      },
+      "node_id": "1763161849799",
+      "node_label": "Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic",
+      "response_words": 54,
+      "met_target": true,
+      "timestamp": "2025-11-24T07:28:34.669289"
+    }
+  ]
+}

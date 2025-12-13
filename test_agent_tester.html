@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Tester API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { margin: 5px; padding: 10px 15px; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Agent Tester API Test</h1>
+    <p>Testing the Agent Tester endpoints for agent: <strong>b6b1d141-75a2-43d8-80b8-3decae5c0a92</strong></p>
+    
+    <button onclick="testStartSession()">Test Start Session</button>
+    <button onclick="testSendMessage()">Test Send Message</button>
+    <button onclick="testResetSession()">Test Reset Session</button>
+    <button onclick="testAllEndpoints()">Test All Endpoints</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const BACKEND_URL = 'https://tts-guardian.preview.emergentagent.com';
+        const AGENT_ID = 'b6b1d141-75a2-43d8-80b8-3decae5c0a92';
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testStartSession() {
+            addResult('Testing POST /api/agents/{id}/test/start...', 'info');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/agents/${AGENT_ID}/test/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    addResult(`✅ Start Session: Endpoint exists, returns 401 (authentication required) - ${JSON.stringify(data)}`, 'success');
+                } else if (response.status === 404) {
+                    addResult(`❌ Start Session: 404 Not Found - ${JSON.stringify(data)}`, 'error');
+                } else {
+                    addResult(`✅ Start Session: Status ${response.status} - ${JSON.stringify(data)}`, 'success');
+                }
+            } catch (error) {
+                addResult(`❌ Start Session: Network error - ${error.message}`, 'error');
+            }
+        }
+
+        async function testSendMessage() {
+            addResult('Testing POST /api/agents/{id}/test/message...', 'info');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/agents/${AGENT_ID}/test/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        message: 'Yes, this is John',
+                        session_id: 'test-session-123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    addResult(`✅ Send Message: Endpoint exists, returns 401 (authentication required) - ${JSON.stringify(data)}`, 'success');
+                } else if (response.status === 404) {
+                    addResult(`❌ Send Message: 404 Not Found - ${JSON.stringify(data)}`, 'error');
+                } else {
+                    addResult(`✅ Send Message: Status ${response.status} - ${JSON.stringify(data)}`, 'success');
+                }
+            } catch (error) {
+                addResult(`❌ Send Message: Network error - ${error.message}`, 'error');
+            }
+        }
+
+        async function testResetSession() {
+            addResult('Testing POST /api/agents/{id}/test/reset...', 'info');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/agents/${AGENT_ID}/test/reset`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        session_id: 'test-session-123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    addResult(`✅ Reset Session: Endpoint exists, returns 401 (authentication required) - ${JSON.stringify(data)}`, 'success');
+                } else if (response.status === 404) {
+                    addResult(`❌ Reset Session: 404 Not Found - ${JSON.stringify(data)}`, 'error');
+                } else {
+                    addResult(`✅ Reset Session: Status ${response.status} - ${JSON.stringify(data)}`, 'success');
+                }
+            } catch (error) {
+                addResult(`❌ Reset Session: Network error - ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllEndpoints() {
+            addResult('=== COMPREHENSIVE AGENT TESTER API TEST ===', 'info');
+            await testStartSession();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testSendMessage();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testResetSession();
+            addResult('=== TEST COMPLETE ===', 'info');
+        }
+
+        // Test CORS
+        addResult('Testing CORS configuration...', 'info');
+        fetch(`${BACKEND_URL}/api/agents/${AGENT_ID}/test/start`, {
+            method: 'OPTIONS',
+            headers: {
+                'Origin': 'https://li-ai.org',
+                'Access-Control-Request-Method': 'POST',
+                'Access-Control-Request-Headers': 'Content-Type'
+            }
+        }).then(response => {
+            if (response.ok) {
+                addResult('✅ CORS: Preflight request successful', 'success');
+            } else {
+                addResult(`❌ CORS: Preflight failed with status ${response.status}`, 'error');
+            }
+        }).catch(error => {
+            addResult(`❌ CORS: Preflight error - ${error.message}`, 'error');
+        });
+    </script>
+</body>
+</html>

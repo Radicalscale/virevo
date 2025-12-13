@@ -1,0 +1,164 @@
+{
+  "summary": {
+    "total_tests": 19,
+    "passed_tests": 15,
+    "failed_tests": 4,
+    "success_rate": 78.94736842105263,
+    "backend_url": "https://tts-guardian.preview.emergentagent.com",
+    "test_timestamp": "2025-11-30T03:12:20.368378"
+  },
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "status": "PASS",
+      "details": "Backend is running. Response: {\"status\":\"healthy\",\"database\":\"connected\",\"deepgram\":\"configured\",\"openai\":\"configured\",\"elevenlabs",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-11-30T03:12:18.955175"
+    },
+    {
+      "test": "QC CRUD - List QC agents",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:18.989235"
+    },
+    {
+      "test": "QC CRUD - Create QC agent",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:18.999679"
+    },
+    {
+      "test": "QC CRUD - Get specific agent",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.008323"
+    },
+    {
+      "test": "QC CRUD - Update agent",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.014240"
+    },
+    {
+      "test": "QC CRUD - Delete agent",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.021600"
+    },
+    {
+      "test": "QC KB - List KB items",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.055152"
+    },
+    {
+      "test": "QC KB - Upload KB file",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.059853"
+    },
+    {
+      "test": "QC KB - Delete KB item",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.064702"
+    },
+    {
+      "test": "Interruption - Get default phrases",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.101162"
+    },
+    {
+      "test": "Interruption - Check for interruption",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": "401/403",
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.106564"
+    },
+    {
+      "test": "Audio Tonality - No Auth",
+      "status": "PASS",
+      "details": "Correctly requires authentication",
+      "expected_status": 401,
+      "actual_status": 401,
+      "timestamp": "2025-11-30T03:12:19.145944"
+    },
+    {
+      "test": "Audio Tonality - Endpoint Exists",
+      "status": "PASS",
+      "details": "Endpoint exists (405 Method Not Allowed for GET on POST endpoint)",
+      "expected_status": 405,
+      "actual_status": 405,
+      "timestamp": "2025-11-30T03:12:19.177861"
+    },
+    {
+      "test": "Audio Tonality - Missing call_id (Authenticated)",
+      "status": "PASS",
+      "details": "Correctly validates missing call_id parameter",
+      "expected_status": 400,
+      "actual_status": 400,
+      "timestamp": "2025-11-30T03:12:20.249065"
+    },
+    {
+      "test": "Audio Tonality - Invalid call_id (Authenticated)",
+      "status": "PASS",
+      "details": "Correctly returns 404 for non-existent call_id",
+      "expected_status": 404,
+      "actual_status": 404,
+      "timestamp": "2025-11-30T03:12:20.313759"
+    },
+    {
+      "test": "OpenAPI Schema - /api/docs",
+      "status": "FAIL",
+      "details": "Schema endpoint not accessible",
+      "expected_status": 200,
+      "actual_status": 404,
+      "timestamp": "2025-11-30T03:12:20.348850"
+    },
+    {
+      "test": "OpenAPI Schema - /api/openapi.json",
+      "status": "FAIL",
+      "details": "Schema endpoint not accessible",
+      "expected_status": 200,
+      "actual_status": 404,
+      "timestamp": "2025-11-30T03:12:20.353839"
+    },
+    {
+      "test": "OpenAPI Schema - /docs",
+      "status": "WARN",
+      "details": "Endpoint returns HTML (frontend redirect), not OpenAPI JSON schema",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-11-30T03:12:20.361369"
+    },
+    {
+      "test": "OpenAPI Schema - /openapi.json",
+      "status": "WARN",
+      "details": "Endpoint returns HTML (frontend redirect), not OpenAPI JSON schema",
+      "expected_status": 200,
+      "actual_status": 200,
+      "timestamp": "2025-11-30T03:12:20.368009"
+    }
+  ]
+}
