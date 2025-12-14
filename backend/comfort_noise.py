@@ -172,3 +172,106 @@ def generate_continuous_comfort_noise(duration_seconds: int = 300, output_path: 
         logger.error(f"Error generating comfort noise: {e}")
         return None
 
+
+# =============================================================================
+# MULAW COMFORT NOISE FOR WEBSOCKET MIXING
+# =============================================================================
+# These functions generate comfort noise in raw mulaw format for mixing
+# directly into WebSocket audio chunks (since REST API playback doesn't
+# overlay properly with WebSocket streaming)
+
+# Global mulaw comfort noise sample for WebSocket mixing
+_comfort_noise_mulaw = None
+
+
+def generate_comfort_noise_mulaw() -> bytes:
+    """
+    Generate comfort noise as raw mulaw bytes for WebSocket mixing.
+    Returns 30 seconds of mulaw comfort noise at 8kHz.
+    """
+    try:
+        import subprocess
+        import tempfile
+        import os as os_module
+        
+        # Generate comfort noise as AudioSegment
+        sample = generate_comfort_noise_sample(duration_seconds=30)
+        if not sample:
+            return None
+        
+        # Export to temporary WAV
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as wav_file:
+            wav_path = wav_file.name
+        
+        with tempfile.NamedTemporaryFile(suffix='.mulaw', delete=False) as mulaw_file:
+            mulaw_path = mulaw_file.name
+        
+        try:
+            # Export AudioSegment to WAV
+            sample.export(wav_path, format='wav')
+            
+            # Convert WAV to mulaw using ffmpeg
+            result = subprocess.run([
+                'ffmpeg', '-y',
+                '-i', wav_path,
+                '-ar', '8000',        # 8kHz sample rate
+                '-ac', '1',           # Mono
+                '-f', 'mulaw',        # mulaw codec
+                mulaw_path
+            ], capture_output=True, timeout=10)
+            
+            if result.returncode == 0:
+                with open(mulaw_path, 'rb') as f:
+                    mulaw_data = f.read()
+                logger.info(f"✅ Generated mulaw comfort noise: {len(mulaw_data)} bytes")
+                return mulaw_data
+            else:
+                logger.error(f"❌ ffmpeg error: {result.stderr.decode()}")
+                return None
+                
+        finally:
+            # Clean up temp files
+            try:
+                os_module.remove(wav_path)
+                os_module.remove(mulaw_path)
+            except:
+                pass
+                
+    except Exception as e:
+        logger.error(f"❌ Error generating mulaw comfort noise: {e}")
+        return None
+
+
+def get_comfort_noise_mulaw() -> bytes:
+    """Get cached mulaw comfort noise sample (loads on first call)"""
+    global _comfort_noise_mulaw
+    if _comfort_noise_mulaw is None:
+        logger.info("🎵 Loading mulaw comfort noise for WebSocket mixing...")
+        _comfort_noise_mulaw = generate_comfort_noise_mulaw()
+    return _comfort_noise_mulaw
+
+
+def get_comfort_noise_chunk(chunk_size: int, position: int) -> bytes:
+    """
+    Get a chunk of comfort noise mulaw bytes for sending during silence.
+    
+    Args:
+        chunk_size: Number of bytes to return (typically 160 for 20ms)
+        position: Current position in the noise loop
+        
+    Returns:
+        Raw mulaw bytes of comfort noise
+    """
+    noise = get_comfort_noise_mulaw()
+    if not noise or len(noise) == 0:
+        # Return silence (0xFF in mulaw is silence)
+        return bytes([0xFF] * chunk_size)
+    
+    noise_len = len(noise)
+    chunk = bytearray(chunk_size)
+    
+    for i in range(chunk_size):
+        noise_pos = (position + i) % noise_len
+        chunk[i] = noise[noise_pos]
+    
+    return bytes(chunk)
