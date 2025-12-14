@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File
+from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -2871,6 +2871,189 @@ def update_call_state(call_control_id: str, updates: dict):
     # Update in-memory fallback
     if call_control_id in active_telnyx_calls:
         active_telnyx_calls[call_control_id].update(updates)
+
+# ============ WEBHOOK TRIGGER ENDPOINT (API Key Auth for External Services) ============
+
+class WebhookTriggerCallRequest(BaseModel):
+    """Request model for webhook-triggered outbound calls"""
+    agent_id: str
+    to_number: str
+    from_number: Optional[str] = None
+    custom_variables: Optional[dict] = None
+    email: Optional[str] = None
+
+@api_router.post("/webhook/trigger-call")
+async def webhook_trigger_outbound_call(
+    request: WebhookTriggerCallRequest,
+    x_api_key: str = Header(..., alias="X-API-Key")
+):
+    """
+    Trigger an outbound call via external webhook.
+    
+    Use this endpoint from external services like n8n, Zapier, Make, etc.
+    
+    Authentication: Pass your user API key in the X-API-Key header.
+    You can find/create your API key in Settings > API Keys > "webhook" service.
+    
+    Example:
+    ```
+    curl -X POST "https://your-backend.com/api/webhook/trigger-call" \
+      -H "Content-Type: application/json" \
+      -H "X-API-Key: your-webhook-api-key" \
+      -d '{
+        "agent_id": "your-agent-uuid",
+        "to_number": "+17701234567",
+        "from_number": "+14048000152",
+        "custom_variables": {"name": "John"}
+      }'
+    ```
+    """
+    try:
+        from key_encryption import decrypt_api_key
+        
+        # Find user by webhook API key
+        # First, check if the key matches any stored webhook key
+        all_webhook_keys = await db.api_keys.find({
+            "service_name": "webhook",
+            "is_active": True
+        }).to_list(None)
+        
+        user_id = None
+        for key_doc in all_webhook_keys:
+            try:
+                decrypted_key = decrypt_api_key(key_doc.get("api_key", ""))
+                if decrypted_key == x_api_key:
+                    user_id = key_doc.get("user_id")
+                    break
+            except:
+                continue
+        
+        if not user_id:
+            logger.warning(f"❌ Invalid webhook API key attempted")
+            raise HTTPException(status_code=401, detail="Invalid API key")
+        
+        logger.info(f"✅ Webhook auth successful for user: {user_id[:8]}...")
+        
+        # Get agent and verify ownership
+        agent = await db.agents.find_one({"id": request.agent_id, "user_id": user_id})
+        if not agent:
+            raise HTTPException(status_code=404, detail="Agent not found or not owned by this user")
+        
+        # Get from_number
+        from_number = request.from_number or "+14048000152"
+        
+        # Create webhook URL
+        backend_url = os.environ.get("BACKEND_URL")
+        if not backend_url:
+            raise ValueError("BACKEND_URL environment variable must be set for outbound calls")
+        
+        if not backend_url.startswith("http://") and not backend_url.startswith("https://"):
+            backend_url = f"https://{backend_url}"
+        
+        webhook_url = f"{backend_url}/api/telnyx/webhook"
+        
+        # Create WebSocket streaming URL
+        if backend_url.startswith("https://"):
+            ws_url = backend_url.replace("https://", "wss://")
+        elif backend_url.startswith("http://"):
+            ws_url = backend_url.replace("http://", "ws://")
+        else:
+            ws_url = f"wss://{backend_url}"
+        
+        stream_url = f"{ws_url}/api/telnyx/audio-stream"
+        
+        # Get user's Telnyx API keys from database
+        telnyx_api_key = await get_api_key(user_id, "telnyx")
+        telnyx_connection_id = await get_api_key(user_id, "telnyx_connection_id")
+        
+        if not telnyx_api_key or not telnyx_connection_id:
+            raise HTTPException(
+                status_code=400, 
+                detail="Telnyx API key and Connection ID must be configured in API Keys settings"
+            )
+        
+        # Get voicemail detection settings
+        vm_settings = agent.get("settings", {}).get("voicemail_detection", {})
+        enable_amd = vm_settings.get("enabled", True) and vm_settings.get("use_telnyx_amd", True)
+        amd_mode = vm_settings.get("telnyx_amd_mode", "premium")
+        
+        # Initiate call via Telnyx
+        telnyx_service = get_telnyx_service(api_key=telnyx_api_key, connection_id=telnyx_connection_id)
+        call_result = await telnyx_service.initiate_outbound_call(
+            to_number=request.to_number,
+            from_number=from_number,
+            webhook_url=webhook_url,
+            custom_variables=request.custom_variables,
+            stream_url=stream_url,
+            enable_amd=enable_amd,
+            amd_mode=amd_mode
+        )
+        
+        if not call_result.get("success"):
+            raise HTTPException(status_code=500, detail=call_result.get("error"))
+        
+        call_control_id = call_result["call_control_id"]
+        
+        # Create call log
+        await create_call_log(
+            call_id=call_control_id,
+            agent_id=request.agent_id,
+            direction="outbound",
+            from_number=from_number,
+            to_number=request.to_number,
+            user_id=user_id
+        )
+        
+        # Sanitize agent data
+        agent_sanitized = {}
+        for key, value in agent.items():
+            if key == "_id":
+                continue
+            if isinstance(value, datetime):
+                agent_sanitized[key] = value.isoformat()
+            else:
+                agent_sanitized[key] = value
+        
+        call_data = {
+            "agent_id": request.agent_id,
+            "agent": agent_sanitized,
+            "custom_variables": {
+                **(request.custom_variables or {}),
+                "to_number": request.to_number,
+                "phone_number": request.to_number,
+                "email": request.email
+            },
+            "to_number": request.to_number,
+            "email": request.email,
+            "session": None
+        }
+        
+        # Store in Redis and memory
+        try:
+            redis_service.set_call_data(call_control_id, call_data, ttl=3600)
+            active_telnyx_calls[call_control_id] = call_data
+            logger.info(f"📦 Call data stored in Redis and memory")
+        except Exception as e:
+            logger.error(f"❌ Error storing call data: {e}")
+            active_telnyx_calls[call_control_id] = call_data
+        
+        logger.info(f"📞 Webhook-triggered outbound call initiated: {call_control_id}")
+        
+        return {
+            "success": True,
+            "call_id": call_control_id,
+            "status": "queued",
+            "from_number": from_number,
+            "to_number": request.to_number,
+            "email": request.email
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in webhook trigger call: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @api_router.post("/telnyx/call/outbound")
 async def initiate_outbound_call(
