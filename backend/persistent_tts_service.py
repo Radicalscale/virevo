@@ -261,7 +261,8 @@ class PersistentTTSSession:
         self,
         sentence: str,
         is_first: bool = False,
-        is_last: bool = False
+        is_last: bool = False,
+        current_voice_id: str = None  # 🔥 New parameter to handle voice updates
     ) -> bool:
         """
         Stream a sentence through the persistent WebSocket
@@ -271,10 +272,27 @@ class PersistentTTSSession:
             sentence: Text to synthesize
             is_first: If True, this is the first sentence of the response
             is_last: If True, this is the last sentence and should flush
+            current_voice_id: If provided, checks if voice changed and reconnects
             
         Returns:
             bool: True if streaming started successfully
         """
+        # 🔥 CHECK FOR VOICE CHANGE: If agent config updated, reconnect with new voice
+        if current_voice_id and current_voice_id != self.voice_id:
+            logger.info(f"🎙️ [Call {self.call_control_id}] Voice changed detected! ({self.voice_id} -> {current_voice_id})")
+            logger.info(f"🔄 Reconnecting persistent TTS session with new voice...")
+            
+            # Update internal voice ID
+            self.voice_id = current_voice_id
+            
+            # Force reconnection (will use new self.voice_id)
+            # We close first to ensure clean state
+            if self.ws_service:
+                await self.ws_service.close()
+                self.connected = False
+            
+            # Reconnection happens automatically below in the check
+        
         # 🔥 CRITICAL FIX: Reset interrupt flag FIRST if this is a new response
         # This MUST happen before checking the flag, otherwise we can never recover from interruption
         if is_first:
