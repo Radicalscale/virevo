@@ -2048,7 +2048,27 @@ const AgentForm = () => {
               </p>
 
               <div>
-                <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="webhook-active"
+                      checked={formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          post_call_webhook_active: e.target.checked
+                        }
+                      })}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <Label htmlFor="webhook-active" className="text-sm text-gray-300 cursor-pointer">
+                      Enable Webhook
+                    </Label>
+                  </div>
+                </div>
                 <Input
                   type="url"
                   placeholder="https://your-n8n-instance.com/webhook/your-webhook-id"
@@ -2057,13 +2077,14 @@ const AgentForm = () => {
                     ...formData,
                     settings: {
                       ...formData.settings,
-                      post_call_webhook_url: e.target.value || null
+                      post_call_webhook_url: e.target.value
                     }
                   })}
-                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                  disabled={!(formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url)}
+                  className={`bg-gray-900 border-gray-700 text-white mt-1 ${(formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url) ? '' : 'opacity-50 cursor-not-allowed'}`}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Leave empty to disable. When set, a POST request will be sent after each call with the full transcript.
+                  When enabled, a POST request will be sent after each call with the full transcript.
                 </p>
               </div>
 
