@@ -66,6 +66,22 @@ const API_SERVICES = [
     placeholder: 'KEY...',
     getKeyUrl: 'https://portal.telnyx.com/#/app/api-keys',
     required: true
+  },
+  {
+    name: 'telnyx_connection_id',
+    label: 'Telnyx Connection ID',
+    description: 'Your Telnyx TeXML or SIP Connection ID (REQUIRED for calls)',
+    placeholder: 'your-connection-id-here',
+    getKeyUrl: 'https://portal.telnyx.com/#/app/connections',
+    required: true
+  },
+  {
+    name: 'webhook',
+    label: 'Webhook API Key',
+    description: 'API key for external services (n8n, Zapier, Make) to trigger calls',
+    placeholder: 'Create any secret key (e.g., my-secret-key-12345)',
+    getKeyUrl: null,
+    required: false
   }
 ];
 
@@ -151,7 +167,7 @@ function APIKeyManager() {
         service_name: serviceName,
         api_key: keyValue
       });
-      
+
       showMessage('success', `${serviceName} API key saved successfully`);
       setEditingKey(null);
       setKeyValue('');
@@ -277,7 +293,7 @@ function APIKeyManager() {
                   >
                     {hasKey ? 'Update Key' : 'Add Key'}
                   </button>
-                  
+
                   {hasKey && (
                     <>
                       <button
@@ -295,15 +311,17 @@ function APIKeyManager() {
                       </button>
                     </>
                   )}
-                  
-                  <a
-                    href={service.getKeyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-link"
-                  >
-                    Get API Key →
-                  </a>
+
+                  {service.getKeyUrl && (
+                    <a
+                      href={service.getKeyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-link"
+                    >
+                      Get API Key →
+                    </a>
+                  )}
                 </div>
               )}
             </div>
@@ -315,7 +333,7 @@ function APIKeyManager() {
       <div className="qc-config-section" style={{ marginTop: '40px', padding: '24px', background: '#1a1a2e', borderRadius: '8px', border: '1px solid #333' }}>
         <h2 style={{ color: '#fff', marginBottom: '8px' }}>🎯 QC Agent Configuration</h2>
         <p style={{ color: '#888', marginBottom: '24px' }}>Configure the AI model used for post-call quality analysis</p>
-        
+
         <div style={{ display: 'grid', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', color: '#fff', marginBottom: '8px', fontWeight: '500' }}>
