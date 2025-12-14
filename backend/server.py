@@ -4058,18 +4058,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         # when it knows the real audio length after TTS generation)
                         call_states[call_control_id]["agent_last_spoke_time"] = time.time()
                         
-                        # 🔥 Get latest voice ID from config to handle mid-call updates
-                        elevenlabs_settings = agent_config.get("settings", {}).get("elevenlabs_settings", {})
-                        current_voice_id = elevenlabs_settings.get("voice_id")
-                        
                         # Stream sentence immediately (non-blocking, queued for playback)
                         tts_task = asyncio.create_task(
-                            persistent_tts_session.stream_sentence(
-                                sentence, 
-                                is_first=is_first, 
-                                is_last=is_last,
-                                current_voice_id=current_voice_id  # Pass to handle updates
-                            )
+                            persistent_tts_session.stream_sentence(sentence, is_first=is_first, is_last=is_last)
                         )
                         tts_tasks.append(tts_task)
                     else:
