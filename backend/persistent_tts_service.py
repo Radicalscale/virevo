@@ -251,14 +251,7 @@ class PersistentTTSSession:
                 self.sentence_counter += 1
                 sentence_num = self.sentence_counter
                 
-                # 🔥 CONTEXT-AWARE PADDING LOGIC
-                # Determine how long to hold the floor after audio finishes
-                # ? = Question = 0.1s padding (Expect answer)
-                # . = Statement = 0.5s padding (Expect backchannel/silence)
-                is_question = sentence.strip().endswith('?') 
-                self.padding_duration = 0.1 if is_question else 0.5
-                
-                logger.debug(f"🧠 [Call {self.call_control_id}] Sentence type: {'Question' if is_question else 'Statement'} -> Padding: {self.padding_duration}s")
+
                 
                 # ⏱️ Track first sentence start time
                 if sentence_num == 1 and self.request_start_time is None:
@@ -560,10 +553,8 @@ class PersistentTTSSession:
                 # extend from that point. Otherwise, start from now.
                 base_time = max(current_expected_end, current_time)
                 
-                # 🔥 FLOOR HOLDING: Add Context-Aware Padding
-                # padding_duration is set in stream_sentence (0.1s for ?, 0.5s for .)
-                padding = getattr(self, 'padding_duration', 0.5)
-                new_expected_end = base_time + actual_duration_seconds + padding
+                # Audio expected end = just the actual audio duration, no padding
+                new_expected_end = base_time + actual_duration_seconds
                 
                 call_states[self.call_control_id]["playback_expected_end_time"] = new_expected_end
                 
@@ -572,7 +563,7 @@ class PersistentTTSSession:
                 self.is_speaking = True
                 
                 time_until_end = new_expected_end - current_time
-                logger.info(f"⏱️ EXTEND playback_expected_end_time: +{actual_duration_seconds:.1f}s + 0.5s buffer (total: {time_until_end:.1f}s from now)")
+                logger.info(f"⏱️ EXTEND playback_expected_end_time: +{actual_duration_seconds:.1f}s (total: {time_until_end:.1f}s from now)")
             
             for i in range(0, len(mulaw_data), chunk_size):
                 # 🔥 CHECK INTERRUPTED FLAG - stop immediately if user interrupted
