@@ -2876,35 +2876,85 @@ def update_call_state(call_control_id: str, updates: dict):
 
 @api_router.post("/webhook/trigger-call")
 async def webhook_trigger_outbound_call(
-    request: WebhookTriggerCallRequest,
+    payload: dict,
     x_api_key: str = Header(..., alias="X-API-Key")
 ):
     """
     Trigger an outbound call via external webhook.
     
-    Use this endpoint from external services like n8n, Zapier, Make, etc.
+    Use this endpoint from external services like n8n, Zapier, Make, GoHighLevel, etc.
     
     Authentication: Pass your user API key in the X-API-Key header.
     You can find/create your API key in Settings > API Keys > "webhook" service.
     
-    Example:
+    Supports two payload formats:
+    
+    1. Simple format (recommended):
+    ```json
+    {
+      "agent_id": "your-agent-uuid",
+      "to_number": "+17701234567",
+      "from_number": "+14048000152",
+      "custom_variables": {"name": "John"}
+    }
     ```
-    curl -X POST "https://your-backend.com/api/webhook/trigger-call" \
-      -H "Content-Type: application/json" \
-      -H "X-API-Key: your-webhook-api-key" \
-      -d '{
+    
+    2. GoHighLevel format (auto-detected):
+    ```json
+    {
+      "phone": "+17701234567",
+      "first_name": "John",
+      "customData": {
         "agent_id": "your-agent-uuid",
-        "to_number": "+17701234567",
-        "from_number": "+14048000152",
-        "custom_variables": {"name": "John"}
-      }'
+        "from_number": "+14048000152"
+      }
+    }
     ```
     """
     try:
         from key_encryption import decrypt_api_key
         
+        # Extract data from payload - handle both simple and GoHighLevel formats
+        custom_data = payload.get("customData", {}) or {}
+        
+        # Extract agent_id (check root first, then customData)
+        agent_id = payload.get("agent_id") or custom_data.get("agent_id")
+        
+        # Extract to_number (check root first, then customData, then phone field)
+        to_number = payload.get("to_number") or custom_data.get("to_number") or payload.get("phone")
+        
+        # Extract from_number (optional)
+        from_number = payload.get("from_number") or custom_data.get("from_number")
+        
+        # Extract email (optional)
+        email = payload.get("email") or custom_data.get("email") or custom_data.get("customer_email")
+        
+        # Build custom_variables from remaining data
+        custom_variables = payload.get("custom_variables") or {}
+        
+        # Add GoHighLevel fields to custom_variables if present
+        if payload.get("first_name"):
+            custom_variables["customer_name"] = f"{payload.get('first_name', '')} {payload.get('last_name', '')}".strip()
+        if custom_data.get("customer_name"):
+            custom_variables["customer_name"] = custom_data.get("customer_name")
+        if payload.get("contact_id"):
+            custom_variables["contact_id"] = payload.get("contact_id")
+        
+        # Validate required fields
+        if not agent_id:
+            raise HTTPException(
+                status_code=400, 
+                detail="Missing agent_id. Provide it at root level or in customData."
+            )
+        if not to_number:
+            raise HTTPException(
+                status_code=400, 
+                detail="Missing to_number. Provide it at root level, in customData, or as 'phone' field."
+            )
+        
+        logger.info(f"📞 Webhook trigger: agent={agent_id}, to={to_number}, from={from_number}")
+        
         # Find user by webhook API key
-        # First, check if the key matches any stored webhook key
         all_webhook_keys = await db.api_keys.find({
             "service_name": "webhook",
             "is_active": True
@@ -2927,12 +2977,12 @@ async def webhook_trigger_outbound_call(
         logger.info(f"✅ Webhook auth successful for user: {user_id[:8]}...")
         
         # Get agent and verify ownership
-        agent = await db.agents.find_one({"id": request.agent_id, "user_id": user_id})
+        agent = await db.agents.find_one({"id": agent_id, "user_id": user_id})
         if not agent:
             raise HTTPException(status_code=404, detail="Agent not found or not owned by this user")
         
-        # Get from_number
-        from_number = request.from_number or "+14048000152"
+        # Use extracted from_number or default
+        final_from_number = from_number or "+14048000152"
         
         # Create webhook URL
         backend_url = os.environ.get("BACKEND_URL")
@@ -2972,10 +3022,10 @@ async def webhook_trigger_outbound_call(
         # Initiate call via Telnyx
         telnyx_service = get_telnyx_service(api_key=telnyx_api_key, connection_id=telnyx_connection_id)
         call_result = await telnyx_service.initiate_outbound_call(
-            to_number=request.to_number,
-            from_number=from_number,
+            to_number=to_number,
+            from_number=final_from_number,
             webhook_url=webhook_url,
-            custom_variables=request.custom_variables,
+            custom_variables=custom_variables,
             stream_url=stream_url,
             enable_amd=enable_amd,
             amd_mode=amd_mode
@@ -2989,10 +3039,10 @@ async def webhook_trigger_outbound_call(
         # Create call log
         await create_call_log(
             call_id=call_control_id,
-            agent_id=request.agent_id,
+            agent_id=agent_id,
             direction="outbound",
-            from_number=from_number,
-            to_number=request.to_number,
+            from_number=final_from_number,
+            to_number=to_number,
             user_id=user_id
         )
         
@@ -3007,16 +3057,16 @@ async def webhook_trigger_outbound_call(
                 agent_sanitized[key] = value
         
         call_data = {
-            "agent_id": request.agent_id,
+            "agent_id": agent_id,
             "agent": agent_sanitized,
             "custom_variables": {
-                **(request.custom_variables or {}),
-                "to_number": request.to_number,
-                "phone_number": request.to_number,
-                "email": request.email
+                **(custom_variables or {}),
+                "to_number": to_number,
+                "phone_number": to_number,
+                "email": email
             },
-            "to_number": request.to_number,
-            "email": request.email,
+            "to_number": to_number,
+            "email": email,
             "session": None
         }
         
@@ -3035,9 +3085,9 @@ async def webhook_trigger_outbound_call(
             "success": True,
             "call_id": call_control_id,
             "status": "queued",
-            "from_number": from_number,
-            "to_number": request.to_number,
-            "email": request.email
+            "from_number": final_from_number,
+            "to_number": to_number,
+            "email": email
         }
         
     except HTTPException:
