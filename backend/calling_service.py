@@ -2480,14 +2480,52 @@ Return ONLY a JSON object with the extracted values. If a value was NOT explicit
                         extraction_prompt += ", "
             extraction_prompt += "}"
             
-            # Call LLM to extract - use temperature=0 for deterministic math calculations
-            client = await self.get_llm_client_for_session("openai")
-            response = await client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": extraction_prompt}],
-                temperature=0.0,
-                max_tokens=500
-            )
+            # Get LLM provider from agent config (not hardcoded OpenAI)
+            llm_provider = self.agent_config.get("settings", {}).get("llm_provider", "openai")
+            model = self.agent_config.get("model", "gpt-4o-mini")
+            
+            logger.info(f"🤖 Using configured LLM provider: {llm_provider} ({model}) for extraction")
+            
+            # Get appropriate client based on provider
+            if llm_provider == "grok":
+                client = await self.get_llm_client_for_session("grok")
+            else:
+                client = await self.get_llm_client_for_session("openai")
+            
+            # Helper function to make the extraction call
+            async def call_extraction():
+                if llm_provider == "grok":
+                    return await client.create_completion(
+                        messages=[{"role": "user", "content": extraction_prompt}],
+                        model=model,
+                        temperature=0.0,
+                        max_tokens=500
+                    )
+                else:
+                    return await client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "user", "content": extraction_prompt}],
+                        temperature=0.0,
+                        max_tokens=500
+                    )
+            
+            # 1-second timeout with silent retry
+            response = None
+            for attempt in range(2):  # Max 2 attempts
+                try:
+                    response = await asyncio.wait_for(call_extraction(), timeout=1.0)
+                    break  # Success, exit loop
+                except asyncio.TimeoutError:
+                    if attempt == 0:
+                        logger.warning(f"⚠️ Extraction timeout (attempt 1) - retrying silently...")
+                    else:
+                        logger.warning(f"⚠️ Extraction timeout (attempt 2) - falling back to normal node logic")
+                        # Return success with no extraction - normal node logic handles missing vars
+                        return {"success": True}
+            
+            if response is None:
+                logger.warning(f"⚠️ Extraction failed - falling back to normal node logic")
+                return {"success": True}
             
             extraction_response = response.choices[0].message.content.strip()
             # Remove markdown if present
@@ -2521,6 +2559,7 @@ Return ONLY a JSON object with the extracted values. If a value was NOT explicit
         except Exception as e:
             logger.error(f"Error in real-time extraction: {e}")
             return {"success": True}  # Don't block conversation on extraction errors
+
 
     async def _extract_variables_background(self, extract_variables: list, user_message: str):
         """Extract variables in the background (non-blocking, fire-and-forget)
