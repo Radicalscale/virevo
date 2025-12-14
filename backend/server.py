@@ -6951,6 +6951,61 @@ async def finalize_call_log(call_id: str, end_reason: str = None, error_message:
         except Exception as campaign_err:
             logger.error(f"Error auto-adding call to campaign: {campaign_err}")
         
+        # POST-CALL WEBHOOK: Send transcript to external webhook if configured
+        try:
+            call_log = await db.call_logs.find_one({"call_id": call_id})
+            if call_log and call_log.get("agent_id"):
+                agent = await db.agents.find_one({"id": call_log.get("agent_id")})
+                if agent:
+                    # Check if post_call_webhook_url is configured in agent settings
+                    agent_settings = agent.get("settings", {}) or {}
+                    post_call_webhook_url = agent_settings.get("post_call_webhook_url")
+                    
+                    if post_call_webhook_url:
+                        logger.info(f"📤 Sending post-call webhook to: {post_call_webhook_url}")
+                        
+                        # Build webhook payload
+                        webhook_payload = {
+                            "event": "call.completed",
+                            "call_id": call_id,
+                            "agent_id": call_log.get("agent_id"),
+                            "agent_name": agent.get("name", "Unknown Agent"),
+                            "direction": call_log.get("direction", "outbound"),
+                            "status": status,
+                            "end_reason": end_reason,
+                            "duration": duration,
+                            "from_number": call_log.get("from_number"),
+                            "to_number": call_log.get("to_number"),
+                            "start_time": call_log.get("start_time").isoformat() if isinstance(call_log.get("start_time"), datetime) else call_log.get("start_time"),
+                            "end_time": end_time.isoformat(),
+                            "transcript": call_log.get("transcript", []),
+                            "extracted_variables": call_log.get("extracted_variables", {}),
+                            "custom_variables": call_log.get("custom_variables", {}),
+                            "cost": round(cost, 4),
+                            "recording_url": call_log.get("recording_url")
+                        }
+                        
+                        # Send webhook asynchronously (non-blocking)
+                        async def send_webhook():
+                            try:
+                                async with httpx.AsyncClient(timeout=30.0) as client:
+                                    response = await client.post(
+                                        post_call_webhook_url,
+                                        json=webhook_payload,
+                                        headers={"Content-Type": "application/json"}
+                                    )
+                                    if response.status_code >= 200 and response.status_code < 300:
+                                        logger.info(f"✅ Post-call webhook sent successfully (status={response.status_code})")
+                                    else:
+                                        logger.warning(f"⚠️ Post-call webhook returned status {response.status_code}: {response.text[:200]}")
+                            except Exception as webhook_err:
+                                logger.error(f"❌ Failed to send post-call webhook: {webhook_err}")
+                        
+                        # Fire and forget - don't block call finalization
+                        asyncio.create_task(send_webhook())
+        except Exception as webhook_err:
+            logger.error(f"Error preparing post-call webhook: {webhook_err}")
+        
         return True
     except Exception as e:
         logger.error(f"❌ Error finalizing call log {call_id}: {e}")

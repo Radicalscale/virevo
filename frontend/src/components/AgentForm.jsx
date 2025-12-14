@@ -17,7 +17,7 @@ const AgentForm = () => {
   const { toast } = useToast();
   const isNew = !id;  // No ID means we're creating a new agent
   const isEdit = !!id;  // Has ID means we're editing
-  
+
   const [loading, setLoading] = useState(isEdit);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +29,7 @@ const AgentForm = () => {
     system_prompt: '',
     settings: {}
   });
-  
+
   // Knowledge Base state
   const [kbItems, setKbItems] = useState([]);
   const [kbLoading, setKbLoading] = useState(false);
@@ -65,7 +65,7 @@ const AgentForm = () => {
   // Fetch KB items for this agent
   const fetchKbItems = async () => {
     if (!id) return;
-    
+
     try {
       setKbLoading(true);
       const response = await kbAPI.list(id);
@@ -81,7 +81,7 @@ const AgentForm = () => {
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !id) return;
-    
+
     // Check file type
     const validExtensions = ['pdf', 'txt', 'docx'];
     const fileExt = file.name.split('.').pop().toLowerCase();
@@ -93,12 +93,12 @@ const AgentForm = () => {
       });
       return;
     }
-    
+
     try {
       setUploadingFile(true);
       const formData = new FormData();
       formData.append('file', file);
-      
+
       await kbAPI.upload(id, formData);
       toast({
         title: "Success",
@@ -121,7 +121,7 @@ const AgentForm = () => {
   // Handle URL addition
   const handleAddUrl = async () => {
     if (!urlInput.trim() || !id) return;
-    
+
     try {
       setAddingUrl(true);
       await kbAPI.addUrl(id, urlInput);
@@ -146,7 +146,7 @@ const AgentForm = () => {
   // Handle KB item deletion
   const handleDeleteKbItem = async (kbId) => {
     if (!id) return;
-    
+
     try {
       await kbAPI.delete(id, kbId);
       toast({
@@ -167,7 +167,7 @@ const AgentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       if (isEdit) {
         await agentAPI.update(id, formData);
@@ -233,11 +233,10 @@ const AgentForm = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div
                   onClick={() => setFormData({ ...formData, agent_type: 'single_prompt' })}
-                  className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
-                    formData.agent_type === 'single_prompt'
+                  className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.agent_type === 'single_prompt'
                       ? 'border-blue-500 bg-blue-500/10'
                       : 'border-gray-700 hover:border-gray-600'
-                  }`}
+                    }`}
                 >
                   <h3 className="font-semibold text-white mb-2">📝 Single Prompt</h3>
                   <p className="text-sm text-gray-400">
@@ -246,11 +245,10 @@ const AgentForm = () => {
                 </div>
                 <div
                   onClick={() => setFormData({ ...formData, agent_type: 'call_flow' })}
-                  className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
-                    formData.agent_type === 'call_flow'
+                  className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.agent_type === 'call_flow'
                       ? 'border-purple-500 bg-purple-500/10'
                       : 'border-gray-700 hover:border-gray-600'
-                  }`}
+                    }`}
                 >
                   <h3 className="font-semibold text-white mb-2">🔀 Call Flow</h3>
                   <p className="text-sm text-gray-400">
@@ -303,8 +301,8 @@ const AgentForm = () => {
             <Label htmlFor="system_prompt" className="text-gray-300">
               {formData.agent_type === 'call_flow' ? 'Global Prompt' : 'System Prompt'}
               <span className="text-gray-500 text-xs ml-2">
-                {formData.agent_type === 'call_flow' 
-                  ? '(Universal personality and behavior across all nodes)' 
+                {formData.agent_type === 'call_flow'
+                  ? '(Universal personality and behavior across all nodes)'
                   : '(Main instructions for the AI agent)'}
               </span>
             </Label>
@@ -312,7 +310,7 @@ const AgentForm = () => {
               id="system_prompt"
               value={formData.system_prompt}
               onChange={(e) => setFormData({ ...formData, system_prompt: e.target.value })}
-              placeholder={formData.agent_type === 'call_flow' 
+              placeholder={formData.agent_type === 'call_flow'
                 ? "# WHO YOU ARE\nYou are [name], a [role] who [purpose]...\n\n# YOUR PERSONALITY\n- [trait 1]\n- [trait 2]\n\n# COMMUNICATION STYLE\n- [style 1]\n- [style 2]\n\n# RECOVERY STRATEGY\nWhen user is confused: [approach]"
                 : "You are a helpful AI assistant that..."}
               className="bg-gray-900 border-gray-700 text-white mt-2"
@@ -320,8 +318,8 @@ const AgentForm = () => {
               required={formData.agent_type === 'single_prompt'}
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.agent_type === 'call_flow' 
-                ? 'Define your agent\'s universal personality, tone, and recovery strategies. This applies across ALL nodes and helps handle unexpected responses naturally.' 
+              {formData.agent_type === 'call_flow'
+                ? 'Define your agent\'s universal personality, tone, and recovery strategies. This applies across ALL nodes and helps handle unexpected responses naturally.'
                 : 'This is the core personality and instructions for your agent.'}
             </p>
           </div>
@@ -352,7 +350,7 @@ const AgentForm = () => {
               ⚙️ Advanced Settings (LLM, Voice & TTS Providers)
             </summary>
             <div className="p-4 border-t border-gray-700 space-y-6">
-              
+
               {/* LLM Provider Selection */}
               <div>
                 <Label className="text-gray-300 font-semibold">LLM Provider</Label>
@@ -473,8 +471,8 @@ const AgentForm = () => {
                   {formData.settings?.tts_provider === 'cartesia'
                     ? 'Cartesia Sonic: Ultra-low latency (40-90ms TTFB), best for real-time conversations'
                     : formData.settings?.tts_provider === 'hume'
-                    ? 'Hume AI: Alternative for emotional voice synthesis'
-                    : 'ElevenLabs: High-quality TTS with natural voices'}
+                      ? 'Hume AI: Alternative for emotional voice synthesis'
+                      : 'ElevenLabs: High-quality TTS with natural voices'}
                 </p>
               </div>
 
@@ -491,9 +489,9 @@ const AgentForm = () => {
                   checked={formData.settings?.enable_comfort_noise || false}
                   onChange={(e) => setFormData({
                     ...formData,
-                    settings: { 
-                      ...formData.settings, 
-                      enable_comfort_noise: e.target.checked 
+                    settings: {
+                      ...formData.settings,
+                      enable_comfort_noise: e.target.checked
                     }
                   })}
                   className="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
@@ -522,11 +520,11 @@ const AgentForm = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500 mt-1">
-                  {formData.settings?.stt_provider === 'assemblyai' 
-                    ? 'AssemblyAI with Turn Detection for natural conversations' 
+                  {formData.settings?.stt_provider === 'assemblyai'
+                    ? 'AssemblyAI with Turn Detection for natural conversations'
                     : formData.settings?.stt_provider === 'soniox'
-                    ? 'Soniox with advanced endpoint detection - Zero latency (native mulaw support)'
-                    : 'Deepgram for real-time transcription'}
+                      ? 'Soniox with advanced endpoint detection - Zero latency (native mulaw support)'
+                      : 'Deepgram for real-time transcription'}
                 </p>
               </div>
 
@@ -534,114 +532,114 @@ const AgentForm = () => {
               {formData.settings?.stt_provider === 'deepgram' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <Label className="text-gray-300 font-semibold block">Deepgram (STT) Settings</Label>
-                
-                <div>
-                  <Label className="text-gray-400 text-sm">Endpointing (ms)</Label>
-                  <Input
-                    type="number"
-                    value={formData.settings?.deepgram_settings?.endpointing || 500}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: {
-                        ...formData.settings,
-                        deepgram_settings: {
-                          ...formData.settings?.deepgram_settings,
-                          endpointing: parseInt(e.target.value)
-                        }
-                      }
-                    })}
-                    className="bg-gray-900 border-gray-700 text-white mt-1"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Silence duration before speech ends (200ms=responsive, 2000ms=patient)</p>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.settings?.deepgram_settings?.interim_results ?? false}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: {
-                        ...formData.settings,
-                        deepgram_settings: {
-                          ...formData.settings?.deepgram_settings,
-                          interim_results: e.target.checked
+                  <div>
+                    <Label className="text-gray-400 text-sm">Endpointing (ms)</Label>
+                    <Input
+                      type="number"
+                      value={formData.settings?.deepgram_settings?.endpointing || 500}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          deepgram_settings: {
+                            ...formData.settings?.deepgram_settings,
+                            endpointing: parseInt(e.target.value)
+                          }
                         }
-                      }
-                    })}
-                    className="w-4 h-4"
-                  />
-                  <Label className="text-gray-400 text-sm">Interim Results</Label>
-                  <p className="text-xs text-gray-500">Receive partial transcripts as user speaks</p>
-                </div>
+                      })}
+                      className="bg-gray-900 border-gray-700 text-white mt-1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Silence duration before speech ends (200ms=responsive, 2000ms=patient)</p>
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.settings?.deepgram_settings?.punctuate ?? true}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: {
-                        ...formData.settings,
-                        deepgram_settings: {
-                          ...formData.settings?.deepgram_settings,
-                          punctuate: e.target.checked
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.settings?.deepgram_settings?.interim_results ?? false}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          deepgram_settings: {
+                            ...formData.settings?.deepgram_settings,
+                            interim_results: e.target.checked
+                          }
                         }
-                      }
-                    })}
-                    className="w-4 h-4"
-                  />
-                  <Label className="text-gray-400 text-sm">Punctuate</Label>
-                  <p className="text-xs text-gray-500">Add punctuation to transcripts</p>
-                </div>
+                      })}
+                      className="w-4 h-4"
+                    />
+                    <Label className="text-gray-400 text-sm">Interim Results</Label>
+                    <p className="text-xs text-gray-500">Receive partial transcripts as user speaks</p>
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.settings?.deepgram_settings?.smart_format ?? true}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: {
-                        ...formData.settings,
-                        deepgram_settings: {
-                          ...formData.settings?.deepgram_settings,
-                          smart_format: e.target.checked
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.settings?.deepgram_settings?.punctuate ?? true}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          deepgram_settings: {
+                            ...formData.settings?.deepgram_settings,
+                            punctuate: e.target.checked
+                          }
                         }
-                      }
-                    })}
-                    className="w-4 h-4"
-                  />
-                  <Label className="text-gray-400 text-sm">Smart Format</Label>
-                  <p className="text-xs text-gray-500">Format numbers, dates, currency intelligently</p>
-                </div>
+                      })}
+                      className="w-4 h-4"
+                    />
+                    <Label className="text-gray-400 text-sm">Punctuate</Label>
+                    <p className="text-xs text-gray-500">Add punctuation to transcripts</p>
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.settings?.deepgram_settings?.vad_events ?? true}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: {
-                        ...formData.settings,
-                        deepgram_settings: {
-                          ...formData.settings?.deepgram_settings,
-                          vad_events: e.target.checked
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.settings?.deepgram_settings?.smart_format ?? true}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          deepgram_settings: {
+                            ...formData.settings?.deepgram_settings,
+                            smart_format: e.target.checked
+                          }
                         }
-                      }
-                    })}
-                    className="w-4 h-4"
-                  />
-                  <Label className="text-gray-400 text-sm">VAD Events</Label>
-                  <p className="text-xs text-gray-500">Voice activity detection events</p>
+                      })}
+                      className="w-4 h-4"
+                    />
+                    <Label className="text-gray-400 text-sm">Smart Format</Label>
+                    <p className="text-xs text-gray-500">Format numbers, dates, currency intelligently</p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.settings?.deepgram_settings?.vad_events ?? true}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          deepgram_settings: {
+                            ...formData.settings?.deepgram_settings,
+                            vad_events: e.target.checked
+                          }
+                        }
+                      })}
+                      className="w-4 h-4"
+                    />
+                    <Label className="text-gray-400 text-sm">VAD Events</Label>
+                    <p className="text-xs text-gray-500">Voice activity detection events</p>
+                  </div>
                 </div>
-              </div>
               )}
 
               {/* AssemblyAI Settings */}
               {formData.settings?.stt_provider === 'assemblyai' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <Label className="text-gray-300 font-semibold block">AssemblyAI Settings</Label>
-                  
+
                   <div>
                     <Label className="text-gray-400 text-sm">Turn Detection Threshold (0.0-1.0)</Label>
                     <Input
@@ -668,7 +666,7 @@ const AgentForm = () => {
                   {/* Smart Endpointing Parameters */}
                   <div className="border-t border-gray-700 pt-3">
                     <Label className="text-gray-300 font-semibold block mb-3">Smart Endpointing (Advanced)</Label>
-                    
+
                     <div className="space-y-3">
                       <div>
                         <Label className="text-gray-400 text-sm">End of Turn Confidence (0.0-1.0)</Label>
@@ -772,7 +770,7 @@ const AgentForm = () => {
                   </div>
 
                   <Label className="text-gray-300 font-semibold block">Soniox Settings</Label>
-                  
+
                   {/* Model Selection */}
                   <div>
                     <Label className="text-gray-400 text-sm">Model</Label>
@@ -868,7 +866,7 @@ const AgentForm = () => {
               {formData.settings?.tts_provider === 'elevenlabs' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <Label className="text-gray-300 font-semibold block">ElevenLabs Settings</Label>
-                  
+
                   <div>
                     <Label className="text-gray-400 text-sm">Voice ID</Label>
                     <Input
@@ -1135,9 +1133,9 @@ const AgentForm = () => {
                     <Label className="text-blue-400 font-semibold text-sm">📖 ElevenLabs Best Practices</Label>
                     <div className="space-y-1 text-xs">
                       <div>
-                        <a 
-                          href="https://elevenlabs.io/docs/best-practices/prompting/eleven-v3" 
-                          target="_blank" 
+                        <a
+                          href="https://elevenlabs.io/docs/best-practices/prompting/eleven-v3"
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-blue-300 underline"
                         >
@@ -1146,9 +1144,9 @@ const AgentForm = () => {
                         <span className="text-gray-500"> - Use [laughs], [excited], [whispers], [sarcastic] in text</span>
                       </div>
                       <div>
-                        <a 
-                          href="https://elevenlabs.io/docs/best-practices/prompting/normalization" 
-                          target="_blank" 
+                        <a
+                          href="https://elevenlabs.io/docs/best-practices/prompting/normalization"
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-blue-300 underline"
                         >
@@ -1157,9 +1155,9 @@ const AgentForm = () => {
                         <span className="text-gray-500"> - Auto-convert numbers, dates, special characters</span>
                       </div>
                       <div>
-                        <a 
-                          href="https://elevenlabs.io/docs/best-practices/prompting/controls" 
-                          target="_blank" 
+                        <a
+                          href="https://elevenlabs.io/docs/best-practices/prompting/controls"
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-blue-300 underline"
                         >
@@ -1168,9 +1166,9 @@ const AgentForm = () => {
                         <span className="text-gray-500"> - Add pauses and pronunciation tags</span>
                       </div>
                       <div>
-                        <a 
-                          href="https://elevenlabs.io/docs/api-reference/voices/settings/get-default" 
-                          target="_blank" 
+                        <a
+                          href="https://elevenlabs.io/docs/api-reference/voices/settings/get-default"
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-blue-300 underline"
                         >
@@ -1192,7 +1190,7 @@ const AgentForm = () => {
                   </div>
 
                   <Label className="text-gray-300 font-semibold block">Cartesia Sonic Settings</Label>
-                  
+
                   <div>
                     <Label className="text-gray-400 text-sm">Voice ID</Label>
                     <Input
@@ -1520,7 +1518,7 @@ const AgentForm = () => {
               {formData.settings?.tts_provider === 'hume' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <Label className="text-gray-300 font-semibold block">Hume AI Settings</Label>
-                  
+
                   <div>
                     <Label className="text-gray-400 text-sm">Voice ID</Label>
                     <Input
@@ -1572,9 +1570,9 @@ const AgentForm = () => {
                     <p className="text-purple-400 text-sm font-semibold">🎙️ Custom Sesame TTS (RunPod)</p>
                     <p className="text-purple-300 text-xs mt-1">24kHz WAV audio, optimized for Telnyx</p>
                   </div>
-                  
+
                   <Label className="text-gray-300 font-semibold block">Sesame TTS Settings</Label>
-                  
+
                   <div>
                     <Label className="text-gray-400 text-sm">Speaker ID (Voice)</Label>
                     <Select
@@ -1999,6 +1997,49 @@ const AgentForm = () => {
                     <strong>Hybrid Detection:</strong> Telnyx AMD detects at call answer (voicemail, business greeting).
                     AI detection monitors during the call for IVR menus ("press 1 for sales") that appear mid-conversation.
                     Together, they provide comprehensive protection with zero latency impact.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Post-Call Webhook Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🔗 Post-Call Webhook (Optional)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-4">
+              <p className="text-gray-400 text-sm mb-4">
+                Send call transcript and details to an external webhook (n8n, Zapier, Make, etc.) when calls end.
+                This is useful for custom analytics, CRM updates, or AI-powered call analysis.
+              </p>
+
+              <div>
+                <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                <Input
+                  type="url"
+                  placeholder="https://your-n8n-instance.com/webhook/your-webhook-id"
+                  value={formData.settings?.post_call_webhook_url || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      post_call_webhook_url: e.target.value || null
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Leave empty to disable. When set, a POST request will be sent after each call with the full transcript.
+                </p>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">📤</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>Webhook Payload:</strong> The webhook will receive: call_id, agent_name, transcript (full array),
+                    duration, status, from_number, to_number, extracted_variables, custom_variables, and timestamps.
                   </div>
                 </div>
               </div>
