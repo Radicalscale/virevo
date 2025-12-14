@@ -226,15 +226,15 @@ class ElevenLabsWebSocketService:
                 
                 except asyncio.TimeoutError:
                     # No more audio coming - generation complete for this sentence
-                    logger.debug("✅ ElevenLabs audio stream complete (timeout)")
+                    logger.info("⏱️  [TIMING] ElevenLabs audio stream complete (0.5s timeout reached) - End of Sentence")
                     break
                     
                 except json.JSONDecodeError as e:
                     logger.error(f"❌ Invalid JSON from ElevenLabs: {e}")
                     continue
                 
-        except websockets.exceptions.ConnectionClosed:
-            logger.warning("⚠️  ElevenLabs WebSocket connection closed")
+        except websockets.exceptions.ConnectionClosed as e:
+            logger.warning(f"⚠️  ElevenLabs WebSocket connection closed unexpectedly: {e}")
             self.connected = False
         except Exception as e:
             logger.error(f"❌ Error receiving audio from ElevenLabs: {e}")

@@ -261,7 +261,8 @@ class PersistentTTSSession:
         self,
         sentence: str,
         is_first: bool = False,
-        is_last: bool = False
+        is_last: bool = False,
+        current_voice_id: str = None
     ) -> bool:
         """
         Stream a sentence through the persistent WebSocket
@@ -271,10 +272,22 @@ class PersistentTTSSession:
             sentence: Text to synthesize
             is_first: If True, this is the first sentence of the response
             is_last: If True, this is the last sentence and should flush
+            current_voice_id: If provided, check if voice has changed and reconnect if needed
             
         Returns:
             bool: True if streaming started successfully
         """
+        # 🔥 DYNAMIC VOICE CHECK: If voice ID has changed, reconnect with new voice
+        if current_voice_id and current_voice_id != self.voice_id:
+            logger.info(f"🎙️ [Call {self.call_control_id}] VOICE CHANGE DETECTED: {self.voice_id[:8]}... → {current_voice_id[:8]}...")
+            self.voice_id = current_voice_id
+            # Force reconnection with new voice
+            reconnected = await self._reconnect()
+            if not reconnected:
+                logger.error(f"❌ [Call {self.call_control_id}] Failed to reconnect with new voice, aborting sentence")
+                return False
+            logger.info(f"✅ [Call {self.call_control_id}] Reconnected with new voice: {current_voice_id[:8]}...")
+        
         # 🔥 CRITICAL FIX: Reset interrupt flag FIRST if this is a new response
         # This MUST happen before checking the flag, otherwise we can never recover from interruption
         if is_first:
@@ -357,6 +370,11 @@ class PersistentTTSSession:
                         logger.debug(f"📦 [Call {self.call_control_id}] Streamed {chunk_count} chunks...")
                 
                 self._retry_attempted = False  # Reset for next sentence
+                
+                if chunk_count == 0:
+                    logger.warning(f"⚠️ [Call {self.call_control_id}] Finished streaming sentence #{sentence_num} with 0 chunks received! (Time: {(time.time() - stream_start)*1000:.0f}ms)")
+                else:
+                    logger.info(f"✅ [Call {self.call_control_id}] Finished streaming sentence #{sentence_num}: {chunk_count} chunks received")
                 
                 # Queue success marker
                 return True
