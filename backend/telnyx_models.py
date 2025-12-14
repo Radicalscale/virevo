@@ -94,6 +94,14 @@ class OutboundCallRequest(BaseModel):
     email: Optional[str] = None  # Contact's email address
     custom_variables: Dict[str, Any] = {}  # Inject variables into agent
 
+class WebhookTriggerCallRequest(BaseModel):
+    """Request model for webhook-triggered outbound calls (external services like n8n)"""
+    agent_id: str
+    to_number: str
+    from_number: Optional[str] = None
+    custom_variables: Optional[Dict[str, Any]] = None
+    email: Optional[str] = None
+
 class CallHistoryFilter(BaseModel):
     agent_id: Optional[str] = None
     direction: Optional[CallDirection] = None

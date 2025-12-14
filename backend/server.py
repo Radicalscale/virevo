@@ -27,7 +27,7 @@ from models import (
 
 # Import Telnyx models and service
 from telnyx_models import (
-    PhoneNumberModel, CallLogModel, OutboundCallRequest, 
+    PhoneNumberModel, CallLogModel, OutboundCallRequest, WebhookTriggerCallRequest,
     CallDirection, CallStatus, CallEndReason, Sentiment
 )
 from telnyx_service import TelnyxService
@@ -2873,14 +2873,6 @@ def update_call_state(call_control_id: str, updates: dict):
         active_telnyx_calls[call_control_id].update(updates)
 
 # ============ WEBHOOK TRIGGER ENDPOINT (API Key Auth for External Services) ============
-
-class WebhookTriggerCallRequest(BaseModel):
-    """Request model for webhook-triggered outbound calls"""
-    agent_id: str
-    to_number: str
-    from_number: Optional[str] = None
-    custom_variables: Optional[dict] = None
-    email: Optional[str] = None
 
 @api_router.post("/webhook/trigger-call")
 async def webhook_trigger_outbound_call(
