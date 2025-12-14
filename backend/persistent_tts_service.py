@@ -84,6 +84,11 @@ class PersistentTTSSession:
         # 💓 Keep-alive task to prevent ElevenLabs 20-second timeout
         self._keepalive_task: Optional[asyncio.Task] = None
         
+        # 🔊 Comfort noise task - sends noise when not speaking
+        self._comfort_noise_task: Optional[asyncio.Task] = None
+        self._comfort_noise_position = 0  # Position in comfort noise loop
+        self._enable_comfort_noise = False  # Set from agent config
+        
     async def _keepalive_loop(self):
         """
         Send periodic keep-alive to prevent ElevenLabs 20-second text input timeout.
@@ -113,6 +118,47 @@ class PersistentTTSSession:
             logger.debug(f"💓 [Call {self.call_control_id}] Keep-alive task cancelled")
         except Exception as e:
             logger.error(f"💓 [Call {self.call_control_id}] Keep-alive loop error: {e}")
+    
+    async def _comfort_noise_loop(self):
+        """
+        Send comfort noise chunks when agent is not speaking.
+        This ensures continuous background audio throughout the call.
+        """
+        logger.info(f"🔊 [Call {self.call_control_id}] Starting comfort noise loop")
+        
+        try:
+            from comfort_noise import get_comfort_noise_chunk
+            chunk_size = 160  # 20ms at 8kHz mulaw
+            
+            while self.connected and self.telnyx_ws:
+                # Only send comfort noise when NOT speaking
+                if not self.is_speaking and not self.is_holding_floor:
+                    try:
+                        # Get a chunk of comfort noise
+                        chunk = get_comfort_noise_chunk(chunk_size, self._comfort_noise_position)
+                        self._comfort_noise_position += chunk_size
+                        
+                        # Send via Telnyx WebSocket
+                        payload = base64.b64encode(chunk).decode('utf-8')
+                        message = {
+                            "event": "media",
+                            "media": {
+                                "payload": payload
+                            }
+                        }
+                        await self.telnyx_ws.send_text(json.dumps(message))
+                        
+                    except Exception as e:
+                        logger.debug(f"🔊 [Call {self.call_control_id}] Comfort noise send error: {e}")
+                
+                # 20ms per chunk = 50 chunks/second
+                await asyncio.sleep(0.02)
+                
+        except asyncio.CancelledError:
+            logger.debug(f"🔊 [Call {self.call_control_id}] Comfort noise task cancelled")
+        except Exception as e:
+            logger.error(f"🔊 [Call {self.call_control_id}] Comfort noise loop error: {e}")
+
         
     async def connect(self) -> bool:
         """
@@ -143,6 +189,13 @@ class PersistentTTSSession:
                 
                 # 💓 Start keep-alive loop to prevent 20-second timeout
                 self._keepalive_task = asyncio.create_task(self._keepalive_loop())
+                
+                # 🔊 Check if comfort noise is enabled and start the loop
+                agent_settings = self.agent_config.get("settings", {})
+                self._enable_comfort_noise = agent_settings.get("enable_comfort_noise", False)
+                if self._enable_comfort_noise and self.telnyx_ws:
+                    self._comfort_noise_task = asyncio.create_task(self._comfort_noise_loop())
+                    logger.info(f"🔊 [Call {self.call_control_id}] Comfort noise loop started")
                 
                 return True
             else:
@@ -752,6 +805,15 @@ class PersistentTTSSession:
             except asyncio.CancelledError:
                 pass
             self._keepalive_task = None
+        
+        # 🔊 Cancel comfort noise task
+        if self._comfort_noise_task:
+            self._comfort_noise_task.cancel()
+            try:
+                await self._comfort_noise_task
+            except asyncio.CancelledError:
+                pass
+            self._comfort_noise_task = None
         
         # Stop playback consumer
         if self.playback_task:
