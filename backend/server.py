@@ -7189,6 +7189,53 @@ async def telnyx_webhook(payload: dict):
             playback_id = payload.get("data", {}).get("payload", {}).get("playback_id")
             media_url = payload.get("data", {}).get("payload", {}).get("media_url", "")
             
+            # COMFORT NOISE RESTART: Check if this is the comfort noise playback ending
+            # If so, restart it to ensure continuous playback
+            state = call_states.get(call_control_id)
+            comfort_noise_id = state.get("comfort_noise_playback_id") if state else None
+            
+            if playback_id == comfort_noise_id:
+                logger.info(f"🔊 Comfort noise playback ended (id: {playback_id}), restarting...")
+                
+                # Restart comfort noise in the background
+                async def restart_comfort_noise():
+                    try:
+                        # Get user's Telnyx keys
+                        call_data = redis_service.get_call_data(call_control_id) or active_telnyx_calls.get(call_control_id, {})
+                        agent_info = call_data.get("agent", {}) if isinstance(call_data, dict) else {}
+                        user_id = agent_info.get("user_id")
+                        
+                        if user_id:
+                            telnyx_api_key = await get_api_key(user_id, "telnyx")
+                            telnyx_connection_id = await get_api_key(user_id, "telnyx_connection_id")
+                            
+                            if telnyx_api_key and telnyx_connection_id:
+                                telnyx_service = get_telnyx_service(api_key=telnyx_api_key, connection_id=telnyx_connection_id)
+                                backend_url = os.environ.get('BACKEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001'))
+                                comfort_noise_url = f"{backend_url}/api/tts-audio/comfort_noise_continuous.mp3"
+                                
+                                result = await telnyx_service.play_audio_url(
+                                    call_control_id,
+                                    comfort_noise_url,
+                                    loop=True,
+                                    overlay=True
+                                )
+                                
+                                if result.get("success"):
+                                    new_playback_id = result.get("playback_id")
+                                    if call_control_id in call_states:
+                                        call_states[call_control_id]["comfort_noise_playback_id"] = new_playback_id
+                                    logger.info(f"🎵 Comfort noise restarted (new playback_id: {new_playback_id})")
+                                else:
+                                    logger.warning(f"⚠️ Failed to restart comfort noise: {result}")
+                    except Exception as e:
+                        logger.error(f"❌ Error restarting comfort noise: {e}")
+                
+                asyncio.create_task(restart_comfort_noise())
+                
+                # Don't process this as a regular playback end
+                return {"status": "ok"}
+            
             # MULTI-WORKER FIX: Update Redis playback state so WebSocket worker can detect
             # when all playbacks finish, regardless of which worker receives the webhook
             redis_svc = redis_service

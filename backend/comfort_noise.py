@@ -20,14 +20,15 @@ logger = logging.getLogger(__name__)
 # Original values: WHITE_NOISE_DB=-63, HUM_DB=-73
 # Halved (50%):    WHITE_NOISE_DB=-69, HUM_DB=-79
 # Quartered (25%): WHITE_NOISE_DB=-75, HUM_DB=-85
-# 1/8th (12.5%):   WHITE_NOISE_DB=-81, HUM_DB=-91 (current)
+# 1/8th (12.5%):   WHITE_NOISE_DB=-81, HUM_DB=-91
+# Current (15% lower than 1/8th): WHITE_NOISE_DB=-83, HUM_DB=-93
 #
 # You can also set via environment variables for easy adjustment:
-#   COMFORT_NOISE_WHITE_DB=-81
-#   COMFORT_NOISE_HUM_DB=-91
+#   COMFORT_NOISE_WHITE_DB=-83
+#   COMFORT_NOISE_HUM_DB=-93
 # =============================================================================
-COMFORT_NOISE_WHITE_DB = int(os.environ.get("COMFORT_NOISE_WHITE_DB", -81))
-COMFORT_NOISE_HUM_DB = int(os.environ.get("COMFORT_NOISE_HUM_DB", -91))
+COMFORT_NOISE_WHITE_DB = int(os.environ.get("COMFORT_NOISE_WHITE_DB", -83))
+COMFORT_NOISE_HUM_DB = int(os.environ.get("COMFORT_NOISE_HUM_DB", -93))
 
 # Global comfort noise sample loaded once at startup
 _comfort_noise_sample = None
