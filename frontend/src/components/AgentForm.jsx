@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Upload, Link as LinkIcon, Trash2, FileText, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Link as LinkIcon, Trash2, FileText, ExternalLink, Info } from 'lucide-react';
 import { agentAPI, kbAPI } from '../services/api';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -234,8 +234,8 @@ const AgentForm = () => {
                 <div
                   onClick={() => setFormData({ ...formData, agent_type: 'single_prompt' })}
                   className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.agent_type === 'single_prompt'
-                      ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-gray-700 hover:border-gray-600'
+                    ? 'border-blue-500 bg-blue-500/10'
+                    : 'border-gray-700 hover:border-gray-600'
                     }`}
                 >
                   <h3 className="font-semibold text-white mb-2">📝 Single Prompt</h3>
@@ -246,8 +246,8 @@ const AgentForm = () => {
                 <div
                   onClick={() => setFormData({ ...formData, agent_type: 'call_flow' })}
                   className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${formData.agent_type === 'call_flow'
-                      ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-gray-700 hover:border-gray-600'
+                    ? 'border-purple-500 bg-purple-500/10'
+                    : 'border-gray-700 hover:border-gray-600'
                     }`}
                 >
                   <h3 className="font-semibold text-white mb-2">🔀 Call Flow</h3>
@@ -920,7 +920,18 @@ const AgentForm = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-gray-400 text-sm">Stability (0-1)</Label>
+                      <Label className="text-gray-400 text-sm flex items-center gap-1">
+                        Stability (0-1)
+                        <div className="relative group">
+                          <Info size={14} className="text-blue-400 cursor-help" />
+                          <div className="absolute z-50 hidden group-hover:block left-0 top-6 w-72 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                            <strong className="text-blue-400">Stability</strong>
+                            <p className="mt-1"><strong>Higher (0.7-1.0):</strong> More consistent, predictable voice. Better for professional/formal content. Less emotional variation.</p>
+                            <p className="mt-1"><strong>Lower (0-0.3):</strong> More expressive and dynamic. Better for storytelling/emotional content. May have more variation between generations.</p>
+                            <p className="mt-1 text-gray-400">Recommended: 0.5 for balanced output</p>
+                          </div>
+                        </div>
+                      </Label>
                       <Input
                         type="number"
                         step="0.1"
@@ -967,7 +978,18 @@ const AgentForm = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-gray-400 text-sm">Similarity Boost (0-1)</Label>
+                      <Label className="text-gray-400 text-sm flex items-center gap-1">
+                        Similarity Boost (0-1)
+                        <div className="relative group">
+                          <Info size={14} className="text-blue-400 cursor-help" />
+                          <div className="absolute z-50 hidden group-hover:block left-0 top-6 w-72 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                            <strong className="text-blue-400">Similarity Boost</strong>
+                            <p className="mt-1"><strong>Higher (0.7-1.0):</strong> Closer to the original voice sample. More accurate voice cloning. May amplify artifacts if audio quality is poor.</p>
+                            <p className="mt-1"><strong>Lower (0-0.3):</strong> More flexibility and variation. Can sound more natural but less like the original. Reduces artifacts.</p>
+                            <p className="mt-1 text-gray-400">Recommended: 0.75 for good voice matching</p>
+                          </div>
+                        </div>
+                      </Label>
                       <Input
                         type="number"
                         step="0.05"
@@ -989,7 +1011,19 @@ const AgentForm = () => {
                     </div>
 
                     <div>
-                      <Label className="text-gray-400 text-sm">Style (0-1)</Label>
+                      <Label className="text-gray-400 text-sm flex items-center gap-1">
+                        Style (0-1)
+                        <div className="relative group">
+                          <Info size={14} className="text-blue-400 cursor-help" />
+                          <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-72 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                            <strong className="text-blue-400">Style Exaggeration</strong>
+                            <p className="mt-1"><strong>Higher (0.3-1.0):</strong> More exaggerated speaking style from the original sample. More dramatic intonation and emphasis. Can sound theatrical.</p>
+                            <p className="mt-1"><strong>Lower (0-0.2):</strong> More neutral speaking style. Reduces quirks from original sample. Better for consistent, professional output.</p>
+                            <p className="mt-1 text-gray-400">Recommended: 0.0-0.2 for phone calls. Only works with v2+ models.</p>
+                            <p className="mt-1 text-yellow-400">⚠️ High values increase latency and may cause instability.</p>
+                          </div>
+                        </div>
+                      </Label>
                       <Input
                         type="number"
                         step="0.1"
@@ -1008,7 +1042,6 @@ const AgentForm = () => {
                         })}
                         className="bg-gray-900 border-gray-700 text-white mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Controls speaking style variation (v2 models only)</p>
                     </div>
                   </div>
 
