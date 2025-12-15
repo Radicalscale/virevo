@@ -9,6 +9,7 @@ import uuid
 import asyncio
 import json
 import httpx
+import traceback
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -17,11 +18,6 @@ from motor.motor_asyncio import AsyncIOMotorClient
 class DirectorService:
     """
     The DirectorService orchestrates the 'Director Studio' functionality.
-    It manages:
-    1. Sandboxing (Cloning agents to MongoDB)
-    2. Chaos Scripting (Grok 4 via xAI API)
-    3. The Ear / Judge (GPT-4o via OpenAI API)
-    4. Evolution Engine (Mutation & Selection)
     """
 
     def __init__(self, user_id: str):
@@ -64,7 +60,6 @@ class DirectorService:
         """
         Creates a safe clone of an agent for testing.
         Stores the sandbox in MongoDB for persistence.
-        Returns the sandbox_id.
         """
         await self._init_db()
         
@@ -112,9 +107,7 @@ class DirectorService:
         )
 
     async def update_sandbox_node(self, sandbox_id: str, node_id: str, updates: Dict):
-        """
-        Manually update a node in the sandbox.
-        """
+        """Manually update a node in the sandbox."""
         await self._init_db()
         
         config = await self.get_sandbox_config(sandbox_id)
@@ -122,9 +115,10 @@ class DirectorService:
             raise ValueError("Sandbox not found")
         
         call_flow = config.get('call_flow', [])
+        node_id_str = str(node_id)
         
         for node in call_flow:
-            if node.get('id') == node_id:
+            if str(node.get('id')) == node_id_str:
                 node['data'] = {**node.get('data', {}), **updates}
                 print(f"[Director] Updated Node {node_id} in {sandbox_id}")
                 await self._save_sandbox_config(sandbox_id, config)
@@ -140,74 +134,94 @@ class DirectorService:
         
         print(f"[Director] Starting Evolution for {node_id} in {sandbox_id} ({generations} gens)")
         
-        config = await self.get_sandbox_config(sandbox_id)
-        if not config:
-            raise ValueError("Sandbox not found")
-        
-        call_flow = config.get('call_flow', [])
-        
-        # Find the target node
-        target_node = None
-        for node in call_flow:
-            if node.get('id') == node_id:
-                target_node = node
-                break
-        
-        if not target_node:
-            raise ValueError(f"Node {node_id} not found")
-        
-        node_data = target_node.get('data', {})
-        
-        # 1. Generate Chaos Scenario using Grok
-        scenario = await self._call_grok_for_scenario(node_data)
-        
-        best_score = 0
-        best_variant = node_data
-        
-        for gen in range(generations):
-            print(f"--- Generation {gen + 1} ---")
+        try:
+            config = await self.get_sandbox_config(sandbox_id)
+            if not config:
+                raise ValueError("Sandbox not found")
             
-            # 2. Mutation Phase
-            variants = await self._generate_mutations(node_data)
+            call_flow = config.get('call_flow', [])
+            node_id_str = str(node_id)
             
-            # 3. Battle Royale (Test Phase)
-            results = []
-            for variant in variants:
-                audio_stream, text_output, latency = await self._run_streaming_test(variant, scenario)
-                score = await self._call_openai_judge(audio_stream, text_output, latency, scenario)
-                results.append({"variant": variant, "score": score})
+            # Find the target node (compare as strings for safety)
+            target_node = None
+            for node in call_flow:
+                if str(node.get('id')) == node_id_str:
+                    target_node = node
+                    break
             
-            # 4. Selection
-            winner = max(results, key=lambda x: x["score"]["total"])
-            print(f"[Director] Generation {gen+1} Winner: Score {winner['score']['total']}")
+            if not target_node:
+                print(f"[Director] ❌ Node {node_id} not found. Available: {[n.get('id') for n in call_flow[:5]]}")
+                raise ValueError(f"Node {node_id} not found in call flow")
             
-            if winner["score"]["total"] > best_score:
-                best_score = winner["score"]["total"]
-                best_variant = winner["variant"]
+            node_data = target_node.get('data', {})
+            node_label = target_node.get('label') or node_data.get('label') or node_id
+            print(f"[Director] Evolving node: {node_label}")
             
-        # Apply winner to sandbox
-        for node in call_flow:
-            if node.get('id') == node_id:
-                node['data'] = best_variant
-                break
-        
-        config['call_flow'] = call_flow
-        await self._save_sandbox_config(sandbox_id, config)
-        
-        return best_variant, best_score
+            # 1. Generate Chaos Scenario using Grok
+            scenario = await self._call_grok_for_scenario(node_data)
+            print(f"[Director] Scenario: {scenario[:80]}...")
+            
+            best_score = 0
+            best_variant = node_data
+            
+            for gen in range(generations):
+                print(f"--- Generation {gen + 1} ---")
+                
+                # 2. Mutation Phase
+                variants = await self._generate_mutations(node_data)
+                
+                # 3. Battle Royale (Test each variant)
+                results = []
+                for i, variant in enumerate(variants):
+                    try:
+                        audio_stream, text_output, latency = await self._run_streaming_test(variant, scenario)
+                        score = await self._call_openai_judge(audio_stream, text_output, latency, scenario)
+                        results.append({"variant": variant, "score": score})
+                        print(f"[Director] Variant {i+1}: Score {score.get('total', 0)}")
+                    except Exception as var_err:
+                        print(f"[Director] Variant {i+1} error: {var_err}")
+                        results.append({"variant": variant, "score": {"total": 0}})
+                
+                # 4. Selection
+                if results:
+                    winner = max(results, key=lambda x: x["score"].get("total", 0))
+                    winner_score = winner["score"].get("total", 0)
+                    print(f"[Director] Generation {gen+1} Winner: Score {winner_score}")
+                    
+                    if winner_score > best_score:
+                        best_score = winner_score
+                        best_variant = winner["variant"]
+            
+            # Apply winner to sandbox
+            for node in call_flow:
+                if str(node.get('id')) == node_id_str:
+                    node['data'] = best_variant
+                    break
+            
+            config['call_flow'] = call_flow
+            await self._save_sandbox_config(sandbox_id, config)
+            
+            print(f"[Director] ✅ Evolution complete for {node_label}. Best score: {best_score}")
+            return best_variant, best_score
+            
+        except Exception as e:
+            print(f"[Director] ❌ Evolution error: {e}")
+            print(traceback.format_exc())
+            raise
 
     async def _call_grok_for_scenario(self, node_context: Dict) -> str:
         """Use Grok 4 to generate a chaos scenario."""
         if not self.grok_api_key:
             print("[Director] ⚠️ No Grok API key, using fallback scenario")
-            return "User is skeptical and asking tough questions."
+            return "User is skeptical and asking tough questions about the offer."
         
         system_prompt = """You are a chaos engineer for AI voice agents.
 Generate a single difficult, edge-case user persona for testing.
 Be creative: interruptions, mumbling, anger, sarcasm, background noise.
 Output ONLY the persona description in 1-2 sentences."""
         
-        user_prompt = f"Generate a chaos scenario for testing this node: {json.dumps(node_context)[:500]}"
+        content = node_context.get('content', '')[:300]
+        user_prompt = f"Generate a chaos scenario for testing this voice agent response: {content}"
         
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
@@ -231,36 +245,33 @@ Output ONLY the persona description in 1-2 sentences."""
                 if response.status_code == 200:
                     result = response.json()
                     scenario = result['choices'][0]['message']['content'].strip()
-                    print(f"[Grok 4] Generated: {scenario[:80]}...")
                     return scenario
                 else:
-                    print(f"[Grok] API Error {response.status_code}")
-                    return "User is skeptical and rushed."
+                    print(f"[Grok] API Error {response.status_code}: {response.text[:100]}")
+                    return "User is skeptical and rushed, asking tough questions."
         except Exception as e:
             print(f"[Grok] Error: {e}")
-            return "User is skeptical and rushed."
+            return "User is skeptical and asking tough questions."
 
     async def _call_openai_judge(self, audio: bytes, text: str, latency: float, scenario: str) -> Dict:
         """Use GPT-4o to judge the performance."""
         if not self.openai_api_key:
             print("[Director] ⚠️ No OpenAI API key, using fallback judgment")
-            return {"total": 7.0, "reasoning": ["Fallback score"]}
+            return {"total": 7.0, "latency": 7, "tonality": 7, "humanity": 7, "reasoning": ["Fallback"]}
         
-        system_prompt = """You are the AI Director judging a voice agent's performance.
+        system_prompt = """You are an AI Director judging a voice agent's performance.
 Evaluate based on:
-1. LATENCY (Score 1-10): Was there dead air? >1s is bad.
-2. TONALITY (Score 1-10): Did it sound robotic/flat?
-3. HUMANITY (Score 1-10): Did it feel like a real person?
+1. LATENCY (1-10): Was there dead air? >1s is bad.
+2. TONALITY (1-10): Did the text read naturally?
+3. HUMANITY (1-10): Does it feel like a real person wrote this?
 
-Output JSON: {"latency": X, "tonality": X, "humanity": X, "total": X, "reasoning": ["..."]}"""
+Respond with JSON only: {"latency": X, "tonality": X, "humanity": X, "total": X, "reasoning": ["..."]}"""
 
-        user_prompt = f"""
-Scenario: {scenario}
-Agent's Text Response: "{text}"
+        user_prompt = f"""Scenario: {scenario}
+Agent's Response: "{text[:500]}"
 Measured Latency: {latency:.2f}s
 
-Judge this response. Remember: Low latency = good. Natural tone = good.
-"""
+Judge this response."""
 
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
@@ -277,7 +288,7 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
                             {"role": "user", "content": user_prompt}
                         ],
                         "temperature": 0.3,
-                        "max_tokens": 500,
+                        "max_tokens": 300,
                         "response_format": {"type": "json_object"}
                     }
                 )
@@ -285,10 +296,9 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
                 if response.status_code == 200:
                     result = response.json()
                     judgment = json.loads(result['choices'][0]['message']['content'])
-                    print(f"[GPT-4o Judge] Score: {judgment.get('total', 0)}")
                     return judgment
                 else:
-                    print(f"[OpenAI] API Error {response.status_code}: {response.text[:100]}")
+                    print(f"[OpenAI] API Error {response.status_code}")
                     return {"total": 5.0, "reasoning": ["API error"]}
         except Exception as e:
             print(f"[OpenAI] Error: {e}")
@@ -298,15 +308,16 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
         """Generate 3 mutant variants of the node config."""
         mutants = [copy.deepcopy(base_node_data) for _ in range(3)]
         
-        content = base_node_data.get('content', '')
+        content = base_node_data.get('content', '') or ''
         
         # Variant A: Polite/Slow
         mutants[0]['content'] = content + " Please take your time."
         mutants[0]['voice_settings'] = {"stability": 0.6, "speed": 0.9}
         mutants[0]['_variant_type'] = "Diplomat"
         
-        # Variant B: Concise/Fast
-        mutants[1]['content'] = content.split('.')[0] + "."  # First sentence only
+        # Variant B: Concise/Fast  
+        first_sentence = content.split('.')[0] + "." if '.' in content else content
+        mutants[1]['content'] = first_sentence
         mutants[1]['voice_settings'] = {"stability": 0.4, "speed": 1.1}
         mutants[1]['_variant_type'] = "The Closer"
         
@@ -323,16 +334,16 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
         In production, this would open a WebSocket to ElevenLabs.
         """
         import random
-        text = node_data.get('content', '')
+        text = node_data.get('content', '') or ''
         base_latency = 0.3
         jitter = random.uniform(0.0, 0.4)
         
         voice_settings = node_data.get('voice_settings', {})
         if voice_settings.get('stability', 0.5) > 0.7:
-            jitter += 0.2  # High stability = more "thinking" time
+            jitter += 0.2
         
         simulated_ttfb = base_latency + jitter
-        await asyncio.sleep(simulated_ttfb / 5)  # Fast-forward
+        await asyncio.sleep(0.1)  # Small delay to simulate
         
         fake_audio = b"\\x00\\xFF" * 512
         return fake_audio, text, simulated_ttfb
@@ -356,7 +367,6 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
         
         if result.modified_count > 0:
             print(f"[Director] ✅ Promoted Sandbox {sandbox_id} to Live Agent {agent_id}")
-            # Delete the sandbox after promotion
             await self.db.director_sandboxes.delete_one({
                 "sandbox_id": sandbox_id,
                 "user_id": self.user_id
