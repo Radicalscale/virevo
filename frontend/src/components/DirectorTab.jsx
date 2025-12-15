@@ -5,6 +5,18 @@ import { Button } from './ui/button';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
+// Safe fetch that clones response before consuming (fixes rrweb-recorder conflict)
+const safeFetch = async (url, options = {}) => {
+    const res = await fetch(url, options);
+    const cloned = res.clone();
+    try {
+        const data = await cloned.json();
+        return { ok: res.ok, status: res.status, data };
+    } catch (e) {
+        return { ok: false, status: res.status, data: { detail: 'Invalid JSON response' } };
+    }
+};
+
 const DirectorTab = () => {
     // State
     const [agents, setAgents] = useState([]);
@@ -36,13 +48,12 @@ const DirectorTab = () => {
         setAgentsLoading(true);
         setAgentsError(null);
         try {
-            const res = await fetch(`${API_BASE}/api/agents`, {
+            const { ok, status, data } = await safeFetch(`${API_BASE}/api/agents`, {
                 credentials: 'include'
             });
-            if (!res.ok) {
-                throw new Error(`Failed to fetch agents (${res.status})`);
+            if (!ok) {
+                throw new Error(`Failed to fetch agents (${status})`);
             }
-            const data = await res.json();
             setAgents(data || []);
         } catch (e) {
             console.error('Error fetching agents:', e);
@@ -63,14 +74,13 @@ const DirectorTab = () => {
         // Create sandbox via real API
         setSandboxLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/director/sandbox`, {
+            const { ok, data } = await safeFetch(`${API_BASE}/api/director/sandbox`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agent_id: agent.id })
             });
-            const data = await res.json();
-            if (!res.ok) {
+            if (!ok) {
                 throw new Error(data.detail || 'Failed to create sandbox');
             }
             setSandboxId(data.sandbox_id);
@@ -88,11 +98,10 @@ const DirectorTab = () => {
     const fetchNodes = async (sbId) => {
         setNodesLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/director/sandbox/${sbId}/nodes`, {
+            const { ok, data } = await safeFetch(`${API_BASE}/api/director/sandbox/${sbId}/nodes`, {
                 credentials: 'include'
             });
-            const data = await res.json();
-            if (!res.ok) {
+            if (!ok) {
                 throw new Error(data.detail || 'Failed to fetch nodes');
             }
             setNodes(data.nodes || []);
@@ -104,7 +113,7 @@ const DirectorTab = () => {
     };
 
     const evolveNode = async (nodeId, nodeName) => {
-        const res = await fetch(`${API_BASE}/api/director/evolve`, {
+        const { ok, data } = await safeFetch(`${API_BASE}/api/director/evolve`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -114,8 +123,7 @@ const DirectorTab = () => {
                 generations: 3
             })
         });
-        const data = await res.json();
-        if (!res.ok) {
+        if (!ok) {
             throw new Error(data.detail || `Evolution failed for ${nodeName}`);
         }
         return { nodeId, nodeName, ...data };
@@ -179,14 +187,13 @@ const DirectorTab = () => {
         if (!sandboxId) return;
         setPromoting(true);
         try {
-            const res = await fetch(`${API_BASE}/api/director/promote`, {
+            const { ok, data } = await safeFetch(`${API_BASE}/api/director/promote`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sandbox_id: sandboxId })
             });
-            const data = await res.json();
-            if (!res.ok) {
+            if (!ok) {
                 throw new Error(data.detail || 'Promotion failed');
             }
             alert('✅ Sandbox promoted to live agent!');
