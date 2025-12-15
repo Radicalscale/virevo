@@ -9135,6 +9135,11 @@ set_agent_test_db(db)  # Inject database connection
 app.include_router(agent_test_router)
 logger.info("✅ Agent test router loaded")
 
+# ============ DIRECTOR STUDIO ROUTER ============
+from director_router import router as director_router
+app.include_router(director_router)
+logger.info("✅ Director Studio router loaded")
+
 # ============ QC AGENTS INTEGRATION ============
 from qc_agents.orchestrator import QCAgentOrchestrator
 qc_orchestrator = None  # Will be initialized per-request

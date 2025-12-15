@@ -24,6 +24,7 @@ import CampaignSettingsPage from "./components/CampaignSettingsPage";
 import QCAgents from "./components/QCAgents";
 import QCAgentEditor from "./components/QCAgentEditor";
 import QCAnalyticsDashboard from "./components/QCAnalyticsDashboard";
+import DirectorTab from "./components/DirectorTab";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -42,7 +43,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            
+
             {/* Protected routes */}
             <Route
               path="/*"
@@ -78,6 +79,7 @@ function App() {
                         <Route path="/qc/analytics" element={<QCAnalyticsDashboard />} />
                         <Route path="/analytics" element={<Analytics />} />
                         <Route path="/settings" element={<APIKeyManager />} />
+                        <Route path="/director" element={<DirectorTab />} />
                       </Routes>
                     </div>
                   </div>
