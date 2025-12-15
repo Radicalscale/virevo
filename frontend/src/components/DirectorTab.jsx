@@ -404,33 +404,110 @@ const DirectorTab = () => {
                         </Button>
                     </div>
 
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                    <div className="space-y-6">
                         {evolutionResults.map((result, idx) => (
-                            <div key={idx} className={`p-4 rounded-lg border ${result.success === false ? 'bg-red-900/20 border-red-500/50' : 'bg-green-900/20 border-green-500/50'}`}>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-semibold">{result.nodeName || result.nodeId}</h3>
-                                        {result.success === false ? (
-                                            <p className="text-red-400 text-sm">{result.error}</p>
-                                        ) : (
-                                            <>
-                                                <p className="text-green-400 text-sm">
-                                                    Score: {result.best_score}/10 | Variant: {result.best_variant?.type}
-                                                </p>
-                                                {result.best_variant?.content_preview && (
-                                                    <p className="text-gray-400 text-xs mt-1 truncate max-w-md">
-                                                        "{result.best_variant.content_preview}"
-                                                    </p>
+                            <div key={idx} className="border border-gray-700 rounded-lg overflow-hidden">
+                                {/* Node Header */}
+                                <div className="bg-gray-700 p-4 flex justify-between items-center">
+                                    <h3 className="font-bold text-lg">{result.node_label || result.nodeName || result.nodeId}</h3>
+                                    <span className="bg-green-500 text-black text-sm font-bold px-3 py-1 rounded">
+                                        Best Score: {result.best_score}/10
+                                    </span>
+                                </div>
+
+                                {result.success === false ? (
+                                    <div className="p-4 text-red-400">{result.error}</div>
+                                ) : (
+                                    <div className="p-4 space-y-4">
+                                        {/* Scenario */}
+                                        {result.scenario && (
+                                            <div className="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded-lg">
+                                                <p className="text-sm text-yellow-400 font-semibold mb-1">Chaos Scenario:</p>
+                                                <p className="text-gray-300 text-sm">{result.scenario}</p>
+                                            </div>
+                                        )}
+
+                                        {/* Generations */}
+                                        {result.generations && result.generations.map((gen, genIdx) => (
+                                            <div key={genIdx} className="border-l-4 border-purple-500 pl-4">
+                                                <h4 className="text-purple-400 font-semibold mb-3">Generation {gen.generation}</h4>
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                                                    {gen.variants && gen.variants.map((variant, varIdx) => (
+                                                        <div
+                                                            key={varIdx}
+                                                            className={`p-3 rounded-lg border ${result.best_variant?.variant_type === variant.variant_type
+                                                                    ? 'bg-green-900/30 border-green-500'
+                                                                    : 'bg-gray-900 border-gray-700'
+                                                                }`}
+                                                        >
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="font-medium text-white">{variant.variant_type}</span>
+                                                                <span className={`text-sm font-bold ${variant.score?.total >= 8 ? 'text-green-400' :
+                                                                        variant.score?.total >= 6 ? 'text-yellow-400' :
+                                                                            'text-red-400'
+                                                                    }`}>
+                                                                    {variant.score?.total || 0}/10
+                                                                </span>
+                                                            </div>
+
+                                                            {/* Full Content */}
+                                                            <div className="bg-black/30 p-2 rounded text-xs text-gray-300 mb-2 max-h-32 overflow-y-auto">
+                                                                {variant.content || 'No content'}
+                                                            </div>
+
+                                                            {/* Voice Settings */}
+                                                            {variant.voice_settings && (
+                                                                <div className="text-xs text-gray-500 mb-2">
+                                                                    Stability: {variant.voice_settings.stability || 'default'} |
+                                                                    Speed: {variant.voice_settings.speed || 'default'}
+                                                                </div>
+                                                            )}
+
+                                                            {/* Latency */}
+                                                            <div className="text-xs text-blue-400 mb-2">
+                                                                TTFB: {variant.latency_ms || 0}ms
+                                                            </div>
+
+                                                            {/* Audio Playback */}
+                                                            {variant.audio_base64 && variant.audio_base64 !== 'U0lNVUxBVEVEX0FVRElP' && (
+                                                                <audio
+                                                                    controls
+                                                                    className="w-full h-8"
+                                                                    src={`data:audio/mpeg;base64,${variant.audio_base64}`}
+                                                                />
+                                                            )}
+
+                                                            {/* Score Breakdown */}
+                                                            {variant.score?.reasoning && (
+                                                                <div className="mt-2 text-xs text-gray-400">
+                                                                    <p className="font-semibold text-gray-300">Reasoning:</p>
+                                                                    {variant.score.reasoning.map((r, i) => (
+                                                                        <p key={i}>• {r}</p>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {/* Winner Summary */}
+                                        {result.best_variant && (
+                                            <div className="bg-green-900/30 border border-green-500 p-4 rounded-lg mt-4">
+                                                <h4 className="text-green-400 font-bold mb-2">🏆 Winner: {result.best_variant.variant_type}</h4>
+                                                <p className="text-gray-300 text-sm mb-2">{result.best_variant.content}</p>
+                                                {result.best_variant.audio_base64 && result.best_variant.audio_base64 !== 'U0lNVUxBVEVEX0FVRElP' && (
+                                                    <audio
+                                                        controls
+                                                        className="w-full"
+                                                        src={`data:audio/mpeg;base64,${result.best_variant.audio_base64}`}
+                                                    />
                                                 )}
-                                            </>
+                                            </div>
                                         )}
                                     </div>
-                                    {result.success !== false && (
-                                        <span className="bg-green-500 text-black text-xs font-bold px-2 py-1 rounded">
-                                            ✓
-                                        </span>
-                                    )}
-                                </div>
+                                )}
                             </div>
                         ))}
                     </div>

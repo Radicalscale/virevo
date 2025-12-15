@@ -102,26 +102,26 @@ async def get_sandbox_nodes(sandbox_id: str, current_user: dict = Depends(get_cu
 async def evolve_node(request: EvolveNodeRequest, current_user: dict = Depends(get_current_user)):
     """
     Run the evolutionary optimization loop on a specific node.
-    Uses Grok for chaos scenarios and GPT-4o for judgment.
+    Returns FULL data including all variants, audio, and scores.
     """
     try:
         service = DirectorService(user_id=current_user['id'])
         
-        best_variant, best_score = await service.evolve_node(
+        result = await service.evolve_node(
             sandbox_id=request.sandbox_id,
             node_id=request.node_id,
             generations=request.generations
         )
         
+        # Result now contains full evolution log with audio
         return {
             "success": True,
-            "message": f"Evolution complete for {request.node_id}",
-            "best_score": best_score,
-            "best_variant": {
-                "type": best_variant.get("_variant_type", "Optimized"),
-                "content_preview": best_variant.get("content", "")[:100],
-                "voice_settings": best_variant.get("voice_settings", {})
-            }
+            "node_id": result.get("node_id"),
+            "node_label": result.get("node_label"),
+            "scenario": result.get("scenario"),
+            "generations": result.get("generations", []),
+            "best_variant": result.get("best_variant"),
+            "best_score": result.get("best_score", 0)
         }
     except HTTPException:
         raise

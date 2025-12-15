@@ -24,6 +24,7 @@ class DirectorService:
         self.user_id = user_id
         self.openai_api_key: Optional[str] = None
         self.grok_api_key: Optional[str] = None
+        self.elevenlabs_api_key: Optional[str] = None
         self.db = None
         
     async def _init_db(self):
@@ -49,12 +50,17 @@ class DirectorService:
             elif service_name == 'openai':
                 self.openai_api_key = key_doc.get('api_key')
                 print(f"[Director] ✅ OpenAI API key loaded")
+            elif service_name == 'elevenlabs':
+                self.elevenlabs_api_key = key_doc.get('api_key')
+                print(f"[Director] ✅ ElevenLabs API key loaded")
         
         # Fallback to environment variables if not in DB
         if not self.openai_api_key:
             self.openai_api_key = os.environ.get('OPENAI_API_KEY')
         if not self.grok_api_key:
             self.grok_api_key = os.environ.get('GROK_API_KEY') or os.environ.get('XAI_API_KEY')
+        if not self.elevenlabs_api_key:
+            self.elevenlabs_api_key = os.environ.get('ELEVEN_API_KEY')
 
     async def create_sandbox(self, agent_id: str) -> str:
         """
@@ -129,10 +135,13 @@ class DirectorService:
     async def evolve_node(self, sandbox_id: str, node_id: str, generations: int = 3):
         """
         Starts the Evolutionary Optimization loop for a specific node.
+        Returns FULL data including all variants, audio, and scores.
         """
         await self._init_db()
         
         print(f"[Director] Starting Evolution for {node_id} in {sandbox_id} ({generations} gens)")
+        
+        evolution_log = []  # Full history for UI
         
         try:
             config = await self.get_sandbox_config(sandbox_id)
@@ -142,7 +151,12 @@ class DirectorService:
             call_flow = config.get('call_flow', [])
             node_id_str = str(node_id)
             
-            # Find the target node (compare as strings for safety)
+            # Get agent settings for voice
+            agent_settings = config.get('settings', {})
+            elevenlabs_settings = agent_settings.get('elevenlabs_settings', {})
+            voice_id = elevenlabs_settings.get('voice_id', '21m00Tcm4TlvDq8ikWAM')
+            
+            # Find the target node
             target_node = None
             for node in call_flow:
                 if str(node.get('id')) == node_id_str:
@@ -163,34 +177,65 @@ class DirectorService:
             
             best_score = 0
             best_variant = node_data
+            best_variant_data = None
             
             for gen in range(generations):
                 print(f"--- Generation {gen + 1} ---")
+                generation_results = []
                 
                 # 2. Mutation Phase
                 variants = await self._generate_mutations(node_data)
                 
-                # 3. Battle Royale (Test each variant)
-                results = []
+                # 3. Battle Royale (Test each variant with REAL audio)
                 for i, variant in enumerate(variants):
                     try:
-                        audio_stream, text_output, latency = await self._run_streaming_test(variant, scenario)
-                        score = await self._call_openai_judge(audio_stream, text_output, latency, scenario)
-                        results.append({"variant": variant, "score": score})
-                        print(f"[Director] Variant {i+1}: Score {score.get('total', 0)}")
+                        audio_bytes, text_output, latency = await self._run_streaming_test(variant, scenario, voice_id)
+                        score = await self._call_openai_judge(audio_bytes, text_output, latency, scenario)
+                        
+                        # Encode audio to base64 for frontend
+                        import base64
+                        audio_base64 = base64.b64encode(audio_bytes).decode('utf-8') if audio_bytes else None
+                        
+                        variant_result = {
+                            "variant_type": variant.get('_variant_type', 'Unknown'),
+                            "content": variant.get('content', ''),
+                            "voice_settings": variant.get('voice_settings', {}),
+                            "audio_base64": audio_base64,
+                            "latency_ms": int(latency * 1000),
+                            "score": score
+                        }
+                        generation_results.append(variant_result)
+                        print(f"[Director] Variant {i+1} ({variant.get('_variant_type')}): Score {score.get('total', 0)}")
+                        
                     except Exception as var_err:
                         print(f"[Director] Variant {i+1} error: {var_err}")
-                        results.append({"variant": variant, "score": {"total": 0}})
+                        generation_results.append({
+                            "variant_type": variant.get('_variant_type', 'Unknown'),
+                            "content": variant.get('content', ''),
+                            "voice_settings": variant.get('voice_settings', {}),
+                            "error": str(var_err),
+                            "score": {"total": 0}
+                        })
+                
+                evolution_log.append({
+                    "generation": gen + 1,
+                    "variants": generation_results
+                })
                 
                 # 4. Selection
-                if results:
-                    winner = max(results, key=lambda x: x["score"].get("total", 0))
+                if generation_results:
+                    winner = max(generation_results, key=lambda x: x["score"].get("total", 0))
                     winner_score = winner["score"].get("total", 0)
-                    print(f"[Director] Generation {gen+1} Winner: Score {winner_score}")
+                    print(f"[Director] Generation {gen+1} Winner: {winner['variant_type']} Score {winner_score}")
                     
                     if winner_score > best_score:
                         best_score = winner_score
-                        best_variant = winner["variant"]
+                        best_variant_data = winner
+                        # Find the actual variant dict to save
+                        for v in variants:
+                            if v.get('_variant_type') == winner['variant_type']:
+                                best_variant = v
+                                break
             
             # Apply winner to sandbox
             for node in call_flow:
@@ -202,7 +247,15 @@ class DirectorService:
             await self._save_sandbox_config(sandbox_id, config)
             
             print(f"[Director] ✅ Evolution complete for {node_label}. Best score: {best_score}")
-            return best_variant, best_score
+            
+            return {
+                "node_id": node_id,
+                "node_label": node_label,
+                "scenario": scenario,
+                "generations": evolution_log,
+                "best_variant": best_variant_data,
+                "best_score": best_score
+            }
             
         except Exception as e:
             print(f"[Director] ❌ Evolution error: {e}")
@@ -328,25 +381,68 @@ Judge this response."""
         
         return mutants
 
-    async def _run_streaming_test(self, node_data: Dict, scenario: str):
+    async def _run_streaming_test(self, node_data: Dict, scenario: str, voice_id: str = None):
         """
-        Simulates the Real-Time Streaming TTS Loopback.
-        In production, this would open a WebSocket to ElevenLabs.
+        Generate REAL audio via ElevenLabs and measure TTFB.
         """
-        import random
+        import time
+        
         text = node_data.get('content', '') or ''
-        base_latency = 0.3
-        jitter = random.uniform(0.0, 0.4)
+        if not text:
+            return b'', '', 0.5
         
         voice_settings = node_data.get('voice_settings', {})
-        if voice_settings.get('stability', 0.5) > 0.7:
-            jitter += 0.2
+        voice_id = voice_id or '21m00Tcm4TlvDq8ikWAM'  # Default Rachel voice
         
-        simulated_ttfb = base_latency + jitter
-        await asyncio.sleep(0.1)  # Small delay to simulate
+        if not self.elevenlabs_api_key:
+            print("[Director] ⚠️ No ElevenLabs key, using simulated audio")
+            await asyncio.sleep(0.2)
+            return b'SIMULATED_AUDIO', text, 0.3
         
-        fake_audio = b"\\x00\\xFF" * 512
-        return fake_audio, text, simulated_ttfb
+        start_time = time.time()
+        
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
+                
+                data = {
+                    "text": text[:1000],  # Limit text length for speed
+                    "model_id": "eleven_flash_v2_5",  # Fastest model
+                    "voice_settings": {
+                        "stability": voice_settings.get('stability', 0.5),
+                        "similarity_boost": 0.75,
+                        "speed": voice_settings.get('speed', 1.0)
+                    },
+                    "optimize_streaming_latency": 4
+                }
+                
+                headers = {
+                    "xi-api-key": self.elevenlabs_api_key,
+                    "Content-Type": "application/json"
+                }
+                
+                chunks = []
+                first_chunk_time = None
+                
+                async with client.stream('POST', url, headers=headers, json=data) as response:
+                    if response.status_code == 200:
+                        async for chunk in response.aiter_bytes():
+                            if first_chunk_time is None:
+                                first_chunk_time = time.time() - start_time
+                            chunks.append(chunk)
+                    else:
+                        print(f"[Director] ElevenLabs error: {response.status_code}")
+                        return b'', text, 1.0
+                
+                audio_data = b''.join(chunks)
+                ttfb = first_chunk_time or (time.time() - start_time)
+                
+                print(f"[Director] 🎙️ TTS complete: {len(audio_data)} bytes, TTFB: {ttfb:.3f}s")
+                return audio_data, text, ttfb
+                
+        except Exception as e:
+            print(f"[Director] TTS error: {e}")
+            return b'', text, 1.0
 
     async def promote_sandbox(self, sandbox_id: str) -> bool:
         """
