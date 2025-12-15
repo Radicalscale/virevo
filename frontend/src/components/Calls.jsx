@@ -8,6 +8,9 @@ const Calls = () => {
   const navigate = useNavigate();
   const [calls, setCalls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCalls, setTotalCalls] = useState(0);
+  const [limit] = useState(50);
   const [filters, setFilters] = useState({
     agent_id: '',
     direction: '',
@@ -32,21 +35,25 @@ const Calls = () => {
   useEffect(() => {
     fetchCalls();
     fetchAnalytics();
-  }, []);
+  }, [currentPage]); // Re-fetch when page changes
 
   const fetchCalls = async () => {
     try {
       setLoading(true);
-      const params = {};
-      
+      const params = {
+        limit: limit,
+        offset: (currentPage - 1) * limit
+      };
+
       if (filters.agent_id) params.agent_id = filters.agent_id;
       if (filters.direction) params.direction = filters.direction;
       if (filters.status) params.status = filters.status;
       if (filters.start_date) params.start_date = filters.start_date;
       if (filters.end_date) params.end_date = filters.end_date;
-      
+
       const response = await analyticsAPI.callHistory(params);
-      setCalls(response.data);
+      setCalls(response.data.calls);
+      setTotalCalls(response.data.total);
     } catch (error) {
       console.error('Error fetching calls:', error);
     } finally {
@@ -69,6 +76,7 @@ const Calls = () => {
   };
 
   const applyFilters = () => {
+    setCurrentPage(1); // Reset to first page
     fetchCalls();
     fetchAnalytics();
   };
@@ -114,7 +122,7 @@ const Calls = () => {
 
     return calls.filter(call => {
       const callDuration = call.duration || 0;
-      
+
       switch (durationFilter.operator) {
         case 'greater_than':
           return callDuration > targetDuration;
@@ -168,7 +176,7 @@ const Calls = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-      
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -205,7 +213,7 @@ const Calls = () => {
             <Filter className="w-5 h-5" />
             <h2 className="text-lg font-semibold">Filters</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm text-gray-400 mb-2">Direction</label>
@@ -274,16 +282,15 @@ const Calls = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Duration Filter Button */}
           <div className="mt-4 flex items-center gap-2">
             <button
               onClick={() => setShowDurationModal(true)}
-              className={`flex items-center gap-2 px-4 py-2 rounded border ${
-                durationFilter.enabled 
-                  ? 'bg-blue-600 border-blue-500 text-white' 
+              className={`flex items-center gap-2 px-4 py-2 rounded border ${durationFilter.enabled
+                  ? 'bg-blue-600 border-blue-500 text-white'
                   : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
-              }`}
+                }`}
             >
               <Filter className="w-4 h-4" />
               Filter by Duration
@@ -353,8 +360,8 @@ const Calls = () => {
                   </tr>
                 ) : (
                   getFilteredCalls().map((call) => (
-                    <tr 
-                      key={call.id} 
+                    <tr
+                      key={call.id}
                       className="hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleViewDetails(call.call_id)}
                     >
@@ -407,6 +414,29 @@ const Calls = () => {
             </table>
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-4 flex items-center justify-between bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div className="text-sm text-gray-400">
+            Showing <span className="font-medium text-white">{Math.min((currentPage - 1) * limit + 1, totalCalls)}</span> to <span className="font-medium text-white">{Math.min(currentPage * limit, totalCalls)}</span> of <span className="font-medium text-white">{totalCalls}</span> results
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage * limit >= totalCalls}
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Duration Filter Modal */}
@@ -414,7 +444,7 @@ const Calls = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700">
             <h3 className="text-xl font-bold text-white mb-4">Filter by Duration</h3>
-            
+
             <div className="space-y-4">
               {/* Operator Selection */}
               <div>
@@ -446,7 +476,7 @@ const Calls = () => {
                     step="0.1"
                   />
                 </div>
-                
+
                 {durationFilter.operator === 'between' && (
                   <div className="flex-1">
                     <label className="block text-sm text-gray-400 mb-2">Max Value</label>
@@ -461,7 +491,7 @@ const Calls = () => {
                     />
                   </div>
                 )}
-                
+
                 {/* Unit Selection */}
                 <div className="w-24">
                   <label className="block text-sm text-gray-400 mb-2">Unit</label>

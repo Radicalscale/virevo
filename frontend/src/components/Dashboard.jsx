@@ -22,9 +22,9 @@ const Dashboard = () => {
           analyticsAPI.callHistory({ limit: 10 }),
           analyticsAPI.dashboardAnalytics()
         ]);
-        
+
         setAgents(agentsRes.data);
-        setRecentCalls(callsRes.data);
+        setRecentCalls(callsRes.data.calls); // Updated to handle paginated response
         setAnalytics(analyticsRes.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -109,11 +109,10 @@ const Dashboard = () => {
                   <Icon size={24} className="text-white" />
                 </div>
                 {stat.change && (
-                  <span className={`text-sm font-medium ${
-                    stat.positive !== undefined 
+                  <span className={`text-sm font-medium ${stat.positive !== undefined
                       ? (stat.positive ? 'text-green-400' : 'text-red-400')
                       : 'text-orange-400'
-                  }`}>
+                    }`}>
                     {stat.change}
                   </span>
                 )}
@@ -182,9 +181,8 @@ const Dashboard = () => {
                     <p className="text-gray-400 text-sm capitalize">{call.direction || 'outbound'}</p>
                   </div>
                   <div className="text-right">
-                    <p className={`font-medium text-sm ${
-                      call.status === 'completed' ? 'text-green-400' : 'text-gray-400'
-                    }`}>
+                    <p className={`font-medium text-sm ${call.status === 'completed' ? 'text-green-400' : 'text-gray-400'
+                      }`}>
                       {call.status}
                     </p>
                     <p className="text-gray-400 text-xs">

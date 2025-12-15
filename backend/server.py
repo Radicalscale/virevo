@@ -8407,7 +8407,7 @@ async def serve_tts_audio(filename: str):
 
 # ==================== CALL HISTORY & ANALYTICS API ====================
 
-@api_router.get("/call-history", response_model=List[dict])
+@api_router.get("/call-history", response_model=dict)
 async def get_call_history(
     current_user: dict = Depends(get_current_user),
     agent_id: Optional[str] = None,
@@ -8445,12 +8445,15 @@ async def get_call_history(
         
         logger.info(f"📞 Query: {query}")
         
+        # Get total count first
+        total_count = await db.call_logs.count_documents(query)
+        
         # Query database - sort by created_at since start_time may not exist in all records
         # Try start_time first, fall back to created_at
         cursor = db.call_logs.find(query).sort("created_at", -1).skip(offset).limit(limit)
         calls = await cursor.to_list(length=limit)
         
-        logger.info(f"📞 Found {len(calls)} calls for user")
+        logger.info(f"📞 Found {len(calls)} calls for user (Total: {total_count})")
         
         # Convert ObjectId to string and datetime to ISO
         for call in calls:
@@ -8476,7 +8479,12 @@ async def get_call_history(
                 if hasattr(call["created_at"], 'isoformat'):
                     call["created_at"] = call["created_at"].isoformat()
         
-        return calls
+        return {
+            "calls": calls,
+            "total": total_count,
+            "limit": limit,
+            "offset": offset
+        }
     except Exception as e:
         logger.error(f"Error fetching call history: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
