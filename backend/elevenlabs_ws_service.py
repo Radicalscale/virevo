@@ -185,13 +185,17 @@ class ElevenLabsWebSocketService:
         try:
             # ElevenLabs streams audio in chunks, then waits for more input
             # After flush, we get audio chunks, then silence (no isFinal signal)
-            # Use a short timeout (0.5s) to detect when audio stream ends
+            # Dynamic timeout: longer for first chunk (generation latency), shorter after
+            first_chunk_received = False
             while True:
                 try:
-                    # Short timeout - if no message in 0.5s after flush, assume done
+                    # Dynamic timeout:
+                    # - 2.5s for first chunk (allows for generation/network latency)
+                    # - 0.5s for subsequent chunks (detects end of stream quickly)
+                    timeout = 0.5 if first_chunk_received else 2.5
                     message = await asyncio.wait_for(
                         self.websocket.recv(),
-                        timeout=0.5
+                        timeout=timeout
                     )
                     
                     data = json.loads(message)
@@ -203,6 +207,7 @@ class ElevenLabsWebSocketService:
                         audio_bytes = base64.b64decode(audio_base64)
                         
                         logger.debug(f"🎵 Received audio chunk: {len(audio_bytes)} bytes")
+                        first_chunk_received = True  # Switch to short timeout after first chunk
                         yield audio_bytes
                     
                     # Check for alignment data (word timestamps)
@@ -226,7 +231,10 @@ class ElevenLabsWebSocketService:
                 
                 except asyncio.TimeoutError:
                     # No more audio coming - generation complete for this sentence
-                    logger.info("⏱️  [TIMING] ElevenLabs audio stream complete (0.5s timeout reached) - End of Sentence")
+                    if first_chunk_received:
+                        logger.info("⏱️  [TIMING] ElevenLabs audio stream complete (0.5s timeout reached) - End of Sentence")
+                    else:
+                        logger.warning("⚠️  [TIMING] ElevenLabs timeout waiting for first chunk (2.5s) - No audio received!")
                     break
                     
                 except json.JSONDecodeError as e:
