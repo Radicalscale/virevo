@@ -28,7 +28,7 @@ class DirectorService:
         
     async def _init_db(self):
         """Initialize MongoDB connection and load API keys for this tenant."""
-        if self.db:
+        if self.db is not None:
             return
             
         mongo_url = os.environ.get('MONGO_URL')
