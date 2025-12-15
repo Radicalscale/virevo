@@ -335,7 +335,7 @@ Judge this response."""
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": "gpt-4o",
+                        "model": "gpt-5.2",
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt}
@@ -357,39 +357,162 @@ Judge this response."""
             print(f"[OpenAI] Error: {e}")
             return {"total": 5.0, "reasoning": [str(e)]}
 
-    async def _generate_mutations(self, base_node_data: Dict) -> List[Dict]:
-        """Generate 3 mutant variants of the node config."""
-        mutants = [copy.deepcopy(base_node_data) for _ in range(3)]
+    def _extract_speech_content(self, content: str) -> str:
+        """Extract only the speakable content from node (Agent says: '...')"""
+        import re
         
+        # Find all "Agent says: "..." patterns
+        pattern = r'Agent says:\s*["\'](.+?)["\']'
+        matches = re.findall(pattern, content, re.DOTALL)
+        
+        if matches:
+            # Join all speech parts for TTS testing
+            return " ".join(matches)
+        
+        # Fallback: if no Agent says pattern, look for content in quotes
+        quote_pattern = r'"([^"]{20,})"'
+        quote_matches = re.findall(quote_pattern, content)
+        if quote_matches:
+            return " ".join(quote_matches[:3])  # Max 3 quotes
+        
+        # Last resort: return first 200 chars if no patterns found
+        return content[:200] if content else "Hello, how can I help you today?"
+
+    async def _generate_mutations(self, base_node_data: Dict) -> List[Dict]:
+        """Generate 3 intelligent variant rewrites using GPT-5.2."""
         content = base_node_data.get('content', '') or ''
         
-        # Variant A: Polite/Slow
-        mutants[0]['content'] = content + " Please take your time."
-        mutants[0]['voice_settings'] = {"stability": 0.6, "speed": 0.9}
+        if not self.openai_api_key:
+            print("[Director] ⚠️ No OpenAI key, using fallback mutations")
+            return self._fallback_mutations(base_node_data)
+        
+        variants = []
+        variant_configs = [
+            {
+                "type": "Diplomat",
+                "personality": "polite, patient, and understanding",
+                "speech_style": "softer, more accommodating, uses phrases like 'I understand' and 'take your time'",
+                "voice_settings": {"stability": 0.6, "speed": 0.9}
+            },
+            {
+                "type": "The Closer",
+                "personality": "direct, confident, and action-oriented",
+                "speech_style": "concise, assertive, uses urgency and clear calls to action",
+                "voice_settings": {"stability": 0.4, "speed": 1.1}
+            },
+            {
+                "type": "The Empath",
+                "personality": "warm, emotionally intelligent, and relatable",
+                "speech_style": "uses pauses for effect, emotional hooks, personal connection",
+                "voice_settings": {"stability": 0.5, "speed": 1.0, "style": 0.3}
+            }
+        ]
+        
+        for config in variant_configs:
+            try:
+                rewritten_content = await self._rewrite_node_with_gpt(content, config)
+                variant = copy.deepcopy(base_node_data)
+                variant['content'] = rewritten_content
+                variant['voice_settings'] = config['voice_settings']
+                variant['_variant_type'] = config['type']
+                variant['_speech_only'] = self._extract_speech_content(rewritten_content)
+                variants.append(variant)
+                print(f"[Director] ✅ Generated {config['type']} variant")
+            except Exception as e:
+                print(f"[Director] ❌ Error generating {config['type']}: {e}")
+                # Add fallback variant
+                variant = copy.deepcopy(base_node_data)
+                variant['_variant_type'] = config['type']
+                variant['_speech_only'] = self._extract_speech_content(content)
+                variants.append(variant)
+        
+        return variants
+    
+    async def _rewrite_node_with_gpt(self, original_content: str, variant_config: Dict) -> str:
+        """Use GPT-5.2 to intelligently rewrite the entire node."""
+        
+        system_prompt = f"""You are an expert voice agent prompt engineer.
+Rewrite the given node content with a {variant_config['personality']} personality.
+
+RULES:
+1. KEEP the exact same structure (## headers, - bullet points, numbered lists)
+2. MODIFY the 'Agent says:' speech content to be {variant_config['speech_style']}
+3. ADJUST tactics/strategies to match the personality
+4. Preserve all state management and escalation logic
+5. DO NOT add or remove sections - only rewrite existing content
+6. Output ONLY the rewritten content, no explanations"""
+
+        user_prompt = f"""Rewrite this node as a {variant_config['type']} variant:
+
+{original_content[:4000]}"""
+
+        try:
+            async with httpx.AsyncClient(timeout=90.0) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {self.openai_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": "gpt-5.2",
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt}
+                        ],
+                        "temperature": 0.7,
+                        "max_tokens": 4000
+                    }
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    rewritten = result['choices'][0]['message']['content'].strip()
+                    return rewritten
+                else:
+                    print(f"[GPT-5.2] Error {response.status_code}: {response.text[:100]}")
+                    return original_content
+        except Exception as e:
+            print(f"[GPT-5.2] Error: {e}")
+            return original_content
+
+    def _fallback_mutations(self, base_node_data: Dict) -> List[Dict]:
+        """Fallback mutations when GPT is unavailable."""
+        content = base_node_data.get('content', '') or ''
+        speech = self._extract_speech_content(content)
+        
+        mutants = [copy.deepcopy(base_node_data) for _ in range(3)]
+        
         mutants[0]['_variant_type'] = "Diplomat"
+        mutants[0]['_speech_only'] = speech
+        mutants[0]['voice_settings'] = {"stability": 0.6, "speed": 0.9}
         
-        # Variant B: Concise/Fast  
-        first_sentence = content.split('.')[0] + "." if '.' in content else content
-        mutants[1]['content'] = first_sentence
-        mutants[1]['voice_settings'] = {"stability": 0.4, "speed": 1.1}
         mutants[1]['_variant_type'] = "The Closer"
+        mutants[1]['_speech_only'] = speech
+        mutants[1]['voice_settings'] = {"stability": 0.4, "speed": 1.1}
         
-        # Variant C: Empathetic/Paused
-        mutants[2]['content'] = "<break time='0.3s'/> " + content
-        mutants[2]['voice_settings'] = {"stability": 0.5, "style_exaggeration": 0.3}
         mutants[2]['_variant_type'] = "The Empath"
+        mutants[2]['_speech_only'] = speech
+        mutants[2]['voice_settings'] = {"stability": 0.5, "speed": 1.0}
+        
+        return mutants
         
         return mutants
 
     async def _run_streaming_test(self, node_data: Dict, scenario: str, voice_id: str = None):
         """
-        Generate REAL audio via ElevenLabs and measure TTFB.
+        Generate REAL audio via ElevenLabs for SPEECH CONTENT ONLY.
+        Uses _speech_only field if available, otherwise extracts from content.
         """
         import time
         
-        text = node_data.get('content', '') or ''
+        # Use extracted speech content, not full node
+        text = node_data.get('_speech_only') or self._extract_speech_content(node_data.get('content', ''))
+        
         if not text:
             return b'', '', 0.5
+        
+        print(f"[Director] 🎤 TTS for speech: {text[:80]}...")
         
         voice_settings = node_data.get('voice_settings', {})
         voice_id = voice_id or '21m00Tcm4TlvDq8ikWAM'  # Default Rachel voice

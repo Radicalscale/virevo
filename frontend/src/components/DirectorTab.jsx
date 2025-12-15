@@ -436,24 +436,35 @@ const DirectorTab = () => {
                                                         <div
                                                             key={varIdx}
                                                             className={`p-3 rounded-lg border ${result.best_variant?.variant_type === variant.variant_type
-                                                                    ? 'bg-green-900/30 border-green-500'
-                                                                    : 'bg-gray-900 border-gray-700'
+                                                                ? 'bg-green-900/30 border-green-500'
+                                                                : 'bg-gray-900 border-gray-700'
                                                                 }`}
                                                         >
                                                             <div className="flex justify-between items-center mb-2">
                                                                 <span className="font-medium text-white">{variant.variant_type}</span>
                                                                 <span className={`text-sm font-bold ${variant.score?.total >= 8 ? 'text-green-400' :
-                                                                        variant.score?.total >= 6 ? 'text-yellow-400' :
-                                                                            'text-red-400'
+                                                                    variant.score?.total >= 6 ? 'text-yellow-400' :
+                                                                        'text-red-400'
                                                                     }`}>
                                                                     {variant.score?.total || 0}/10
                                                                 </span>
                                                             </div>
 
-                                                            {/* Full Content */}
-                                                            <div className="bg-black/30 p-2 rounded text-xs text-gray-300 mb-2 max-h-32 overflow-y-auto">
-                                                                {variant.content || 'No content'}
+                                                            {/* Speech Preview (what TTS speaks) */}
+                                                            <div className="bg-blue-900/30 border border-blue-500/50 p-2 rounded text-xs text-blue-200 mb-2">
+                                                                <span className="text-blue-400 font-semibold">🔊 Speech: </span>
+                                                                {variant._speech_only || variant.content?.match(/Agent says:\s*["'](.+?)["']/)?.[1] || 'No speech content'}
                                                             </div>
+
+                                                            {/* Full Node Content (expandable) */}
+                                                            <details className="mb-2">
+                                                                <summary className="cursor-pointer text-xs text-gray-400 hover:text-white">
+                                                                    📄 View Full Node Content
+                                                                </summary>
+                                                                <pre className="bg-black/50 p-2 rounded text-xs text-gray-300 mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap font-mono">
+                                                                    {variant.content || 'No content'}
+                                                                </pre>
+                                                            </details>
 
                                                             {/* Voice Settings */}
                                                             {variant.voice_settings && (
