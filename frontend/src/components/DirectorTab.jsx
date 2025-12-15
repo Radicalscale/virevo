@@ -3,7 +3,7 @@ import { Play, Activity, GitBranch, Mic, Save, Shield, AlertCircle, Loader2, Ref
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 
-const API_BASE = process.env.REACT_APP_API_URL || '';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
 const DirectorTab = () => {
     // State
