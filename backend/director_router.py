@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import json
 
-from .director_service import DirectorService
-from .auth_utils import get_current_user_id  # Assuming this exists based on other routers
+from director_service import DirectorService
+from auth_utils import get_current_user_id  # Assuming this exists based on other routers
 
 router = APIRouter(prefix="/api/director", tags=["Director Studio"])
 
