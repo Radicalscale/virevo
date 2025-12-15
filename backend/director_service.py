@@ -1,6 +1,7 @@
 """
 Director Service - Real Implementation
-Integrated with MongoDB tenant keys and live API calls (GPT-5.2, Grok 4.1)
+Integrated with MongoDB tenant keys and live API calls (GPT-4o, Grok 4)
+Sandboxes are persisted to MongoDB for stateless operation.
 """
 import os
 import copy
@@ -17,15 +18,14 @@ class DirectorService:
     """
     The DirectorService orchestrates the 'Director Studio' functionality.
     It manages:
-    1. Sandboxing (Cloning agents from the DB)
-    2. Chaos Scripting (Grok 4.1 via xAI API)
-    3. The Ear / Judge (GPT-5.2 / GPT-4o via OpenAI API)
+    1. Sandboxing (Cloning agents to MongoDB)
+    2. Chaos Scripting (Grok 4 via xAI API)
+    3. The Ear / Judge (GPT-4o via OpenAI API)
     4. Evolution Engine (Mutation & Selection)
     """
 
     def __init__(self, user_id: str):
         self.user_id = user_id
-        self.sandboxes: Dict[str, Any] = {}  # sandbox_id -> config
         self.openai_api_key: Optional[str] = None
         self.grok_api_key: Optional[str] = None
         self.db = None
@@ -63,6 +63,7 @@ class DirectorService:
     async def create_sandbox(self, agent_id: str) -> str:
         """
         Creates a safe clone of an agent for testing.
+        Stores the sandbox in MongoDB for persistence.
         Returns the sandbox_id.
         """
         await self._init_db()
@@ -76,27 +77,57 @@ class DirectorService:
         original_agent.pop('_id', None)
         
         sandbox_id = f"sandbox_{agent_id}_{str(uuid.uuid4())[:8]}"
-        self.sandboxes[sandbox_id] = copy.deepcopy(original_agent)
+        
+        # Store sandbox in MongoDB (director_sandboxes collection)
+        sandbox_doc = {
+            "sandbox_id": sandbox_id,
+            "user_id": self.user_id,
+            "agent_id": agent_id,
+            "config": copy.deepcopy(original_agent),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        await self.db.director_sandboxes.insert_one(sandbox_doc)
+        
         print(f"[Director] Created Sandbox {sandbox_id} from Agent {agent_id}")
         return sandbox_id
 
-    def get_sandbox_config(self, sandbox_id: str) -> Optional[Dict]:
-        return self.sandboxes.get(sandbox_id)
+    async def get_sandbox_config(self, sandbox_id: str) -> Optional[Dict]:
+        """Load sandbox from MongoDB."""
+        await self._init_db()
+        sandbox = await self.db.director_sandboxes.find_one({
+            "sandbox_id": sandbox_id,
+            "user_id": self.user_id
+        })
+        if sandbox:
+            return sandbox.get('config')
+        return None
+
+    async def _save_sandbox_config(self, sandbox_id: str, config: Dict):
+        """Save updated sandbox config to MongoDB."""
+        await self._init_db()
+        await self.db.director_sandboxes.update_one(
+            {"sandbox_id": sandbox_id, "user_id": self.user_id},
+            {"$set": {"config": config, "updated_at": datetime.utcnow()}}
+        )
 
     async def update_sandbox_node(self, sandbox_id: str, node_id: str, updates: Dict):
         """
         Manually update a node in the sandbox.
         """
-        if sandbox_id not in self.sandboxes:
+        await self._init_db()
+        
+        config = await self.get_sandbox_config(sandbox_id)
+        if not config:
             raise ValueError("Sandbox not found")
         
-        config = self.sandboxes[sandbox_id]
         call_flow = config.get('call_flow', [])
         
         for node in call_flow:
             if node.get('id') == node_id:
                 node['data'] = {**node.get('data', {}), **updates}
                 print(f"[Director] Updated Node {node_id} in {sandbox_id}")
+                await self._save_sandbox_config(sandbox_id, config)
                 return
         
         raise ValueError(f"Node {node_id} not found in sandbox")
@@ -109,7 +140,10 @@ class DirectorService:
         
         print(f"[Director] Starting Evolution for {node_id} in {sandbox_id} ({generations} gens)")
         
-        config = self.sandboxes[sandbox_id]
+        config = await self.get_sandbox_config(sandbox_id)
+        if not config:
+            raise ValueError("Sandbox not found")
+        
         call_flow = config.get('call_flow', [])
         
         # Find the target node
@@ -157,11 +191,13 @@ class DirectorService:
                 node['data'] = best_variant
                 break
         
-        self.sandboxes[sandbox_id]['call_flow'] = call_flow
+        config['call_flow'] = call_flow
+        await self._save_sandbox_config(sandbox_id, config)
+        
         return best_variant, best_score
 
     async def _call_grok_for_scenario(self, node_context: Dict) -> str:
-        """Use Grok 4.1 to generate a chaos scenario."""
+        """Use Grok 4 to generate a chaos scenario."""
         if not self.grok_api_key:
             print("[Director] ⚠️ No Grok API key, using fallback scenario")
             return "User is skeptical and asking tough questions."
@@ -182,7 +218,7 @@ Output ONLY the persona description in 1-2 sentences."""
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": "grok-4-0709",  # Matching existing codebase
+                        "model": "grok-4-0709",
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt}
@@ -195,7 +231,7 @@ Output ONLY the persona description in 1-2 sentences."""
                 if response.status_code == 200:
                     result = response.json()
                     scenario = result['choices'][0]['message']['content'].strip()
-                    print(f"[Grok 4.1] Generated: {scenario[:80]}...")
+                    print(f"[Grok 4] Generated: {scenario[:80]}...")
                     return scenario
                 else:
                     print(f"[Grok] API Error {response.status_code}")
@@ -205,7 +241,7 @@ Output ONLY the persona description in 1-2 sentences."""
             return "User is skeptical and rushed."
 
     async def _call_openai_judge(self, audio: bytes, text: str, latency: float, scenario: str) -> Dict:
-        """Use GPT-4o / GPT-5.2 to judge the performance."""
+        """Use GPT-4o to judge the performance."""
         if not self.openai_api_key:
             print("[Director] ⚠️ No OpenAI API key, using fallback judgment")
             return {"total": 7.0, "reasoning": ["Fallback score"]}
@@ -216,7 +252,7 @@ Evaluate based on:
 2. TONALITY (Score 1-10): Did it sound robotic/flat?
 3. HUMANITY (Score 1-10): Did it feel like a real person?
 
-Output JSON: {"latency": X, "tonality": X, "humanity": X, "total": X, "reasoning": ["..."]}}"""
+Output JSON: {"latency": X, "tonality": X, "humanity": X, "total": X, "reasoning": ["..."]}"""
 
         user_prompt = f"""
 Scenario: {scenario}
@@ -235,7 +271,7 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": "gpt-4o",  # Using gpt-4o as it's widely available
+                        "model": "gpt-4o",
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt}
@@ -307,20 +343,24 @@ Judge this response. Remember: Low latency = good. Natural tone = good.
         """
         await self._init_db()
         
-        if sandbox_id not in self.sandboxes:
+        config = await self.get_sandbox_config(sandbox_id)
+        if not config:
             raise ValueError("Sandbox not found")
         
-        optimized_config = self.sandboxes[sandbox_id]
-        agent_id = optimized_config.get('id')
+        agent_id = config.get('id')
         
         result = await self.db.agents.update_one(
             {"id": agent_id, "user_id": self.user_id},
-            {"$set": optimized_config}
+            {"$set": config}
         )
         
         if result.modified_count > 0:
             print(f"[Director] ✅ Promoted Sandbox {sandbox_id} to Live Agent {agent_id}")
-            del self.sandboxes[sandbox_id]
+            # Delete the sandbox after promotion
+            await self.db.director_sandboxes.delete_one({
+                "sandbox_id": sandbox_id,
+                "user_id": self.user_id
+            })
             return True
         else:
             print(f"[Director] ❌ Failed to promote sandbox")

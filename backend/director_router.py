@@ -56,7 +56,7 @@ async def get_sandbox(sandbox_id: str, current_user: dict = Depends(get_current_
     """
     try:
         service = DirectorService(user_id=current_user['id'])
-        config = service.get_sandbox_config(sandbox_id)
+        config = await service.get_sandbox_config(sandbox_id)
         if not config:
             raise HTTPException(status_code=404, detail="Sandbox not found")
         return {
@@ -77,7 +77,7 @@ async def get_sandbox_nodes(sandbox_id: str, current_user: dict = Depends(get_cu
     """
     try:
         service = DirectorService(user_id=current_user['id'])
-        config = service.get_sandbox_config(sandbox_id)
+        config = await service.get_sandbox_config(sandbox_id)
         if not config:
             raise HTTPException(status_code=404, detail="Sandbox not found")
         
@@ -106,12 +106,6 @@ async def evolve_node(request: EvolveNodeRequest, current_user: dict = Depends(g
     """
     try:
         service = DirectorService(user_id=current_user['id'])
-        await service._init_db()
-        
-        # Reload sandbox if needed (stateless between requests)
-        if request.sandbox_id not in service.sandboxes:
-            # Try to reconstruct from a stored state or return error
-            raise HTTPException(status_code=404, detail="Sandbox not found. Please create a new one.")
         
         best_variant, best_score = await service.evolve_node(
             sandbox_id=request.sandbox_id,
