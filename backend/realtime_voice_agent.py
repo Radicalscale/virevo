@@ -21,10 +21,15 @@ class RealtimeVoiceAgent:
         self.session = session
         self.telnyx_service = telnyx_service
         self.db = db
+        self.db = db
         self.active_calls = active_calls
         self.deepgram_ws = None
         self.is_agent_speaking = False
         self.last_agent_text = ""
+        
+        # Initialize Natural Delivery Middleware (Dual-Stream Architecture)
+        from natural_delivery_middleware import NaturalDeliveryMiddleware
+        self.delivery_middleware = NaturalDeliveryMiddleware()
         
     async def start(self, telnyx_websocket):
         """
@@ -208,25 +213,52 @@ class RealtimeVoiceAgent:
     async def _speak_and_save(self, text):
         """
         Speak text via Telnyx and save to transcript
+        Uses NaturalDeliveryMiddleware to split logic stream (DB) vs audio stream (TTS)
         """
         try:
-            # Save to transcript
+            # 1. Process text through middleware to handle [H]/[S] tags and strategy
+            from natural_delivery_middleware import NaturalDeliveryMiddleware
+            
+            # Determine model_id from session config if available, default to flash
+            # Safe default
+            model_id = "eleven_flash_v2_5" 
+            if hasattr(self.session, "agent_config"):
+                settings = self.session.agent_config.get("settings", {})
+                model_id = settings.get("elevenlabs_settings", {}).get("model", "eleven_flash_v2_5")
+            
+            # Dual-Stream Processing
+            clean_text, audio_payload = self.delivery_middleware.process(text, model_id)
+            
+            # 2. Logic Stream: Save CLEAN text to transcript (no [H] tags)
             await self.db.call_logs.update_one(
                 {"call_id": self.call_control_id},
                 {"$push": {
                     "transcript": {
                         "speaker": "agent",
-                        "text": text,
+                        "text": clean_text,
                         "timestamp": self._get_timestamp()
                     }
                 }}
             )
             
-            # Speak via Telnyx TTS
-            await self.telnyx_service.speak_text(self.call_control_id, text)
+            # 3. Audio Stream: Speak using rich payload (SSML or Voice Settings)
+            # Unpack payload
+            tts_text = audio_payload["text"]
+            voice_settings = audio_payload["voice_settings"]
+            
+            # Log different text if payload changed
+            if tts_text != clean_text:
+                logger.debug(f"🎭 Natural Delivery: '{clean_text}' -> '{tts_text}' (Settings: {voice_settings})")
+            
+            await self.telnyx_service.speak_text(
+                self.call_control_id, 
+                tts_text,
+                agent_config=self.session.agent_config if hasattr(self.session, "agent_config") else None,
+                voice_settings=voice_settings
+            )
             logger.info("🔊 Agent spoke")
             
-            self.last_agent_text = text
+            self.last_agent_text = clean_text
             
             # Wait for speech to finish before listening again
             word_count = len(text.split())

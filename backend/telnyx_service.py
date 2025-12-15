@@ -381,7 +381,8 @@ class TelnyxService:
         voice: str = "female",
         language: str = "en-US",
         agent_config: dict = None,
-        use_websocket_tts: bool = None
+        use_websocket_tts: bool = None,
+        voice_settings: Optional[Dict[str, Any]] = None  # <-- Added optional settings
     ) -> Dict[str, Any]:
         """
         Convert text to speech and play on the call
@@ -422,7 +423,13 @@ class TelnyxService:
                         if tts_provider == "sesame":
                             result = await self._speak_text_websocket_sesame(call_control_id, text, agent_config)
                         else:
-                            result = await self._speak_text_websocket(call_control_id, text, agent_config)
+                            # Pass voice_settings for dynamic stability/similarity boost (Flash V2.5)
+                            result = await self._speak_text_websocket(
+                                call_control_id, 
+                                text, 
+                                agent_config,
+                                voice_settings=voice_settings
+                            )
                         
                         if result.get("success"):
                             return result
@@ -532,7 +539,8 @@ class TelnyxService:
         self,
         call_control_id: str,
         text: str,
-        agent_config: dict
+        agent_config: dict,
+        voice_settings: Optional[Dict[str, Any]] = None  # <-- Added optional settings
     ) -> Dict[str, Any]:
         """
         WebSocket-based TTS streaming (OPTIMIZED - no pydub)
@@ -542,6 +550,7 @@ class TelnyxService:
             call_control_id: Telnyx call control ID
             text: Text to synthesize
             agent_config: Agent configuration with voice settings
+            voice_settings: Optional dynamic voice settings for this specific chunk
             
         Returns:
             Dict with success status and playback_id
@@ -599,9 +608,20 @@ class TelnyxService:
             }
             await ws_service.websocket.send(json.dumps(bos_message))
             
-            # Now send the actual text
-            await ws_service.send_text(text, try_trigger_generation=True)
-            await ws_service.send_end_of_stream()
+            # Send text to ElevenLabs (Split large text if needed)
+            # For streaming, we send meaningful chunks
+            
+            # Pass dynamic voice settings if provided (for Flash v2.5 mid-stream updates)
+            await ws_service.send_text(
+                text, 
+                voice_settings=voice_settings, 
+                try_trigger_generation=True, 
+                flush=True
+            )
+            
+            # Create a dedicated task for audio processing to keep the event loop responsive
+            # We'll stream audio chunks directly to Telnyx as separate playback calls
+            # OR accumulate and play (easier for synchronization)
             
             # Collect audio chunks
             audio_chunks = []

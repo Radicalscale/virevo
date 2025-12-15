@@ -19,7 +19,7 @@ const FlowBuilder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [nodes, setNodes] = useState([
     {
       id: '1',
@@ -43,7 +43,7 @@ const FlowBuilder = () => {
       }
     }
   ]);
-  
+
   const [selectedNode, setSelectedNode] = useState(nodes[0]);
   const [loading, setLoading] = useState(true);
   const [agent, setAgent] = useState(null);
@@ -54,17 +54,17 @@ const FlowBuilder = () => {
   const [currentTransitionId, setCurrentTransitionId] = useState(null);
   const [transitionContent, setTransitionContent] = useState('');
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-  
+
   // Webhook tester state
   const [webhookTestVariables, setWebhookTestVariables] = useState({});
   const [webhookTestResponse, setWebhookTestResponse] = useState(null);
   const [webhookTestLoading, setWebhookTestLoading] = useState(false);
   const [showWebhookTester, setShowWebhookTester] = useState(false);
   const [customTestVariables, setCustomTestVariables] = useState([]);  // [{name: '', value: ''}]
-  
+
   // Node sequence tester state
   const [showNodeTester, setShowNodeTester] = useState(false);
-  
+
   // AI Node Fixer state
   const [showNodeFixer, setShowNodeFixer] = useState(false);
 
@@ -115,7 +115,7 @@ const FlowBuilder = () => {
   // Webhook tester function
   const testWebhook = async () => {
     if (!selectedNode || selectedNode.type !== 'function') return;
-    
+
     const webhookUrl = selectedNode.data?.webhook_url;
     if (!webhookUrl) {
       toast({
@@ -125,18 +125,18 @@ const FlowBuilder = () => {
       });
       return;
     }
-    
+
     setWebhookTestLoading(true);
     setWebhookTestResponse(null);
-    
+
     try {
       // Get all variables from the node's extract_variables
       const extractVariables = selectedNode.data?.extract_variables || [];
-      
+
       // Build the request body - handle both JSON Schema and Template formats
       let parsedBody;
       const bodyTemplate = selectedNode.data?.webhook_body || '';
-      
+
       // Try to parse as JSON first
       let bodyObj = null;
       try {
@@ -146,13 +146,13 @@ const FlowBuilder = () => {
       } catch {
         bodyObj = null;
       }
-      
+
       // Check if it's a JSON Schema format (has "type" and "properties" keys)
       if (bodyObj && typeof bodyObj === 'object' && bodyObj.type === 'object' && bodyObj.properties) {
         // It's a JSON Schema - build request body from test variables
         console.log('📋 Detected JSON schema format - building request from test variables');
         parsedBody = {};
-        
+
         // Build request body from schema properties and test variables
         for (const propName of Object.keys(bodyObj.properties)) {
           // Check webhookTestVariables first
@@ -170,12 +170,12 @@ const FlowBuilder = () => {
             }
           }
         }
-        
+
         // Check if any variables are missing
         const missingVars = Object.entries(parsedBody)
           .filter(([key, value]) => value === null)
           .map(([key]) => key);
-        
+
         if (missingVars.length > 0) {
           toast({
             title: "Warning",
@@ -188,25 +188,25 @@ const FlowBuilder = () => {
       } else {
         // It's a template format with {{variable}} placeholders - replace them
         let body = bodyTemplate || '{}';
-        
+
         // Replace {{variable}} with test values from extractVariables
         for (const varDef of extractVariables) {
           const varName = varDef.name;
           const testValue = webhookTestVariables[varName] || '';
           body = body.replace(new RegExp(`\\{\\{${varName}\\}\\}`, 'g'), testValue);
         }
-        
+
         // Replace custom variables
         for (const customVar of customTestVariables) {
           if (customVar.name) {
             body = body.replace(new RegExp(`\\{\\{${customVar.name}\\}\\}`, 'g'), customVar.value || '');
           }
         }
-        
+
         // Also replace any other common variables
         body = body.replace(/\{\{call_id\}\}/g, 'test_call_123');
         body = body.replace(/\{\{user_message\}\}/g, webhookTestVariables['user_message'] || 'Test message');
-        
+
         // Parse the body as JSON if it's valid
         try {
           parsedBody = JSON.parse(body);
@@ -214,12 +214,12 @@ const FlowBuilder = () => {
           parsedBody = body;
         }
       }
-      
+
       const method = selectedNode.data?.webhook_method || 'POST';
       const timeout = (selectedNode.data?.webhook_timeout || 10) * 1000;
-      
+
       const startTime = Date.now();
-      
+
       // Make the request through our backend proxy to avoid CORS
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/webhook-test`, {
         method: 'POST',
@@ -235,12 +235,12 @@ const FlowBuilder = () => {
           timeout: timeout
         })
       });
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       const result = await response.json();
-      
+
       setWebhookTestResponse({
         success: result.success,
         status: result.status_code,
@@ -253,15 +253,15 @@ const FlowBuilder = () => {
           body: parsedBody
         }
       });
-      
+
       toast({
         title: result.success ? "Webhook Test Successful" : "Webhook Test Failed",
-        description: result.success 
-          ? `Response received in ${duration}ms` 
+        description: result.success
+          ? `Response received in ${duration}ms`
           : result.error || "Request failed",
         variant: result.success ? "default" : "destructive"
       });
-      
+
     } catch (error) {
       console.error('Webhook test error:', error);
       setWebhookTestResponse({
@@ -298,7 +298,7 @@ const FlowBuilder = () => {
 
   const addNode = (type) => {
     let nodeData;
-    
+
     if (type.id === 'start') {
       nodeData = {
         whoSpeaksFirst: 'user',
@@ -376,14 +376,14 @@ const FlowBuilder = () => {
         transitions: [{ id: '1', condition: '', nextNode: '' }]
       };
     }
-    
+
     const newNode = {
       id: Date.now().toString(),
       type: type.id,
       label: type.name,
       data: nodeData
     };
-    
+
     setNodes([...nodes, newNode]);
     setSelectedNode(newNode);
     setShowNodePalette(false);
@@ -549,11 +549,10 @@ const FlowBuilder = () => {
                 <div key={node.id} id={`node-item-${node.id}`}>
                   <Card
                     onClick={() => setSelectedNode(node)}
-                    className={`p-4 cursor-pointer transition-all ${
-                      isSelected
+                    className={`p-4 cursor-pointer transition-all ${isSelected
                         ? 'bg-gray-800 border-blue-500 shadow-lg shadow-blue-500/20'
                         : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                    }`}
+                      }`}
                     style={{ borderLeftColor: nodeType?.color, borderLeftWidth: '4px' }}
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -581,7 +580,7 @@ const FlowBuilder = () => {
                     {node.data.prompt && (
                       <p className="text-gray-300 text-sm mt-2 line-clamp-2">{node.data.prompt}</p>
                     )}
-                    
+
                     {/* Show dialogue preview for function nodes with speak_during_execution enabled */}
                     {node.type === 'function' && node.data.speak_during_execution && node.data.dialogue_text && (
                       <div className="mt-3 bg-purple-900/30 border border-purple-600/50 rounded-lg p-3">
@@ -593,7 +592,7 @@ const FlowBuilder = () => {
                         <p className="text-gray-300 text-sm italic line-clamp-2">{node.data.dialogue_text}</p>
                       </div>
                     )}
-                    
+
                     {node.data.transitions && node.data.transitions.length > 0 && (
                       <div className="mt-3 space-y-1">
                         {node.data.transitions.map((transition) => (
@@ -619,7 +618,7 @@ const FlowBuilder = () => {
         {selectedNode && (
           <div className="w-96 bg-gray-800 border-l border-gray-700 p-6 overflow-y-auto">
             <h2 className="text-white font-semibold mb-4">Node Settings</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <Label className="text-gray-300">Node Label</Label>
@@ -634,7 +633,7 @@ const FlowBuilder = () => {
               {selectedNode.type === 'start' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Begin Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Who speaks first</Label>
                     <div className="space-y-2 mt-2">
@@ -642,16 +641,14 @@ const FlowBuilder = () => {
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, whoSpeaksFirst: 'ai' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.whoSpeaksFirst === 'ai'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.whoSpeaksFirst === 'ai'
                             ? 'border-blue-500 bg-blue-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center">
-                          <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
-                            selectedNode.data.whoSpeaksFirst === 'ai' ? 'border-blue-500' : 'border-gray-600'
-                          }`}>
+                          <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${selectedNode.data.whoSpeaksFirst === 'ai' ? 'border-blue-500' : 'border-gray-600'
+                            }`}>
                             {selectedNode.data.whoSpeaksFirst === 'ai' && (
                               <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                             )}
@@ -659,21 +656,19 @@ const FlowBuilder = () => {
                           <span className="text-white">AI speaks first</span>
                         </div>
                       </div>
-                      
+
                       <div
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, whoSpeaksFirst: 'user' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.whoSpeaksFirst === 'user'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.whoSpeaksFirst === 'user'
                             ? 'border-blue-500 bg-blue-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center">
-                          <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
-                            selectedNode.data.whoSpeaksFirst === 'user' ? 'border-blue-500' : 'border-gray-600'
-                          }`}>
+                          <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${selectedNode.data.whoSpeaksFirst === 'user' ? 'border-blue-500' : 'border-gray-600'
+                            }`}>
                             {selectedNode.data.whoSpeaksFirst === 'user' && (
                               <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                             )}
@@ -695,14 +690,12 @@ const FlowBuilder = () => {
                       onClick={() => updateNode(selectedNode.id, {
                         data: { ...selectedNode.data, aiSpeaksAfterSilence: !selectedNode.data.aiSpeaksAfterSilence }
                       })}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        selectedNode.data.aiSpeaksAfterSilence ? 'bg-blue-600' : 'bg-gray-700'
-                      }`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selectedNode.data.aiSpeaksAfterSilence ? 'bg-blue-600' : 'bg-gray-700'
+                        }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          selectedNode.data.aiSpeaksAfterSilence ? 'translate-x-6' : 'translate-x-1'
-                        }`}
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${selectedNode.data.aiSpeaksAfterSilence ? 'translate-x-6' : 'translate-x-1'
+                          }`}
                       />
                     </button>
                   </div>
@@ -738,11 +731,11 @@ const FlowBuilder = () => {
               {selectedNode.type === 'function' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Webhook/Function Settings</h3>
-                  
+
                   {/* Function Behavior Controls */}
                   <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4 space-y-4">
                     <h4 className="text-white font-medium">⚙️ Function Behavior</h4>
-                    
+
                     {/* Speak During Execution */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -761,7 +754,7 @@ const FlowBuilder = () => {
                       </div>
                       <p className="text-xs text-gray-400">Agent will say something before executing the webhook (e.g., "One moment...")</p>
                     </div>
-                    
+
                     {/* Dialogue Configuration - Only show if speak_during_execution is enabled */}
                     {selectedNode.data?.speak_during_execution && (
                       <div className="pl-4 border-l-2 border-purple-600 space-y-3">
@@ -782,12 +775,12 @@ const FlowBuilder = () => {
                             </SelectContent>
                           </Select>
                           <p className="text-xs text-gray-400 mt-1">
-                            {selectedNode.data?.dialogue_type === 'static' 
-                              ? 'Use exact text you specify' 
+                            {selectedNode.data?.dialogue_type === 'static'
+                              ? 'Use exact text you specify'
                               : 'AI will generate response based on your prompt'}
                           </p>
                         </div>
-                        
+
                         <div>
                           <Label className="text-gray-300">
                             {selectedNode.data?.dialogue_type === 'static' ? 'Static Text' : 'AI Prompt'}
@@ -799,14 +792,14 @@ const FlowBuilder = () => {
                             })}
                             className="bg-gray-900 border-gray-700 text-white mt-2"
                             rows={3}
-                            placeholder={selectedNode.data?.dialogue_type === 'static' 
-                              ? 'One moment, let me check that for you...' 
+                            placeholder={selectedNode.data?.dialogue_type === 'static'
+                              ? 'One moment, let me check that for you...'
                               : 'Tell the user you are checking availability and ask them to wait'}
                           />
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Wait for Result */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -825,7 +818,7 @@ const FlowBuilder = () => {
                       </div>
                       <p className="text-xs text-gray-400">Wait for the webhook to finish before transitioning to the next node</p>
                     </div>
-                    
+
                     {/* Block Interruptions */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -845,7 +838,7 @@ const FlowBuilder = () => {
                       <p className="text-xs text-gray-400">Users cannot interrupt while AI is speaking</p>
                     </div>
                   </div>
-                  
+
                   {/* Goal - What to achieve if re-prompt needed */}
                   <div className="bg-yellow-900/20 border border-yellow-700/30 rounded-lg p-4">
                     <h4 className="text-white font-medium mb-2">🎯 Node Goal (Optional)</h4>
@@ -865,14 +858,14 @@ const FlowBuilder = () => {
                       Leave empty to use auto-generated re-prompts for missing variables
                     </p>
                   </div>
-                  
+
                   {/* Variable Extraction Section */}
                   <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-4">
                     <h4 className="text-white font-medium mb-2">📊 Variables to Extract</h4>
                     <p className="text-xs text-gray-400 mb-3">
                       AI will extract these variables from previous conversation to send to webhook
                     </p>
-                    
+
                     {(selectedNode.data?.extract_variables || []).map((variable, index) => (
                       <div key={index} className="mb-4 p-4 bg-gray-800/50 rounded border border-gray-700">
                         <div className="flex items-start gap-2 mb-3">
@@ -901,7 +894,7 @@ const FlowBuilder = () => {
                             ✕
                           </button>
                         </div>
-                        
+
                         {/* Description */}
                         <div className="mb-3">
                           <label className="text-xs text-gray-400 mb-1 block">Description</label>
@@ -919,7 +912,7 @@ const FlowBuilder = () => {
                             placeholder="What to extract (e.g., 'The date mentioned by user for appointment')"
                           />
                         </div>
-                        
+
                         {/* Extraction Hint */}
                         <div className="mb-3">
                           <label className="text-xs text-gray-400 mb-1 block">Extraction Hint (Optional)</label>
@@ -938,7 +931,7 @@ const FlowBuilder = () => {
                           />
                           <p className="text-xs text-gray-500 mt-1">Helps AI know what patterns to look for</p>
                         </div>
-                        
+
                         {/* Allow Update Checkbox */}
                         <div className="mb-3 flex items-center gap-2">
                           <input
@@ -957,7 +950,7 @@ const FlowBuilder = () => {
                             <span className="font-semibold text-blue-400">Allow Update</span> - Re-extract this variable each time node is visited
                           </label>
                         </div>
-                        
+
                         {/* Required Checkbox */}
                         <div className="mb-3 flex items-center gap-2">
                           <input
@@ -976,7 +969,7 @@ const FlowBuilder = () => {
                             <span className="font-semibold text-red-400">Required</span> - Webhook won't execute until this is provided
                           </label>
                         </div>
-                        
+
                         {/* Re-prompt Text (only show if required) */}
                         {variable.required && (
                           <div>
@@ -999,7 +992,7 @@ const FlowBuilder = () => {
                                 <SelectItem value="prompt">AI Generated (Prompt)</SelectItem>
                               </SelectContent>
                             </Select>
-                            
+
                             <label className="text-xs text-gray-400 mb-1 block">
                               {variable.reprompt_type === 'prompt' ? 'Re-prompt Instruction' : 'Re-prompt Text'} (if missing)
                             </label>
@@ -1014,12 +1007,12 @@ const FlowBuilder = () => {
                               }}
                               className="bg-gray-900 border border-red-700/50 text-white text-xs w-full px-3 py-2 rounded"
                               rows={2}
-                              placeholder={variable.reprompt_type === 'prompt' 
+                              placeholder={variable.reprompt_type === 'prompt'
                                 ? "Tell the user you need the appointment date and ask when they'd like to schedule"
                                 : "I need to know the appointment date. When would you like to schedule?"}
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                              {variable.reprompt_type === 'prompt' 
+                              {variable.reprompt_type === 'prompt'
                                 ? 'AI will generate a natural response based on this instruction'
                                 : 'Agent will say these exact words if variable is missing'}
                             </p>
@@ -1027,7 +1020,7 @@ const FlowBuilder = () => {
                         )}
                       </div>
                     ))}
-                    
+
                     <button
                       onClick={() => {
                         const newVars = [...(selectedNode.data?.extract_variables || []), { name: '', description: '' }];
@@ -1122,12 +1115,12 @@ const FlowBuilder = () => {
                   <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-3">
                     <p className="text-xs text-green-400 font-medium mb-1">💡 Example Use Case:</p>
                     <p className="text-xs text-gray-400">
-                      1. Extract: appointment_date, appointment_time<br/>
-                      2. Send to webhook for availability check<br/>
+                      1. Extract: appointment_date, appointment_time<br />
+                      2. Send to webhook for availability check<br />
                       3. Add transitions: If webhook_response.available == true → confirm, If available == false → ask_different_date
                     </p>
                   </div>
-                  
+
                   {/* Webhook Tester Section */}
                   <div className="border-t border-gray-700 pt-4 mt-4">
                     <button
@@ -1140,13 +1133,13 @@ const FlowBuilder = () => {
                       </h3>
                       <span className="text-gray-400 text-sm">{showWebhookTester ? '▼' : '▶'}</span>
                     </button>
-                    
+
                     {showWebhookTester && (
                       <div className="mt-4 space-y-4">
                         <p className="text-xs text-gray-400">
                           Test your webhook with sample variable values before using it in calls.
                         </p>
-                        
+
                         {/* JSON Schema Variables - Detect and show variables from schema */}
                         {(() => {
                           const bodyTemplate = selectedNode.data?.webhook_body || '';
@@ -1161,7 +1154,7 @@ const FlowBuilder = () => {
                               }));
                             }
                           } catch (e) { /* JSON parse failed - not a schema format */ }
-                          
+
                           if (schemaVars.length > 0) {
                             return (
                               <div className="bg-blue-900/30 rounded-lg p-3 space-y-3 border border-blue-700/50">
@@ -1193,7 +1186,7 @@ const FlowBuilder = () => {
                           }
                           return null;
                         })()}
-                        
+
                         {/* Variable inputs from extract_variables (Template format) */}
                         {(selectedNode.data?.extract_variables || []).length > 0 && (
                           <div className="bg-gray-900/50 rounded-lg p-3 space-y-3">
@@ -1216,7 +1209,7 @@ const FlowBuilder = () => {
                             ))}
                           </div>
                         )}
-                        
+
                         {/* Additional common variables */}
                         <div className="bg-gray-900/50 rounded-lg p-3 space-y-3">
                           <Label className="text-gray-300 text-sm">Common Variables:</Label>
@@ -1233,7 +1226,7 @@ const FlowBuilder = () => {
                             />
                           </div>
                         </div>
-                        
+
                         {/* Custom variables section */}
                         <div className="bg-gray-900/50 rounded-lg p-3 space-y-3">
                           <div className="flex items-center justify-between">
@@ -1246,7 +1239,7 @@ const FlowBuilder = () => {
                               Add Variable
                             </button>
                           </div>
-                          
+
                           {customTestVariables.map((customVar, idx) => (
                             <div key={idx} className="flex items-center gap-2">
                               <Input
@@ -1281,14 +1274,14 @@ const FlowBuilder = () => {
                               </button>
                             </div>
                           ))}
-                          
+
                           {customTestVariables.length === 0 && (
                             <p className="text-xs text-gray-500 italic">
                               Click + to add custom variables like {`{{phone_number}}`}, {`{{customer_name}}`}, etc.
                             </p>
                           )}
                         </div>
-                        
+
                         {/* Test button */}
                         <Button
                           onClick={testWebhook}
@@ -1307,7 +1300,7 @@ const FlowBuilder = () => {
                             </>
                           )}
                         </Button>
-                        
+
                         {/* Response display */}
                         {webhookTestResponse && (
                           <div className={`rounded-lg p-3 ${webhookTestResponse.success ? 'bg-green-900/30 border border-green-700/50' : 'bg-red-900/30 border border-red-700/50'}`}>
@@ -1320,7 +1313,7 @@ const FlowBuilder = () => {
                                 {webhookTestResponse.duration && ` • ${webhookTestResponse.duration}ms`}
                               </span>
                             </div>
-                            
+
                             {/* Request sent */}
                             <div className="mb-2">
                               <p className="text-xs text-gray-400 mb-1">Request:</p>
@@ -1329,20 +1322,20 @@ const FlowBuilder = () => {
                                 {webhookTestResponse.request?.body && '\n\n' + JSON.stringify(webhookTestResponse.request.body, null, 2)}
                               </pre>
                             </div>
-                            
+
                             {/* Response or error */}
                             <div>
                               <p className="text-xs text-gray-400 mb-1">
                                 {webhookTestResponse.success ? 'Response:' : 'Error:'}
                               </p>
                               <pre className="text-xs bg-gray-900 p-2 rounded overflow-auto max-h-32 text-gray-300">
-                                {webhookTestResponse.success 
+                                {webhookTestResponse.success
                                   ? JSON.stringify(webhookTestResponse.data, null, 2)
                                   : webhookTestResponse.error
                                 }
                               </pre>
                             </div>
-                            
+
                             {/* Variable mapping hint */}
                             {webhookTestResponse.success && (
                               <p className="text-xs text-gray-500 mt-2">
@@ -1361,7 +1354,7 @@ const FlowBuilder = () => {
               {(selectedNode.type === 'call_transfer' || selectedNode.type === 'agent_transfer') && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Transfer Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Transfer Type</Label>
                     <Select
@@ -1434,7 +1427,7 @@ const FlowBuilder = () => {
               {selectedNode.type === 'collect_input' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Collect Input Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Variable Name</Label>
                     <Input
@@ -1508,7 +1501,7 @@ const FlowBuilder = () => {
               {selectedNode.type === 'send_sms' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Send SMS Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Phone Number</Label>
                     <Input
@@ -1549,14 +1542,14 @@ const FlowBuilder = () => {
                     <GitBranch className="w-4 h-4 text-pink-400" />
                     Logic Split Settings
                   </h3>
-                  
+
                   <div className="p-3 bg-blue-900/30 rounded-lg border border-blue-700/50">
                     <p className="text-xs text-blue-300">
-                      💡 Create conditions to route calls based on extracted variables. 
+                      💡 Create conditions to route calls based on extracted variables.
                       Conditions are evaluated in order - first match wins.
                     </p>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label className="text-gray-300">Conditions</Label>
                     {selectedNode.data?.conditions?.map((condition, index) => (
@@ -1579,7 +1572,7 @@ const FlowBuilder = () => {
                             </Button>
                           )}
                         </div>
-                        
+
                         {/* Variable Name - with suggestions from extracted variables */}
                         <div>
                           <Label className="text-xs text-gray-400 mb-1">Variable Name</Label>
@@ -1599,11 +1592,11 @@ const FlowBuilder = () => {
                             {/* Quick variable picker */}
                             {(() => {
                               // Collect all extracted variables from all nodes
-                              const allVars = nodes.flatMap(n => 
+                              const allVars = nodes.flatMap(n =>
                                 (n.data?.extract_variables || []).map(v => v.name)
                               ).filter(Boolean);
                               const uniqueVars = [...new Set(allVars)];
-                              
+
                               if (uniqueVars.length > 0) {
                                 return (
                                   <Select
@@ -1631,7 +1624,7 @@ const FlowBuilder = () => {
                             })()}
                           </div>
                         </div>
-                        
+
                         {/* Value Type Selector */}
                         <div>
                           <Label className="text-xs text-gray-400 mb-1">Value Type</Label>
@@ -1641,8 +1634,8 @@ const FlowBuilder = () => {
                               const newConditions = [...selectedNode.data.conditions];
                               // Reset operator to appropriate default when switching types
                               const defaultOperator = value === 'number' ? 'greater_than' : 'equals';
-                              newConditions[index] = { 
-                                ...condition, 
+                              newConditions[index] = {
+                                ...condition,
                                 value_type: value,
                                 operator: defaultOperator
                               };
@@ -1661,7 +1654,7 @@ const FlowBuilder = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        
+
                         {/* Operator - changes based on value type */}
                         <div>
                           <Label className="text-xs text-gray-400 mb-1">Operator</Label>
@@ -1705,7 +1698,7 @@ const FlowBuilder = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        
+
                         {/* Value Input - different based on type */}
                         {condition.value_type !== 'existence' && (
                           <div>
@@ -1732,7 +1725,7 @@ const FlowBuilder = () => {
                             )}
                           </div>
                         )}
-                        
+
                         {/* Next Node */}
                         <div>
                           <Label className="text-xs text-gray-400 mb-1">→ Then Go To</Label>
@@ -1758,25 +1751,25 @@ const FlowBuilder = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        
+
                         {/* Condition Preview */}
                         <div className="p-2 bg-gray-900/50 rounded text-xs text-gray-400 border border-gray-700/50">
                           <span className="text-gray-500">Preview: </span>
                           <span className="text-purple-400">{condition.variable || '[variable]'}</span>
                           {' '}
                           <span className="text-pink-400">
-                            {condition.operator === 'greater_than' ? '>' : 
-                             condition.operator === 'greater_than_or_equal' ? '>=' :
-                             condition.operator === 'less_than' ? '<' :
-                             condition.operator === 'less_than_or_equal' ? '<=' :
-                             condition.operator === 'equals' ? '=' :
-                             condition.operator === 'not_equals' ? '≠' :
-                             condition.operator === 'contains' ? 'contains' :
-                             condition.operator === 'starts_with' ? 'starts with' :
-                             condition.operator === 'ends_with' ? 'ends with' :
-                             condition.operator === 'exists' ? 'exists' :
-                             condition.operator === 'not_exists' ? 'does not exist' :
-                             condition.operator}
+                            {condition.operator === 'greater_than' ? '>' :
+                              condition.operator === 'greater_than_or_equal' ? '>=' :
+                                condition.operator === 'less_than' ? '<' :
+                                  condition.operator === 'less_than_or_equal' ? '<=' :
+                                    condition.operator === 'equals' ? '=' :
+                                      condition.operator === 'not_equals' ? '≠' :
+                                        condition.operator === 'contains' ? 'contains' :
+                                          condition.operator === 'starts_with' ? 'starts with' :
+                                            condition.operator === 'ends_with' ? 'ends with' :
+                                              condition.operator === 'exists' ? 'exists' :
+                                                condition.operator === 'not_exists' ? 'does not exist' :
+                                                  condition.operator}
                           </span>
                           {' '}
                           {condition.value_type !== 'existence' && (
@@ -1785,7 +1778,7 @@ const FlowBuilder = () => {
                         </div>
                       </div>
                     ))}
-                    
+
                     <Button
                       onClick={() => {
                         const newCondition = {
@@ -1836,7 +1829,7 @@ const FlowBuilder = () => {
               {selectedNode.type === 'press_digit' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Press Digit (DTMF) Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Prompt Message</Label>
                     <Textarea
@@ -1853,7 +1846,7 @@ const FlowBuilder = () => {
                   <div className="space-y-2">
                     <Label className="text-gray-300">Digit Mappings</Label>
                     <p className="text-xs text-gray-500">Map each digit to a next node</p>
-                    
+
                     {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '*', '#'].map(digit => (
                       <div key={digit} className="flex items-center gap-2">
                         <span className="text-white font-mono w-8">{digit}</span>
@@ -1891,7 +1884,7 @@ const FlowBuilder = () => {
               {selectedNode.type === 'extract_variable' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <h3 className="text-white font-semibold">Extract Variable Settings</h3>
-                  
+
                   <div>
                     <Label className="text-gray-300">Variable Name</Label>
                     <Input
@@ -1942,11 +1935,10 @@ const FlowBuilder = () => {
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, mode: 'script' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.mode === 'script'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'script'
                             ? 'border-blue-500 bg-blue-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="text-center">
                           <div className="text-2xl mb-1">📝</div>
@@ -1958,11 +1950,10 @@ const FlowBuilder = () => {
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, mode: 'prompt' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.mode === 'prompt'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'prompt'
                             ? 'border-purple-500 bg-purple-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="text-center">
                           <div className="text-2xl mb-1">🤖</div>
@@ -1994,13 +1985,13 @@ const FlowBuilder = () => {
                       })}
                       className="bg-gray-900 border-gray-700 text-white"
                       rows={4}
-                      placeholder={selectedNode.data.mode === 'script' 
-                        ? "e.g., 'Thank you for calling. Goodbye!'" 
+                      placeholder={selectedNode.data.mode === 'script'
+                        ? "e.g., 'Thank you for calling. Goodbye!'"
                         : "e.g., 'Thank the user and wish them a great day'"}
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {selectedNode.data.mode === 'script' 
-                        ? "AI will say these exact words before ending the call" 
+                      {selectedNode.data.mode === 'script'
+                        ? "AI will say these exact words before ending the call"
                         : "AI will generate a natural goodbye based on these instructions"}
                     </p>
                   </div>
@@ -2017,11 +2008,10 @@ const FlowBuilder = () => {
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, mode: 'script' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.mode === 'script'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'script'
                             ? 'border-blue-500 bg-blue-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="text-center">
                           <div className="text-2xl mb-1">📝</div>
@@ -2033,11 +2023,10 @@ const FlowBuilder = () => {
                         onClick={() => updateNode(selectedNode.id, {
                           data: { ...selectedNode.data, mode: 'prompt' }
                         })}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedNode.data.mode === 'prompt'
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'prompt'
                             ? 'border-purple-500 bg-purple-500/10'
                             : 'border-gray-700 hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <div className="text-center">
                           <div className="text-2xl mb-1">🤖</div>
@@ -2073,9 +2062,9 @@ const FlowBuilder = () => {
                         </div>
                         <p className="text-xs text-purple-300 leading-relaxed">
                           ⚡ <strong>45% faster</strong> - Uses specialized AI workers in parallel for complex nodes
-                          <br/>
+                          <br />
                           🎯 <strong>Best for:</strong> Objection handling, qualification, KB lookups
-                          <br/>
+                          <br />
                           💰 <strong>Cost:</strong> Same as regular processing
                         </p>
                       </div>
@@ -2114,9 +2103,9 @@ const FlowBuilder = () => {
                         </div>
                         <p className="text-xs text-cyan-300 leading-relaxed">
                           📚 <strong>For Q&A/Knowledge Base nodes</strong> - Answer the user's question first
-                          <br/>
+                          <br />
                           🔄 <strong>Behavior:</strong> Skip mandatory variable checks until transition evaluation
-                          <br/>
+                          <br />
                           ✅ <strong>Use when:</strong> User asks questions that should be answered before collecting info
                         </p>
                       </div>
@@ -2144,17 +2133,17 @@ const FlowBuilder = () => {
                       })}
                       className="bg-gray-900 border-gray-700 text-white"
                       rows={6}
-                      placeholder={selectedNode.data.mode === 'script' 
-                        ? "Enter the exact words the AI should say..." 
+                      placeholder={selectedNode.data.mode === 'script'
+                        ? "Enter the exact words the AI should say..."
                         : "Give instructions to guide the AI's response (e.g., 'Ask about their budget and recommend appropriate plans')"}
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {selectedNode.data.mode === 'script' 
-                        ? "AI will read these exact words" 
+                      {selectedNode.data.mode === 'script'
+                        ? "AI will read these exact words"
                         : "AI will use these instructions to generate a natural response"}
                     </p>
                   </div>
-                  
+
                   {/* Goal - What to achieve if transition not met */}
                   <div className="bg-yellow-900/20 border border-yellow-700/30 rounded-lg p-4">
                     <h4 className="text-white font-medium mb-2">🎯 Node Goal (Optional)</h4>
@@ -2174,14 +2163,146 @@ const FlowBuilder = () => {
                       Leave empty if AI should just use node content to generate a response
                     </p>
                   </div>
-                  
+
+                  {/* Per-Node Voice Settings (ElevenLabs) */}
+                  {agent?.settings?.tts_provider === 'elevenlabs' && (
+                    <div className="bg-pink-900/20 border border-pink-700/30 rounded-lg p-4">
+                      <h4 className="text-white font-medium mb-2">🎙️ Voice Settings Override</h4>
+                      <p className="text-xs text-gray-400 mb-3">
+                        Override agent's default voice settings for this node. Leave empty to use agent defaults.
+                      </p>
+
+                      {/* Stability */}
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs text-gray-300">Stability</label>
+                          <span className="text-xs text-pink-400">
+                            {selectedNode.data?.voice_settings?.stability ?? 'default'}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={selectedNode.data?.voice_settings?.stability ?? 0.5}
+                          onChange={(e) => updateNode(selectedNode.id, {
+                            data: {
+                              ...selectedNode.data,
+                              voice_settings: {
+                                ...(selectedNode.data.voice_settings || {}),
+                                stability: parseFloat(e.target.value)
+                              }
+                            }
+                          })}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Lower = more expressive, Higher = more consistent</p>
+                      </div>
+
+                      {/* Similarity Boost */}
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs text-gray-300">Similarity Boost</label>
+                          <span className="text-xs text-pink-400">
+                            {selectedNode.data?.voice_settings?.similarity_boost ?? 'default'}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={selectedNode.data?.voice_settings?.similarity_boost ?? 0.75}
+                          onChange={(e) => updateNode(selectedNode.id, {
+                            data: {
+                              ...selectedNode.data,
+                              voice_settings: {
+                                ...(selectedNode.data.voice_settings || {}),
+                                similarity_boost: parseFloat(e.target.value)
+                              }
+                            }
+                          })}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Higher = closer to original voice</p>
+                      </div>
+
+                      {/* Style */}
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs text-gray-300">Style Exaggeration</label>
+                          <span className="text-xs text-pink-400">
+                            {selectedNode.data?.voice_settings?.style ?? 'default'}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={selectedNode.data?.voice_settings?.style ?? 0}
+                          onChange={(e) => updateNode(selectedNode.id, {
+                            data: {
+                              ...selectedNode.data,
+                              voice_settings: {
+                                ...(selectedNode.data.voice_settings || {}),
+                                style: parseFloat(e.target.value)
+                              }
+                            }
+                          })}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Higher = more dramatic, emotional delivery</p>
+                      </div>
+
+                      {/* Speed */}
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs text-gray-300">Speed</label>
+                          <span className="text-xs text-pink-400">
+                            {selectedNode.data?.voice_settings?.speed ?? 'default'}x
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2"
+                          step="0.05"
+                          value={selectedNode.data?.voice_settings?.speed ?? 1.0}
+                          onChange={(e) => updateNode(selectedNode.id, {
+                            data: {
+                              ...selectedNode.data,
+                              voice_settings: {
+                                ...(selectedNode.data.voice_settings || {}),
+                                speed: parseFloat(e.target.value)
+                              }
+                            }
+                          })}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">0.5x = slow, 1.0x = normal, 2.0x = fast</p>
+                      </div>
+
+                      {/* Reset Button */}
+                      <button
+                        onClick={() => updateNode(selectedNode.id, {
+                          data: { ...selectedNode.data, voice_settings: undefined }
+                        })}
+                        className="text-xs text-pink-400 hover:text-pink-300 underline"
+                      >
+                        Reset to agent defaults
+                      </button>
+                    </div>
+                  )}
+
                   {/* Extract Variables in Real-Time */}
                   <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4">
                     <h4 className="text-white font-medium mb-2">📊 Extract Variables (Real-Time)</h4>
                     <p className="text-xs text-gray-400 mb-3">
                       Extract variables during this conversation - useful for capturing information before webhooks
                     </p>
-                    
+
                     {(selectedNode.data?.extract_variables || []).map((variable, index) => (
                       <div key={index} className="mb-4 p-4 bg-gray-800/50 rounded border border-gray-700">
                         <div className="flex items-start gap-2 mb-3">
@@ -2210,7 +2331,7 @@ const FlowBuilder = () => {
                             ✕
                           </button>
                         </div>
-                        
+
                         {/* Description */}
                         <div className="mb-3">
                           <label className="text-xs text-gray-400 mb-1 block">Description</label>
@@ -2228,7 +2349,7 @@ const FlowBuilder = () => {
                             placeholder="What to extract (e.g., 'The date mentioned by user for appointment')"
                           />
                         </div>
-                        
+
                         {/* Extraction Hint */}
                         <div className="mb-3">
                           <label className="text-xs text-gray-400 mb-1 block">Extraction Hint (Optional)</label>
@@ -2247,7 +2368,7 @@ const FlowBuilder = () => {
                           />
                           <p className="text-xs text-gray-500 mt-1">Helps AI know what patterns to look for</p>
                         </div>
-                        
+
                         {/* Allow Update Checkbox */}
                         <div className="mb-3 flex items-center gap-2">
                           <input
@@ -2266,7 +2387,7 @@ const FlowBuilder = () => {
                             <span className="font-semibold text-blue-400">Allow Update</span> - Re-extract this variable each time node is visited
                           </label>
                         </div>
-                        
+
                         {/* Mandatory Checkbox */}
                         <div className="mb-3 flex items-center gap-2">
                           <input
@@ -2285,7 +2406,7 @@ const FlowBuilder = () => {
                             <span className="font-semibold text-orange-400">Mandatory</span> - Must be collected before transitioning
                           </label>
                         </div>
-                        
+
                         {/* Prompt Message (only show if mandatory) */}
                         {variable.mandatory && (
                           <div>
@@ -2310,7 +2431,7 @@ const FlowBuilder = () => {
                         )}
                       </div>
                     ))}
-                    
+
                     <button
                       onClick={() => {
                         const newVars = [...(selectedNode.data?.extract_variables || []), { name: '', description: '', extraction_hint: '' }];
@@ -2327,407 +2448,407 @@ const FlowBuilder = () => {
               )}
 
               {/* Transitions - not for start, ending, transfer, logic_split, or press_digit nodes */}
-              {selectedNode.type !== 'start' && 
-               selectedNode.type !== 'ending' && 
-               selectedNode.type !== 'call_transfer' && 
-               selectedNode.type !== 'agent_transfer' &&
-               selectedNode.type !== 'logic_split' &&
-               selectedNode.type !== 'press_digit' && (
-                <div>
-                  {/* Auto-Transition Toggle */}
-                  <div className="border border-green-700/30 rounded-lg p-4 bg-green-900/10 mb-4">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedNode.data.auto_transition_to}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            // Enable auto-transition with first available node
-                            const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
-                            updateNode(selectedNode.id, {
-                              data: { ...selectedNode.data, auto_transition_to: firstAvailableNode?.id || '' }
-                            });
-                          } else {
-                            // Disable auto-transition
-                            const newData = { ...selectedNode.data };
-                            delete newData.auto_transition_to;
-                            updateNode(selectedNode.id, { data: newData });
-                          }
-                        }}
-                        className="mt-1 w-4 h-4 text-green-600 bg-gray-900 border-gray-700 rounded focus:ring-green-500"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Zap className="w-4 h-4 text-green-400" />
-                          <label className="text-white font-medium text-sm cursor-pointer" onClick={(e) => {
-                            e.preventDefault();
-                            if (selectedNode.data.auto_transition_to) {
-                              const newData = { ...selectedNode.data };
-                              delete newData.auto_transition_to;
-                              updateNode(selectedNode.id, { data: newData });
-                            } else {
+              {selectedNode.type !== 'start' &&
+                selectedNode.type !== 'ending' &&
+                selectedNode.type !== 'call_transfer' &&
+                selectedNode.type !== 'agent_transfer' &&
+                selectedNode.type !== 'logic_split' &&
+                selectedNode.type !== 'press_digit' && (
+                  <div>
+                    {/* Auto-Transition Toggle */}
+                    <div className="border border-green-700/30 rounded-lg p-4 bg-green-900/10 mb-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedNode.data.auto_transition_to}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              // Enable auto-transition with first available node
                               const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
                               updateNode(selectedNode.id, {
                                 data: { ...selectedNode.data, auto_transition_to: firstAvailableNode?.id || '' }
                               });
+                            } else {
+                              // Disable auto-transition
+                              const newData = { ...selectedNode.data };
+                              delete newData.auto_transition_to;
+                              updateNode(selectedNode.id, { data: newData });
                             }
-                          }}>
-                            Auto-Transition (Skip Evaluation)
-                          </label>
-                        </div>
-                        <p className="text-xs text-green-300 leading-relaxed">
-                          ⚡ <strong>~574ms faster</strong> - Automatically move to next node without LLM evaluation
-                          <br/>
-                          🎯 <strong>Best for:</strong> Linear flows where next node is always the same
-                          <br/>
-                          ⚠️ <strong>Note:</strong> Disables condition-based transitions below
-                        </p>
-                      </div>
-                    </div>
-                    {selectedNode.data.auto_transition_to && (
-                      <div className="mt-3">
-                        <Label className="text-gray-300 text-sm mb-2 block">Next Node (Auto)</Label>
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={selectedNode.data.auto_transition_to}
-                            onValueChange={(value) => updateNode(selectedNode.id, {
-                              data: { ...selectedNode.data, auto_transition_to: value }
-                            })}
-                          >
-                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
-                              <SelectValue placeholder="Select next node..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
-                                <SelectItem key={node.id} value={node.id}>
-                                  {node.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                          {/* Jump to selected node button */}
-                          {selectedNode.data.auto_transition_to && (
-                            <button
-                              onClick={() => {
-                                const targetNode = nodes.find(n => n.id === selectedNode.data.auto_transition_to);
-                                if (targetNode) {
-                                  setSelectedNode(targetNode);
-                                  // Scroll the node into view
-                                  setTimeout(() => {
-                                    const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
-                                    if (nodeElement) {
-                                      nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    }
-                                  }, 100);
-                                }
-                              }}
-                              className="p-2 bg-green-600 hover:bg-green-700 rounded text-white transition-colors flex-shrink-0"
-                              title={`Jump to "${nodes.find(n => n.id === selectedNode.data.auto_transition_to)?.label}" node`}
-                            >
-                              <ArrowRight size={16} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Auto Transition After Response Toggle */}
-                  <div className={`border border-blue-700/30 rounded-lg p-4 bg-blue-900/10 mb-4 ${selectedNode.data.auto_transition_to ? 'opacity-40 pointer-events-none' : ''}`}>
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedNode.data.auto_transition_after_response}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            // Enable auto-transition after response with first available node
-                            const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
-                            // Clear existing transitions and set the auto_transition_after_response
-                            updateNode(selectedNode.id, {
-                              data: { 
-                                ...selectedNode.data, 
-                                auto_transition_after_response: firstAvailableNode?.id || '',
-                                transitions: [] // Clear transitions since only 1 path allowed
+                          }}
+                          className="mt-1 w-4 h-4 text-green-600 bg-gray-900 border-gray-700 rounded focus:ring-green-500"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Zap className="w-4 h-4 text-green-400" />
+                            <label className="text-white font-medium text-sm cursor-pointer" onClick={(e) => {
+                              e.preventDefault();
+                              if (selectedNode.data.auto_transition_to) {
+                                const newData = { ...selectedNode.data };
+                                delete newData.auto_transition_to;
+                                updateNode(selectedNode.id, { data: newData });
+                              } else {
+                                const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
+                                updateNode(selectedNode.id, {
+                                  data: { ...selectedNode.data, auto_transition_to: firstAvailableNode?.id || '' }
+                                });
                               }
-                            });
-                          } else {
-                            // Disable auto-transition after response and restore default transition
-                            const newData = { ...selectedNode.data };
-                            delete newData.auto_transition_after_response;
-                            newData.transitions = [{ id: Date.now().toString(), condition: '', nextNode: '' }];
-                            updateNode(selectedNode.id, { data: newData });
-                          }
-                        }}
-                        className="mt-1 w-4 h-4 text-blue-600 bg-gray-900 border-gray-700 rounded focus:ring-blue-500"
-                        disabled={!!selectedNode.data.auto_transition_to}
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <ArrowRight className="w-4 h-4 text-blue-400" />
-                          <label className="text-white font-medium text-sm cursor-pointer" onClick={(e) => {
-                            e.preventDefault();
-                            if (selectedNode.data.auto_transition_to) return; // Disabled if skip evaluation is active
-                            if (selectedNode.data.auto_transition_after_response) {
+                            }}>
+                              Auto-Transition (Skip Evaluation)
+                            </label>
+                          </div>
+                          <p className="text-xs text-green-300 leading-relaxed">
+                            ⚡ <strong>~574ms faster</strong> - Automatically move to next node without LLM evaluation
+                            <br />
+                            🎯 <strong>Best for:</strong> Linear flows where next node is always the same
+                            <br />
+                            ⚠️ <strong>Note:</strong> Disables condition-based transitions below
+                          </p>
+                        </div>
+                      </div>
+                      {selectedNode.data.auto_transition_to && (
+                        <div className="mt-3">
+                          <Label className="text-gray-300 text-sm mb-2 block">Next Node (Auto)</Label>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={selectedNode.data.auto_transition_to}
+                              onValueChange={(value) => updateNode(selectedNode.id, {
+                                data: { ...selectedNode.data, auto_transition_to: value }
+                              })}
+                            >
+                              <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
+                                <SelectValue placeholder="Select next node..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
+                                  <SelectItem key={node.id} value={node.id}>
+                                    {node.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            {/* Jump to selected node button */}
+                            {selectedNode.data.auto_transition_to && (
+                              <button
+                                onClick={() => {
+                                  const targetNode = nodes.find(n => n.id === selectedNode.data.auto_transition_to);
+                                  if (targetNode) {
+                                    setSelectedNode(targetNode);
+                                    // Scroll the node into view
+                                    setTimeout(() => {
+                                      const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
+                                      if (nodeElement) {
+                                        nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                      }
+                                    }, 100);
+                                  }
+                                }}
+                                className="p-2 bg-green-600 hover:bg-green-700 rounded text-white transition-colors flex-shrink-0"
+                                title={`Jump to "${nodes.find(n => n.id === selectedNode.data.auto_transition_to)?.label}" node`}
+                              >
+                                <ArrowRight size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Auto Transition After Response Toggle */}
+                    <div className={`border border-blue-700/30 rounded-lg p-4 bg-blue-900/10 mb-4 ${selectedNode.data.auto_transition_to ? 'opacity-40 pointer-events-none' : ''}`}>
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedNode.data.auto_transition_after_response}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              // Enable auto-transition after response with first available node
+                              const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
+                              // Clear existing transitions and set the auto_transition_after_response
+                              updateNode(selectedNode.id, {
+                                data: {
+                                  ...selectedNode.data,
+                                  auto_transition_after_response: firstAvailableNode?.id || '',
+                                  transitions: [] // Clear transitions since only 1 path allowed
+                                }
+                              });
+                            } else {
+                              // Disable auto-transition after response and restore default transition
                               const newData = { ...selectedNode.data };
                               delete newData.auto_transition_after_response;
                               newData.transitions = [{ id: Date.now().toString(), condition: '', nextNode: '' }];
                               updateNode(selectedNode.id, { data: newData });
-                            } else {
-                              const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
-                              updateNode(selectedNode.id, {
-                                data: { 
-                                  ...selectedNode.data, 
-                                  auto_transition_after_response: firstAvailableNode?.id || '',
-                                  transitions: []
-                                }
-                              });
                             }
-                          }}>
-                            Auto Transition After Response
-                          </label>
-                        </div>
-                        <p className="text-xs text-blue-300 leading-relaxed">
-                          🎤 <strong>Wait for user</strong> - Agent speaks, waits for user response, then auto-transitions
-                          <br/>
-                          📝 <strong>Captures response</strong> - User's message is added to conversation context
-                          <br/>
-                          🎯 <strong>Best for:</strong> When you don't care what user says, just need them to respond
-                        </p>
-                      </div>
-                    </div>
-                    {selectedNode.data.auto_transition_after_response && (
-                      <div className="mt-3">
-                        <Label className="text-gray-300 text-sm mb-2 block">Transition To (After User Responds)</Label>
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={selectedNode.data.auto_transition_after_response}
-                            onValueChange={(value) => updateNode(selectedNode.id, {
-                              data: { ...selectedNode.data, auto_transition_after_response: value }
-                            })}
-                          >
-                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
-                              <SelectValue placeholder="Select next node..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
-                                <SelectItem key={node.id} value={node.id}>
-                                  {node.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                          {/* Jump to selected node button */}
-                          {selectedNode.data.auto_transition_after_response && (
-                            <button
-                              onClick={() => {
-                                const targetNode = nodes.find(n => n.id === selectedNode.data.auto_transition_after_response);
-                                if (targetNode) {
-                                  setSelectedNode(targetNode);
-                                  // Scroll the node into view
-                                  setTimeout(() => {
-                                    const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
-                                    if (nodeElement) {
-                                      nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    }
-                                  }, 100);
-                                }
-                              }}
-                              className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors flex-shrink-0"
-                              title={`Jump to "${nodes.find(n => n.id === selectedNode.data.auto_transition_after_response)?.label}" node`}
-                            >
-                              <ArrowRight size={16} />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Flow: Agent speaks → User says anything → Auto-transition to this node
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-gray-300">
-                      {selectedNode.data.auto_transition_to 
-                        ? 'Transitions (Disabled - Auto-Transition Active)' 
-                        : selectedNode.data.auto_transition_after_response
-                          ? 'Transitions (Disabled - Auto After Response Active)'
-                          : 'Transitions'}
-                    </Label>
-                    {!selectedNode.data.auto_transition_to && !selectedNode.data.auto_transition_after_response && (
-                      <Button
-                        onClick={addTransition}
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Plus size={14} className="mr-1" />
-                        Add
-                      </Button>
-                    )}
-                  </div>
-                
-                <div className={`space-y-3 ${(selectedNode.data.auto_transition_to || selectedNode.data.auto_transition_after_response) ? 'opacity-40 pointer-events-none' : ''}`}>
-                  {selectedNode.data.transitions?.map((transition) => (
-                    <div key={transition.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700">
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
-                          <Textarea
-                            value={transition.condition}
-                            onChange={(e) => updateTransition(transition.id, 'condition', e.target.value)}
-                            placeholder="Describe when to take this path (e.g., 'If user asks about pricing or wants to know costs' or 'If user needs technical support')"
-                            className="bg-gray-800 border-gray-600 text-white text-sm flex-1"
-                            rows={2}
-                          />
-                          {transition.condition && (
-                            <button
-                              onClick={() => {
-                                setCurrentTransitionId(transition.id);
-                                setTransitionContent(transition.condition);
-                                setShowTransitionModal(true);
-                              }}
-                              className="p-2 bg-yellow-600 hover:bg-yellow-700 rounded text-white transition-colors flex-shrink-0"
-                              title="Optimize transition for faster evaluation"
-                            >
-                              <Zap size={16} />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          AI will analyze the conversation and decide if this condition is met
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={transition.nextNode}
-                            onValueChange={(value) => updateTransition(transition.id, 'nextNode', value)}
-                          >
-                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
-                              <SelectValue placeholder="Next node..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
-                                <SelectItem key={node.id} value={node.id}>
-                                  {node.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                          {/* Jump to selected node button */}
-                          {transition.nextNode && (
-                            <button
-                              onClick={() => {
-                                const targetNode = nodes.find(n => n.id === transition.nextNode);
-                                if (targetNode) {
-                                  setSelectedNode(targetNode);
-                                  // Scroll the node into view in the sidebar
-                                  setTimeout(() => {
-                                    const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
-                                    if (nodeElement) {
-                                      nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    }
-                                  }, 100);
-                                }
-                              }}
-                              className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors flex-shrink-0"
-                              title={`Jump to "${nodes.find(n => n.id === transition.nextNode)?.label}" node`}
-                            >
-                              <ArrowRight size={16} />
-                            </button>
-                          )}
-                        </div>
-                        
-                        {/* Variable Checks - Optional */}
-                        <div className="mt-3 p-3 bg-gray-800/50 rounded border border-gray-700">
-                          <label className="text-xs text-gray-400 mb-2 block font-medium">
-                            🔍 Variable Checks (Optional)
-                          </label>
-                          <p className="text-xs text-gray-500 mb-2">
-                            Require specific variables to have values before this transition can be taken
+                          }}
+                          className="mt-1 w-4 h-4 text-blue-600 bg-gray-900 border-gray-700 rounded focus:ring-blue-500"
+                          disabled={!!selectedNode.data.auto_transition_to}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <ArrowRight className="w-4 h-4 text-blue-400" />
+                            <label className="text-white font-medium text-sm cursor-pointer" onClick={(e) => {
+                              e.preventDefault();
+                              if (selectedNode.data.auto_transition_to) return; // Disabled if skip evaluation is active
+                              if (selectedNode.data.auto_transition_after_response) {
+                                const newData = { ...selectedNode.data };
+                                delete newData.auto_transition_after_response;
+                                newData.transitions = [{ id: Date.now().toString(), condition: '', nextNode: '' }];
+                                updateNode(selectedNode.id, { data: newData });
+                              } else {
+                                const firstAvailableNode = nodes.find(n => n.id !== selectedNode.id);
+                                updateNode(selectedNode.id, {
+                                  data: {
+                                    ...selectedNode.data,
+                                    auto_transition_after_response: firstAvailableNode?.id || '',
+                                    transitions: []
+                                  }
+                                });
+                              }
+                            }}>
+                              Auto Transition After Response
+                            </label>
+                          </div>
+                          <p className="text-xs text-blue-300 leading-relaxed">
+                            🎤 <strong>Wait for user</strong> - Agent speaks, waits for user response, then auto-transitions
+                            <br />
+                            📝 <strong>Captures response</strong> - User's message is added to conversation context
+                            <br />
+                            🎯 <strong>Best for:</strong> When you don't care what user says, just need them to respond
                           </p>
-                          
-                          {/* Collect all variables from all nodes in the flow */}
-                          {(() => {
-                            const allVariables = new Set();
-                            nodes.forEach(node => {
-                              const extractVars = node.data?.extract_variables || [];
-                              extractVars.forEach(v => {
-                                if (v.name) allVariables.add(v.name);
-                              });
-                            });
-                            
-                            if (allVariables.size === 0) {
-                              return (
-                                <p className="text-xs text-gray-500 italic">
-                                  No variables defined in any nodes yet
-                                </p>
-                              );
-                            }
-                            
-                            const checkVariables = transition.check_variables || [];
-                            
-                            return (
-                              <div className="space-y-2">
-                                {Array.from(allVariables).map((varName) => (
-                                  <label key={varName} className="flex items-center gap-2 cursor-pointer hover:bg-gray-700/30 p-1 rounded">
-                                    <input
-                                      type="checkbox"
-                                      checked={checkVariables.includes(varName)}
-                                      onChange={(e) => {
-                                        let newCheckVars = [...(checkVariables || [])];
-                                        if (e.target.checked) {
-                                          newCheckVars.push(varName);
-                                        } else {
-                                          newCheckVars = newCheckVars.filter(v => v !== varName);
-                                        }
-                                        updateTransition(transition.id, 'check_variables', newCheckVars);
-                                      }}
-                                      className="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded"
-                                    />
-                                    <span className="text-xs text-gray-300">
-                                      {varName}
-                                    </span>
-                                  </label>
-                                ))}
-                              </div>
-                            );
-                          })()}
                         </div>
-                        
-                        {selectedNode.data.transitions.length > 1 && (
-                          <Button
-                            onClick={() => deleteTransition(transition.id)}
-                            size="sm"
-                            variant="ghost"
-                            className="w-full text-red-400 hover:text-red-300 mt-2"
-                          >
-                            <Trash2 size={14} className="mr-2" />
-                            Remove
-                          </Button>
-                        )}
                       </div>
+                      {selectedNode.data.auto_transition_after_response && (
+                        <div className="mt-3">
+                          <Label className="text-gray-300 text-sm mb-2 block">Transition To (After User Responds)</Label>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={selectedNode.data.auto_transition_after_response}
+                              onValueChange={(value) => updateNode(selectedNode.id, {
+                                data: { ...selectedNode.data, auto_transition_after_response: value }
+                              })}
+                            >
+                              <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
+                                <SelectValue placeholder="Select next node..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
+                                  <SelectItem key={node.id} value={node.id}>
+                                    {node.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            {/* Jump to selected node button */}
+                            {selectedNode.data.auto_transition_after_response && (
+                              <button
+                                onClick={() => {
+                                  const targetNode = nodes.find(n => n.id === selectedNode.data.auto_transition_after_response);
+                                  if (targetNode) {
+                                    setSelectedNode(targetNode);
+                                    // Scroll the node into view
+                                    setTimeout(() => {
+                                      const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
+                                      if (nodeElement) {
+                                        nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                      }
+                                    }, 100);
+                                  }
+                                }}
+                                className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors flex-shrink-0"
+                                title={`Jump to "${nodes.find(n => n.id === selectedNode.data.auto_transition_after_response)?.label}" node`}
+                              >
+                                <ArrowRight size={16} />
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Flow: Agent speaks → User says anything → Auto-transition to this node
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-                
-                {/* Analyze All Transitions Button */}
-                {!selectedNode.data.auto_transition_to && !selectedNode.data.auto_transition_after_response && selectedNode.data.transitions && selectedNode.data.transitions.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <button
-                      onClick={() => setShowAnalysisModal(true)}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Brain size={18} />
-                      Analyze All Transitions (Detect Confusion & Overlap)
-                    </button>
-                    <p className="text-xs text-gray-400 mt-2 text-center">
-                      See how the LLM interprets your transitions and identify potential issues
-                    </p>
+
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-gray-300">
+                        {selectedNode.data.auto_transition_to
+                          ? 'Transitions (Disabled - Auto-Transition Active)'
+                          : selectedNode.data.auto_transition_after_response
+                            ? 'Transitions (Disabled - Auto After Response Active)'
+                            : 'Transitions'}
+                      </Label>
+                      {!selectedNode.data.auto_transition_to && !selectedNode.data.auto_transition_after_response && (
+                        <Button
+                          onClick={addTransition}
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Plus size={14} className="mr-1" />
+                          Add
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className={`space-y-3 ${(selectedNode.data.auto_transition_to || selectedNode.data.auto_transition_after_response) ? 'opacity-40 pointer-events-none' : ''}`}>
+                      {selectedNode.data.transitions?.map((transition) => (
+                        <div key={transition.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700">
+                          <div className="space-y-2">
+                            <div className="flex items-start gap-2">
+                              <Textarea
+                                value={transition.condition}
+                                onChange={(e) => updateTransition(transition.id, 'condition', e.target.value)}
+                                placeholder="Describe when to take this path (e.g., 'If user asks about pricing or wants to know costs' or 'If user needs technical support')"
+                                className="bg-gray-800 border-gray-600 text-white text-sm flex-1"
+                                rows={2}
+                              />
+                              {transition.condition && (
+                                <button
+                                  onClick={() => {
+                                    setCurrentTransitionId(transition.id);
+                                    setTransitionContent(transition.condition);
+                                    setShowTransitionModal(true);
+                                  }}
+                                  className="p-2 bg-yellow-600 hover:bg-yellow-700 rounded text-white transition-colors flex-shrink-0"
+                                  title="Optimize transition for faster evaluation"
+                                >
+                                  <Zap size={16} />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              AI will analyze the conversation and decide if this condition is met
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Select
+                                value={transition.nextNode}
+                                onValueChange={(value) => updateTransition(transition.id, 'nextNode', value)}
+                              >
+                                <SelectTrigger className="bg-gray-800 border-gray-600 text-white text-sm flex-1">
+                                  <SelectValue placeholder="Next node..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {nodes.filter(n => n.id !== selectedNode.id).map((node) => (
+                                    <SelectItem key={node.id} value={node.id}>
+                                      {node.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+
+                              {/* Jump to selected node button */}
+                              {transition.nextNode && (
+                                <button
+                                  onClick={() => {
+                                    const targetNode = nodes.find(n => n.id === transition.nextNode);
+                                    if (targetNode) {
+                                      setSelectedNode(targetNode);
+                                      // Scroll the node into view in the sidebar
+                                      setTimeout(() => {
+                                        const nodeElement = document.getElementById(`node-item-${targetNode.id}`);
+                                        if (nodeElement) {
+                                          nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        }
+                                      }, 100);
+                                    }
+                                  }}
+                                  className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors flex-shrink-0"
+                                  title={`Jump to "${nodes.find(n => n.id === transition.nextNode)?.label}" node`}
+                                >
+                                  <ArrowRight size={16} />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Variable Checks - Optional */}
+                            <div className="mt-3 p-3 bg-gray-800/50 rounded border border-gray-700">
+                              <label className="text-xs text-gray-400 mb-2 block font-medium">
+                                🔍 Variable Checks (Optional)
+                              </label>
+                              <p className="text-xs text-gray-500 mb-2">
+                                Require specific variables to have values before this transition can be taken
+                              </p>
+
+                              {/* Collect all variables from all nodes in the flow */}
+                              {(() => {
+                                const allVariables = new Set();
+                                nodes.forEach(node => {
+                                  const extractVars = node.data?.extract_variables || [];
+                                  extractVars.forEach(v => {
+                                    if (v.name) allVariables.add(v.name);
+                                  });
+                                });
+
+                                if (allVariables.size === 0) {
+                                  return (
+                                    <p className="text-xs text-gray-500 italic">
+                                      No variables defined in any nodes yet
+                                    </p>
+                                  );
+                                }
+
+                                const checkVariables = transition.check_variables || [];
+
+                                return (
+                                  <div className="space-y-2">
+                                    {Array.from(allVariables).map((varName) => (
+                                      <label key={varName} className="flex items-center gap-2 cursor-pointer hover:bg-gray-700/30 p-1 rounded">
+                                        <input
+                                          type="checkbox"
+                                          checked={checkVariables.includes(varName)}
+                                          onChange={(e) => {
+                                            let newCheckVars = [...(checkVariables || [])];
+                                            if (e.target.checked) {
+                                              newCheckVars.push(varName);
+                                            } else {
+                                              newCheckVars = newCheckVars.filter(v => v !== varName);
+                                            }
+                                            updateTransition(transition.id, 'check_variables', newCheckVars);
+                                          }}
+                                          className="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded"
+                                        />
+                                        <span className="text-xs text-gray-300">
+                                          {varName}
+                                        </span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+
+                            {selectedNode.data.transitions.length > 1 && (
+                              <Button
+                                onClick={() => deleteTransition(transition.id)}
+                                size="sm"
+                                variant="ghost"
+                                className="w-full text-red-400 hover:text-red-300 mt-2"
+                              >
+                                <Trash2 size={14} className="mr-2" />
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Analyze All Transitions Button */}
+                    {!selectedNode.data.auto_transition_to && !selectedNode.data.auto_transition_after_response && selectedNode.data.transitions && selectedNode.data.transitions.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-700">
+                        <button
+                          onClick={() => setShowAnalysisModal(true)}
+                          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Brain size={18} />
+                          Analyze All Transitions (Detect Confusion & Overlap)
+                        </button>
+                        <p className="text-xs text-gray-400 mt-2 text-center">
+                          See how the LLM interprets your transitions and identify potential issues
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-              )}
             </div>
           </div>
         )}

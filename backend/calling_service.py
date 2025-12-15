@@ -179,6 +179,10 @@ class CallSession:
         self.silence_timer_task = None  # Background task for silence monitoring
         self.last_checkin_time = None  # Track last check-in to avoid rapid repeats
         self.max_checkins_reached = False  # Flag to indicate we've hit max and should end after next timeout
+        
+        # Initialize Natural Delivery Middleware (Dual-Stream Architecture)
+        from natural_delivery_middleware import NaturalDeliveryMiddleware
+        self.delivery_middleware = NaturalDeliveryMiddleware()
     
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
@@ -296,7 +300,17 @@ class CallSession:
 - DO NOT repeat questions or phrases you've already said
 - If you've already asked about a specific dollar amount (like $20,000/month), DO NOT ask it again
 - If you need to accomplish the same goal, come up with a DIFFERENT approach - rephrase, use different framing, or ask from a different angle
-- Track what you've already said and ensure each response brings something NEW to the conversation"""
+- Track what you've already said and ensure each response brings something NEW to the conversation
+
+# VOICE DELIVERY (INTERNAL)
+- You are a voice actor. You MUST prefix your responses with a "Voice Tag" to control your tone.
+- [H]: Use for HAPPY, excited, positive, or helpful news. (e.g., "[H] Great! I can help with that.")
+- [S]: Use for SERIOUS, empathetic, careful, or focused moments. (e.g., "[S] I understand, let's reset.")
+- [N]: Use for NEUTRAL, factual information.
+- Rules:
+  1. ALWAYS start your response with [H], [S], or [N].
+  2. Do NOT output the tag if you are just thinking or calling a tool. Only for spoken text.
+"""
         
         # Combine: Global prompt (character/boundaries) + Technical rules (format/repetition)
         if global_prompt:
@@ -4056,6 +4070,8 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         if node_type == "ending":
             self.should_end_call = True
             if stream_callback:
+                # Support both string and dictionary payloads for callback
+                # This ensures compatibility if middleware passes structured data
                 await stream_callback(content)
                 logger.info(f"📤 Streamed ending content: {content[:50]}...")
             return content

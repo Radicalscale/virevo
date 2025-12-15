@@ -134,6 +134,7 @@ class ElevenLabsWebSocketService:
     async def send_text(
         self,
         text: str,
+        voice_settings: Optional[Dict[str, Any]] = None,
         try_trigger_generation: bool = True,
         flush: bool = False
     ) -> bool:
@@ -142,6 +143,7 @@ class ElevenLabsWebSocketService:
         
         Args:
             text: Text to synthesize
+            voice_settings: Optional dynamic voice settings for this chunk
             try_trigger_generation: Attempt to trigger audio generation immediately
             flush: Flush any buffered text and finalize generation
             
@@ -158,11 +160,20 @@ class ElevenLabsWebSocketService:
                 "try_trigger_generation": try_trigger_generation
             }
             
+            # Add dynamic voice settings if provided (Supported by Flash v2.5 mid-stream)
+            if voice_settings:
+                message["voice_settings"] = voice_settings
+
             if flush:
                 message["flush"] = True
             
             await self.websocket.send(json.dumps(message))
-            logger.debug(f"📤 Sent text to ElevenLabs: {text[:50]}...")
+            
+            # Log settings changes to debug level to keep logs clean
+            if voice_settings:
+                logger.debug(f"📤 Sent text with settings {voice_settings}: {text[:50]}...")
+            else:
+                logger.debug(f"📤 Sent text to ElevenLabs: {text[:50]}...")
             
             return True
             
