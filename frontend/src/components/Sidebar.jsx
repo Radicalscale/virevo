@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Phone, 
-  BarChart3, 
-  Settings, 
-  PhoneCall, 
-  LogOut, 
-  UserCheck, 
-  TestTube, 
-  TrendingUp, 
-  Brain, 
+import {
+  LayoutDashboard,
+  Users,
+  Phone,
+  BarChart3,
+  Settings,
+  PhoneCall,
+  LogOut,
+  UserCheck,
+  TestTube,
+  TrendingUp,
+  Brain,
   PieChart,
   Mic,
   FileText,
@@ -20,7 +20,8 @@ import {
   Zap,
   ChevronDown,
   ChevronRight,
-  Plus
+  Plus,
+  Activity
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -43,6 +44,7 @@ const Sidebar = () => {
 
   // QC System items - grouped together (without QC Agents, handled separately)
   const qcItems = [
+    { path: '/director', icon: Activity, label: 'Director Studio', highlight: true, description: 'Evolve agent tonality' },
     { path: '/qc/campaigns', icon: TrendingUp, label: 'QC Campaigns', description: 'Campaign analysis' },
     { path: '/qc/analytics', icon: PieChart, label: 'QC Analytics', highlight: true, description: 'Metrics & ratios' },
   ];
@@ -55,20 +57,19 @@ const Sidebar = () => {
 
   const renderNavItem = (item) => {
     const Icon = item.icon;
-    const isActive = location.pathname === item.path || 
+    const isActive = location.pathname === item.path ||
       (item.path !== '/' && location.pathname.startsWith(item.path));
-    
+
     return (
       <Link
         key={item.path}
         to={item.path}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg mb-1 transition-all duration-200 ${
-          isActive
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg mb-1 transition-all duration-200 ${isActive
             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20'
             : item.highlight
-            ? 'bg-purple-600/10 border border-purple-500/30 text-purple-400 hover:bg-purple-600/20'
-            : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-        }`}
+              ? 'bg-purple-600/10 border border-purple-500/30 text-purple-400 hover:bg-purple-600/20'
+              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+          }`}
         title={item.description}
       >
         <Icon size={18} />
@@ -90,7 +91,7 @@ const Sidebar = () => {
         </h1>
         <p className="text-gray-400 text-sm mt-1">Voice AI Platform</p>
       </div>
-      
+
       <nav className="flex-1 p-4">
         {/* Main Navigation */}
         <div className="mb-6">
@@ -104,18 +105,17 @@ const Sidebar = () => {
             <Zap size={12} className="text-purple-400" />
             QC System
           </p>
-          
+
           {/* QC Agents with Expandable Submenu */}
           <div className="mb-1">
             {/* Main QC Agents Link with Expand Toggle */}
             <div className="flex items-center">
               <Link
                 to="/qc/agents"
-                className={`flex-1 flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                  location.pathname === '/qc/agents' || location.pathname.startsWith('/qc/agents/')
+                className={`flex-1 flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${location.pathname === '/qc/agents' || location.pathname.startsWith('/qc/agents/')
                     ? 'bg-indigo-600 text-white'
                     : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                  }`}
               >
                 <Brain size={18} />
                 <span className="text-sm">QC Agents</span>
@@ -127,7 +127,7 @@ const Sidebar = () => {
                 {qcAgentsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </button>
             </div>
-            
+
             {/* Submenu - Create QC Agent Types */}
             {qcAgentsExpanded && (
               <div className="ml-6 mt-1 pl-4 border-l border-gray-800 space-y-1">
@@ -137,33 +137,30 @@ const Sidebar = () => {
                 </p>
                 <Link
                   to="/qc/agents/new?type=tonality"
-                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${
-                    location.search.includes('type=tonality')
+                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${location.search.includes('type=tonality')
                       ? 'text-purple-400 bg-purple-900/20'
                       : 'text-gray-500 hover:text-purple-400 hover:bg-gray-800/50'
-                  }`}
+                    }`}
                 >
                   <Mic size={12} />
                   Tonality Agent
                 </Link>
                 <Link
                   to="/qc/agents/new?type=language_pattern"
-                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${
-                    location.search.includes('type=language_pattern')
+                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${location.search.includes('type=language_pattern')
                       ? 'text-blue-400 bg-blue-900/20'
                       : 'text-gray-500 hover:text-blue-400 hover:bg-gray-800/50'
-                  }`}
+                    }`}
                 >
                   <FileText size={12} />
                   Language Pattern
                 </Link>
                 <Link
                   to="/qc/agents/new?type=tech_issues"
-                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${
-                    location.search.includes('type=tech_issues')
+                  className={`flex items-center gap-2 text-xs py-1.5 px-2 rounded transition-colors ${location.search.includes('type=tech_issues')
                       ? 'text-orange-400 bg-orange-900/20'
                       : 'text-gray-500 hover:text-orange-400 hover:bg-gray-800/50'
-                  }`}
+                    }`}
                 >
                   <Wrench size={12} />
                   Tech Issues
@@ -171,7 +168,7 @@ const Sidebar = () => {
               </div>
             )}
           </div>
-          
+
           {/* Other QC Items */}
           {qcItems.map(renderNavItem)}
         </div>
@@ -182,7 +179,7 @@ const Sidebar = () => {
           {settingsItems.map(renderNavItem)}
         </div>
       </nav>
-      
+
       {/* User info and logout */}
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-center gap-3 px-4 py-3 bg-gray-800 rounded-lg mb-2">
