@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Activity, GitBranch, Mic, Save, Shield, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Play, Activity, GitBranch, Mic, Save, Shield, AlertCircle, Loader2, RefreshCw, Zap } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 
@@ -20,7 +20,9 @@ const DirectorTab = () => {
     const [selectedNode, setSelectedNode] = useState(null);
 
     const [evolving, setEvolving] = useState(false);
-    const [evolutionResult, setEvolutionResult] = useState(null);
+    const [evolvingAll, setEvolvingAll] = useState(false);
+    const [evolutionProgress, setEvolutionProgress] = useState('');
+    const [evolutionResults, setEvolutionResults] = useState([]);
     const [evolutionError, setEvolutionError] = useState(null);
 
     const [promoting, setPromoting] = useState(false);
@@ -37,7 +39,9 @@ const DirectorTab = () => {
             const res = await fetch(`${API_BASE}/api/agents`, {
                 credentials: 'include'
             });
-            if (!res.ok) throw new Error('Failed to fetch agents');
+            if (!res.ok) {
+                throw new Error(`Failed to fetch agents (${res.status})`);
+            }
             const data = await res.json();
             setAgents(data || []);
         } catch (e) {
@@ -50,10 +54,11 @@ const DirectorTab = () => {
 
     const handleAgentSelect = async (agent) => {
         setSelectedAgent(agent);
-        setEvolutionResult(null);
+        setEvolutionResults([]);
         setSelectedNode(null);
         setNodes([]);
         setSandboxId(null);
+        setEvolutionError(null);
 
         // Create sandbox via real API
         setSandboxLoading(true);
@@ -64,11 +69,10 @@ const DirectorTab = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agent_id: agent.id })
             });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Failed to create sandbox');
-            }
             const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || 'Failed to create sandbox');
+            }
             setSandboxId(data.sandbox_id);
 
             // Now fetch nodes for this sandbox
@@ -87,8 +91,10 @@ const DirectorTab = () => {
             const res = await fetch(`${API_BASE}/api/director/sandbox/${sbId}/nodes`, {
                 credentials: 'include'
             });
-            if (!res.ok) throw new Error('Failed to fetch nodes');
             const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || 'Failed to fetch nodes');
+            }
             setNodes(data.nodes || []);
         } catch (e) {
             console.error('Error fetching nodes:', e);
@@ -97,34 +103,75 @@ const DirectorTab = () => {
         }
     };
 
-    const handleEvolve = async () => {
+    const evolveNode = async (nodeId, nodeName) => {
+        const res = await fetch(`${API_BASE}/api/director/evolve`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sandbox_id: sandboxId,
+                node_id: nodeId,
+                generations: 3
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || `Evolution failed for ${nodeName}`);
+        }
+        return { nodeId, nodeName, ...data };
+    };
+
+    const handleEvolveSingle = async () => {
         if (!selectedNode || !sandboxId) return;
         setEvolving(true);
         setEvolutionError(null);
-        setEvolutionResult(null);
+        setEvolutionResults([]);
+        setEvolutionProgress(`Evolving ${selectedNode.label}...`);
 
         try {
-            const res = await fetch(`${API_BASE}/api/director/evolve`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sandbox_id: sandboxId,
-                    node_id: selectedNode.id,
-                    generations: 3
-                })
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Evolution failed');
-            }
-            const data = await res.json();
-            setEvolutionResult(data);
+            const result = await evolveNode(selectedNode.id, selectedNode.label);
+            setEvolutionResults([result]);
         } catch (e) {
             console.error('Evolution error:', e);
             setEvolutionError(e.message);
         } finally {
             setEvolving(false);
+            setEvolutionProgress('');
+        }
+    };
+
+    const handleEvolveAll = async () => {
+        if (!sandboxId || nodes.length === 0) return;
+        setEvolvingAll(true);
+        setEvolutionError(null);
+        setEvolutionResults([]);
+
+        const results = [];
+
+        try {
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                setEvolutionProgress(`Evolving node ${i + 1}/${nodes.length}: ${node.label}`);
+
+                try {
+                    const result = await evolveNode(node.id, node.label);
+                    results.push(result);
+                } catch (nodeErr) {
+                    results.push({
+                        nodeId: node.id,
+                        nodeName: node.label,
+                        success: false,
+                        error: nodeErr.message
+                    });
+                }
+            }
+            setEvolutionResults(results);
+        } catch (e) {
+            console.error('Evolve all error:', e);
+            setEvolutionError(e.message);
+        } finally {
+            setEvolvingAll(false);
+            setEvolutionProgress('');
         }
     };
 
@@ -138,14 +185,14 @@ const DirectorTab = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sandbox_id: sandboxId })
             });
+            const data = await res.json();
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Promotion failed');
+                throw new Error(data.detail || 'Promotion failed');
             }
             alert('✅ Sandbox promoted to live agent!');
             setSandboxId(null);
             setSelectedAgent(null);
-            setEvolutionResult(null);
+            setEvolutionResults([]);
         } catch (e) {
             console.error('Promote error:', e);
             alert('❌ Failed: ' + e.message);
@@ -215,13 +262,64 @@ const DirectorTab = () => {
             </Card>
 
             {selectedAgent && sandboxId && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <>
+                    {/* Evolution Mode Selection */}
+                    <Card className="bg-gray-800 border-gray-700 p-6">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <Mic className="text-red-400" />
+                            2. Evolution Controls
+                        </h2>
 
-                    {/* 2. Node Inspector */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Evolve All Button */}
+                            <Button
+                                onClick={handleEvolveAll}
+                                disabled={evolvingAll || evolving || nodes.length === 0}
+                                className="py-8 text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+                            >
+                                {evolvingAll ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="animate-spin" /> {evolutionProgress}
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <Zap /> Evolve ALL Nodes ({nodes.length})
+                                    </span>
+                                )}
+                            </Button>
+
+                            {/* Evolve Single Button */}
+                            <Button
+                                onClick={handleEvolveSingle}
+                                disabled={!selectedNode || evolving || evolvingAll}
+                                variant="outline"
+                                className="py-8 text-lg"
+                            >
+                                {evolving ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="animate-spin" /> {evolutionProgress}
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <Play /> Evolve Selected Node
+                                    </span>
+                                )}
+                            </Button>
+                        </div>
+
+                        {evolutionError && (
+                            <div className="mt-4 bg-red-900/30 border border-red-500/50 p-3 rounded-lg text-red-300 text-sm flex items-center gap-2">
+                                <AlertCircle size={16} />
+                                {evolutionError}
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Node Selector (for single-node evolution) */}
                     <Card className="bg-gray-800 border-gray-700 p-6">
                         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                             <GitBranch className="text-purple-400" />
-                            2. Select Node to Evolve
+                            3. Select Node (for single evolution)
                         </h2>
 
                         {nodesLoading ? (
@@ -232,80 +330,29 @@ const DirectorTab = () => {
                         ) : nodes.length === 0 ? (
                             <p className="text-gray-400">No nodes found in this agent's call flow.</p>
                         ) : (
-                            <div className="space-y-2 max-h-80 overflow-y-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
                                 {nodes.map(node => (
                                     <div
                                         key={node.id}
                                         onClick={() => setSelectedNode(node)}
-                                        className={`p-4 rounded-lg cursor-pointer border transition-all ${selectedNode?.id === node.id
+                                        className={`p-3 rounded-lg cursor-pointer border transition-all ${selectedNode?.id === node.id
                                             ? 'bg-purple-900/40 border-purple-500'
                                             : 'bg-gray-900 border-gray-700 hover:border-gray-600'
                                             }`}
                                     >
-                                        <div className="font-medium text-white">{node.label}</div>
-                                        <div className="text-xs text-gray-500 mt-1">Mode: {node.mode}</div>
-                                        {node.content_preview && (
-                                            <div className="text-sm text-gray-400 mt-1 truncate">
-                                                "{node.content_preview}"
-                                            </div>
-                                        )}
+                                        <div className="font-medium text-white text-sm">{node.label}</div>
+                                        <div className="text-xs text-gray-500">Mode: {node.mode}</div>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </Card>
-
-                    {/* 3. Evolution Controls */}
-                    <Card className="bg-gray-800 border-gray-700 p-6 flex flex-col justify-between">
-                        <div>
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Mic className="text-red-400" />
-                                3. The Evolution Engine
-                            </h2>
-                            <p className="text-gray-400 mb-6">
-                                Current State: <span className="text-white">{selectedNode ? 'Ready' : 'Waiting for selection...'}</span>
-                            </p>
-
-                            {selectedNode && (
-                                <div className="bg-black/30 p-4 rounded-lg mb-6 font-mono text-sm text-green-300">
-                                    {">"} Target: {selectedNode.label}<br />
-                                    {">"} Director: GPT-4o (Judgment)<br />
-                                    {">"} Scripter: Grok 4 (Chaos)<br />
-                                    {">"} Sandbox: {sandboxId}
-                                </div>
-                            )}
-
-                            {evolutionError && (
-                                <div className="bg-red-900/30 border border-red-500/50 p-3 rounded-lg mb-4 text-red-300 text-sm flex items-center gap-2">
-                                    <AlertCircle size={16} />
-                                    {evolutionError}
-                                </div>
-                            )}
-                        </div>
-
-                        <Button
-                            onClick={handleEvolve}
-                            disabled={!selectedNode || evolving}
-                            className={`w-full py-6 text-lg font-bold shadow-lg shadow-purple-900/20 ${evolving ? 'bg-purple-800/50' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
-                                }`}
-                        >
-                            {evolving ? (
-                                <span className="flex items-center gap-2">
-                                    <Loader2 className="animate-spin" /> Evolving Variants...
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-2">
-                                    <Play fill="currentColor" /> Run Evolution Loop
-                                </span>
-                            )}
-                        </Button>
-                    </Card>
-                </div>
+                </>
             )}
 
-            {/* 4. Results (Gene Browser) */}
-            {evolutionResult && evolutionResult.success && (
-                <Card className="bg-gray-800 border-green-500/50 p-6 animate-in fade-in slide-in-from-bottom-4">
+            {/* Results */}
+            {evolutionResults.length > 0 && (
+                <Card className="bg-gray-800 border-green-500/50 p-6">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -313,7 +360,7 @@ const DirectorTab = () => {
                                 Evolution Complete
                             </h2>
                             <p className="text-green-400 mt-1">
-                                Best Score: {evolutionResult.best_score}/10
+                                {evolutionResults.length} node(s) optimized
                             </p>
                         </div>
                         <Button
@@ -330,17 +377,35 @@ const DirectorTab = () => {
                         </Button>
                     </div>
 
-                    <div className="bg-gray-900 p-4 rounded-lg">
-                        <h3 className="font-semibold text-lg mb-2">Winning Variant: {evolutionResult.best_variant?.type}</h3>
-                        <p className="text-gray-400 text-sm mb-2">
-                            Content: "{evolutionResult.best_variant?.content_preview}"
-                        </p>
-                        {evolutionResult.best_variant?.voice_settings && (
-                            <div className="text-xs text-gray-500">
-                                Voice: Stability {evolutionResult.best_variant.voice_settings.stability || 'default'},
-                                Speed {evolutionResult.best_variant.voice_settings.speed || 'default'}
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {evolutionResults.map((result, idx) => (
+                            <div key={idx} className={`p-4 rounded-lg border ${result.success === false ? 'bg-red-900/20 border-red-500/50' : 'bg-green-900/20 border-green-500/50'}`}>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="font-semibold">{result.nodeName || result.nodeId}</h3>
+                                        {result.success === false ? (
+                                            <p className="text-red-400 text-sm">{result.error}</p>
+                                        ) : (
+                                            <>
+                                                <p className="text-green-400 text-sm">
+                                                    Score: {result.best_score}/10 | Variant: {result.best_variant?.type}
+                                                </p>
+                                                {result.best_variant?.content_preview && (
+                                                    <p className="text-gray-400 text-xs mt-1 truncate max-w-md">
+                                                        "{result.best_variant.content_preview}"
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                    {result.success !== false && (
+                                        <span className="bg-green-500 text-black text-xs font-bold px-2 py-1 rounded">
+                                            ✓
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                        )}
+                        ))}
                     </div>
                 </Card>
             )}
