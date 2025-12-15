@@ -4769,7 +4769,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                             return False  # Valid time like "2PM", "3:30 PM"
                                         
                                         # Pattern 4: Very short with no vowels (likely noise)
-                                        if len(text) < 5 and not re.search(r'[aeiouAEIOU]', text):
+                                        if len(text) < 5 and not re.search(r'[aeiouyAEIOUY]', text):
                                             return True
                                         
                                         # Pattern 5: Just punctuation/dashes
