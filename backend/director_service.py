@@ -335,7 +335,7 @@ Judge this response."""
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": "gpt-5.2",
+                        "model": "gpt-4o",
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt}
@@ -392,25 +392,26 @@ Judge this response."""
                 "type": "Diplomat",
                 "personality": "polite, patient, and understanding",
                 "speech_style": "softer, more accommodating, uses phrases like 'I understand' and 'take your time'",
-                "voice_settings": {"stability": 0.6, "speed": 0.9}
+                "voice_settings": {"stability": 0.6, "similarity_boost": 0.7, "style": 0.1, "speed": 0.9}
             },
             {
                 "type": "The Closer",
                 "personality": "direct, confident, and action-oriented",
                 "speech_style": "concise, assertive, uses urgency and clear calls to action",
-                "voice_settings": {"stability": 0.4, "speed": 1.1}
+                "voice_settings": {"stability": 0.4, "similarity_boost": 0.8, "style": 0.0, "speed": 1.15}
             },
             {
                 "type": "The Empath",
                 "personality": "warm, emotionally intelligent, and relatable",
                 "speech_style": "uses pauses for effect, emotional hooks, personal connection",
-                "voice_settings": {"stability": 0.5, "speed": 1.0, "style": 0.3}
+                "voice_settings": {"stability": 0.55, "similarity_boost": 0.75, "style": 0.35, "speed": 1.0}
             }
         ]
         
         for config in variant_configs:
             try:
-                rewritten_content = await self._rewrite_node_with_gpt(content, config)
+                # Pass full node data for comprehensive optimization
+                rewritten_content = await self._rewrite_node_with_gpt(content, config, base_node_data)
                 variant = copy.deepcopy(base_node_data)
                 variant['content'] = rewritten_content
                 variant['voice_settings'] = config['voice_settings']
@@ -428,23 +429,60 @@ Judge this response."""
         
         return variants
     
-    async def _rewrite_node_with_gpt(self, original_content: str, variant_config: Dict) -> str:
-        """Use GPT-5.2 to intelligently rewrite the entire node."""
+    async def _rewrite_node_with_gpt(self, original_content: str, variant_config: Dict, full_node_data: Dict = None) -> str:
+        """Use GPT-4o to intelligently rewrite the ENTIRE node including all features."""
         
-        system_prompt = f"""You are an expert voice agent prompt engineer.
-Rewrite the given node content with a {variant_config['personality']} personality.
+        # Build comprehensive optimization prompt
+        system_prompt = f"""You are an expert voice agent optimizer.
+Rewrite the given node with a {variant_config['personality']} personality.
 
-RULES:
-1. KEEP the exact same structure (## headers, - bullet points, numbered lists)
-2. MODIFY the 'Agent says:' speech content to be {variant_config['speech_style']}
-3. ADJUST tactics/strategies to match the personality
-4. Preserve all state management and escalation logic
-5. DO NOT add or remove sections - only rewrite existing content
-6. Output ONLY the rewritten content, no explanations"""
+You must optimize ALL of the following:
+
+1. **CONTENT** (Agent says + instructions):
+   - Rewrite 'Agent says:' speech to be {variant_config['speech_style']}
+   - Keep ## headers, - bullets, numbered lists structure
+   - Adjust tactics to match personality
+
+2. **GOALS** (if present):
+   - Adjust goal wording to match personality approach
+
+3. **TRANSITIONS** (if present):
+   - Keep same target nodes, but adjust condition wording if needed
+
+4. **VARIABLE EXTRACTION** (if present):
+   - Improve variable descriptions for clarity
+   - Optimize re-prompt messages to match personality
+
+5. **VOICE SETTINGS**:
+   - Suggest stability, speed, style values (0.0-1.0) that match the personality:
+     - Diplomat: stability=0.6, speed=0.9, style=0.1
+     - Closer: stability=0.4, speed=1.15, style=0.0
+     - Empath: stability=0.55, speed=1.0, style=0.35
+
+CRITICAL RULES:
+- Preserve ALL transition logic keywords
+- Keep ALL variable names exactly the same
+- Output ONLY the rewritten content text, no JSON or explanations
+- If uncertain about something, keep the original"""
+
+        # Include full node context if available
+        node_context = ""
+        if full_node_data:
+            transitions = full_node_data.get('transitions', [])
+            variables = full_node_data.get('extract_variables', [])
+            goal = full_node_data.get('goal', '')
+            
+            if goal:
+                node_context += f"\n\n--- CURRENT GOAL ---\n{goal}"
+            if transitions:
+                node_context += f"\n\n--- CURRENT TRANSITIONS ---\n{json.dumps(transitions, indent=2)}"
+            if variables:
+                node_context += f"\n\n--- CURRENT VARIABLES ---\n{json.dumps(variables, indent=2)}"
 
         user_prompt = f"""Rewrite this node as a {variant_config['type']} variant:
 
-{original_content[:4000]}"""
+--- CONTENT ---
+{original_content[:4000]}{node_context}"""
 
         try:
             async with httpx.AsyncClient(timeout=90.0) as client:
@@ -455,7 +493,7 @@ RULES:
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": "gpt-5.2",
+                        "model": "gpt-4o",
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt}
