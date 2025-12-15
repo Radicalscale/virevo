@@ -246,9 +246,14 @@ class RealtimeVoiceAgent:
             tts_text = audio_payload["text"]
             voice_settings = audio_payload["voice_settings"]
             
-            # Log different text if payload changed
-            if tts_text != clean_text:
-                logger.debug(f"🎭 Natural Delivery: '{clean_text}' -> '{tts_text}' (Settings: {voice_settings})")
+            # Log transformation if payload changed or non-default settings used
+            # Default stability is 0.5 (Neutral). If distinct, we log it.
+            is_active_delivery = (tts_text != clean_text) or (voice_settings.get("stability") != 0.5)
+            
+            if is_active_delivery:
+                logger.info(f"🎭 Natural Delivery: '{clean_text}' -> '{tts_text}' (Settings: {voice_settings})")
+            else:
+                logger.debug(f"🎭 Natural Delivery (Neutral): '{clean_text}' (Settings: {voice_settings})")
             
             await self.telnyx_service.speak_text(
                 self.call_control_id, 
