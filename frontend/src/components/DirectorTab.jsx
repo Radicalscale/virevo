@@ -5,16 +5,36 @@ import { Button } from './ui/button';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
-// Safe fetch that clones response before consuming (fixes rrweb-recorder conflict)
-const safeFetch = async (url, options = {}) => {
-    const res = await fetch(url, options);
-    const cloned = res.clone();
-    try {
-        const data = await cloned.json();
-        return { ok: res.ok, status: res.status, data };
-    } catch (e) {
-        return { ok: false, status: res.status, data: { detail: 'Invalid JSON response' } };
-    }
+// XHR-based fetch to bypass rrweb's fetch wrapper
+const safeFetch = (url, options = {}) => {
+    return new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(options.method || 'GET', url, true);
+        xhr.withCredentials = true;
+
+        // Set headers
+        if (options.headers) {
+            Object.entries(options.headers).forEach(([key, value]) => {
+                xhr.setRequestHeader(key, value);
+            });
+        }
+
+        xhr.onload = () => {
+            let data = {};
+            try {
+                data = JSON.parse(xhr.responseText);
+            } catch (e) {
+                data = { detail: 'Invalid JSON response' };
+            }
+            resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, data });
+        };
+
+        xhr.onerror = () => {
+            resolve({ ok: false, status: 0, data: { detail: 'Network error' } });
+        };
+
+        xhr.send(options.body || null);
+    });
 };
 
 const DirectorTab = () => {
