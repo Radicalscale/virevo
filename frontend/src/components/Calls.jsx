@@ -52,8 +52,18 @@ const Calls = () => {
       if (filters.end_date) params.end_date = filters.end_date;
 
       const response = await analyticsAPI.callHistory(params);
-      setCalls(response.data.calls);
-      setTotalCalls(response.data.total);
+
+      // Handle both paginated and legacy responses
+      if (response.data.calls) {
+        setCalls(response.data.calls);
+        setTotalCalls(response.data.total);
+      } else if (Array.isArray(response.data)) {
+        setCalls(response.data);
+        setTotalCalls(response.data.length);
+      } else {
+        setCalls([]);
+        setTotalCalls(0);
+      }
     } catch (error) {
       console.error('Error fetching calls:', error);
     } finally {
@@ -288,8 +298,8 @@ const Calls = () => {
             <button
               onClick={() => setShowDurationModal(true)}
               className={`flex items-center gap-2 px-4 py-2 rounded border ${durationFilter.enabled
-                  ? 'bg-blue-600 border-blue-500 text-white'
-                  : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+                ? 'bg-blue-600 border-blue-500 text-white'
+                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
                 }`}
             >
               <Filter className="w-4 h-4" />

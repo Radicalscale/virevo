@@ -24,7 +24,9 @@ const Dashboard = () => {
         ]);
 
         setAgents(agentsRes.data);
-        setRecentCalls(callsRes.data.calls); // Updated to handle paginated response
+        // Handle both paginated (object with calls array) and legacy (array) responses
+        const callsData = callsRes.data.calls || (Array.isArray(callsRes.data) ? callsRes.data : []);
+        setRecentCalls(callsData);
         setAnalytics(analyticsRes.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -110,8 +112,8 @@ const Dashboard = () => {
                 </div>
                 {stat.change && (
                   <span className={`text-sm font-medium ${stat.positive !== undefined
-                      ? (stat.positive ? 'text-green-400' : 'text-red-400')
-                      : 'text-orange-400'
+                    ? (stat.positive ? 'text-green-400' : 'text-red-400')
+                    : 'text-orange-400'
                     }`}>
                     {stat.change}
                   </span>
