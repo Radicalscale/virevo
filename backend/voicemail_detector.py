@@ -12,26 +12,28 @@ logger = logging.getLogger(__name__)
 # Voicemail detection patterns (high confidence)
 VOICEMAIL_PATTERNS = [
     # Common voicemail phrases
-    r"leave.*message.*after.*beep",
-    r"leave.*message.*after.*tone",
-    r"please.*leave.*message",
-    r"please.*record.*message",  # Added: "please record your message"
-    r"not.*available.*right.*now",
-    r"not.*available.*at.*the.*tone",  # Added: "not available. At the tone"
-    r"person.*you.*trying.*reach.*not.*available",  # Added: "The person you're trying to reach is not available"
-    r"cannot.*take.*call",
-    r"reach.*mailbox",
+    r"leave.*mess\s*age.*after.*beep",
+    r"leave.*mess\s*age.*after.*ton\s*e",
+    r"ple\s*ase.*leave.*mess\s*age",
+    r"ple\s*ase.*rec\s*ord.*mess\s*age",  # Added: "please record your message"
+    r"not.*avail\s*able.*right.*now",
+    r"not.*avail\s*able.*at.*the.*ton\s*e",  # Added: "not available. At the tone"
+    r"person.*you.*try\s*ing.*reach.*not.*avail\s*able",  # Added: "The person you're trying to reach is not available"
+    r"can\s*not.*take.*call",
+    r"can\s*\'?t.*tak\s*e.*call", # "Can'ttak eyour call"
+    r"reach.*mail\s*box",
     r"voice.*mail.*system",
-    r"record.*message.*after.*tone",
-    r"record.*message.*after.*beep",
-    r"at.*the.*tone.*record",  # Added: "At the tone, please record"
-    r"at.*the.*tone.*please",  # Added: "At the tone, please..."
-    r"at.*the.*tone",
+    r"rec\s*ord.*mess\s*age.*after.*ton\s*e",
+    r"rec\s*ord.*mess\s*age.*after.*beep",
+    r"at.*the.*ton\s*e.*rec\s*ord",  # Added: "At the tone, please record"
+    r"at.*the.*ton\s*e.*ple\s*ase",  # Added: "At the tone, please..."
+    r"at.*the.*ton\s*e",
     r"after.*the.*beep",
-    r"mailbox.*is.*full",
-    r"you.*have.*reached.*voicemail",
-    r"when.*you.*have.*finished.*recording",  # Added: "When you have finished recording"
+    r"mail\s*box.*is.*full",
+    r"you.*have.*reached.*voice\s*mail",
+    r"when.*you.*have.*fin\s*ished.*rec\s*ord\s*ing",  # Added: "When you have finished recording"
     r"you.*may.*hang.*up",  # Added: "you may hang up"
+    r"hang.*up.*or.*press",
 ]
 
 # IVR detection patterns (automated system)
@@ -42,6 +44,14 @@ IVR_PATTERNS = [
     r"dial\s+\d+\s+for",
     r"say\s+\d+\s+for",
     r"push\s+\d+\s+for",
+    # Garbled press instructions (text numbers)
+    r"press\s*on\s*e",
+    r"press\s*two",
+    r"press\s*thre\s*e",
+    r"press\s*fo\s*ur",
+    r"press\s*fi\s*ve",
+    r"press\s*po\s*und",
+    r"press\s*star",
     # Menu navigation
     r"for.*press\s+\d+",
     r"to.*press\s+\d+",
@@ -50,7 +60,7 @@ IVR_PATTERNS = [
     r"speak.*to.*representative.*press",
     r"operator.*press.*0",
     r"stay.*on.*the.*line",
-    r"your.*call.*is.*important",
+    r"your.*call.*is.*imp\s*or\s*tant",
     # Business hours / closed messages
     r"office.*hours",
     r"currently.*closed",
