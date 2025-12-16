@@ -15,10 +15,13 @@ class NaturalDeliveryMiddleware:
     # Emotional mapping to Voice Settings (Stability, Style)
     # Lower stability = More expressive/variable
     # Higher stability = More consistent/serious
+    # Emotional mapping to Voice Settings (Stability, Style)
+    # Lower stability = More expressive/variable (Updated based on Forensic Analysis)
+    # Higher style = More exaggerated delivery
     EMOTION_MAP = {
-        "H": {"stability": 0.35, "style": 0.5},   # Happy/Excited
-        "S": {"stability": 0.75, "style": 0.0},   # Serious/Empathetic
-        "N": {"stability": 0.5, "style": 0.0}     # Neutral (Default)
+        "H": {"stability": 0.30, "style": 0.75},   # Happy: High energy, very expressive
+        "S": {"stability": 0.50, "style": 0.30},   # Serious: Grounded but not monotone
+        "N": {"stability": 0.40, "style": 0.20}     # Neutral: Engaged, not flat
     }
 
     def __init__(self):
@@ -86,7 +89,8 @@ class NaturalDeliveryMiddleware:
         # Add slight break after commas for pacing
         # But ensure we don't break simple lists too aggressively
         # Regex: Replace comma not followed by digit (to avoid breaking numbers like 1,000)
-        return re.sub(r',(?!\d)', ',<break time="0.1s"/>', text)
+        # UPDATE: Increased break to 0.2s based on feedback "Rushed transitions"
+        return re.sub(r',(?!\d)', ',<break time="0.2s"/>', text)
 
     def _apply_ssml_prosody(self, text: str, emotion_code: str) -> str:
         """

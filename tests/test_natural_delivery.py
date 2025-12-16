@@ -22,8 +22,8 @@ class TestNaturalDeliveryMiddleware:
         
         # Check settings for Happy (Lower stability)
         settings = payload["voice_settings"]
-        assert settings["stability"] == 0.35
-        assert settings["style"] == 0.5
+        assert settings["stability"] == 0.30
+        assert settings["style"] == 0.75
         
         # Check clean text
         assert clean_text == "I am excited!"
@@ -34,7 +34,7 @@ class TestNaturalDeliveryMiddleware:
         
         # Check settings for Serious (Higher stability)
         settings = payload["voice_settings"]
-        assert settings["stability"] == 0.75
+        assert settings["stability"] == 0.50
         
         # Check clean text
         assert clean_text == "This is serious."
@@ -60,7 +60,7 @@ class TestNaturalDeliveryMiddleware:
         # Logic: if no tag, defaults to current_emotion (initially N) or stays N
         # Let's check implementation behavior
         settings = payload["voice_settings"]
-        assert settings["stability"] == 0.5 # Neutral settings
+        assert settings["stability"] == 0.40 # Neutral settings
 
     def test_pause_insertion_flash(self):
         text = "[N] One, two, three."
@@ -68,7 +68,5 @@ class TestNaturalDeliveryMiddleware:
         
         # Check pause insertion for Flash
         tts_text = payload["text"]
-        assert 'One,<break time="0.15s"/> two,<break time="0.15s"/> three.' in tts_text or 'One,<break time="0.1s"/>' in tts_text
-        # Note: Implementation used 0.1s or 0.15s, need to match regex
-        # Viewed code: re.sub(r',(?!\\d)', ',<break time="0.1s"/>', text)
-        assert '<break time="0.1s"/>' in tts_text
+        # Note: Implementation updated to 0.2s
+        assert '<break time="0.2s"/>' in tts_text
