@@ -202,8 +202,9 @@ class ElevenLabsWebSocketService:
                 try:
                     # Dynamic timeout:
                     # - 2.5s for first chunk (allows for generation/network latency)
-                    # - 0.5s for subsequent chunks (detects end of stream quickly)
-                    timeout = 0.5 if first_chunk_received else 2.5
+                    # - 2.0s for subsequent chunks to allow for intentional pauses (e.g. <break time="0.2s"/>)
+                    #   and network jitter. 0.5s was too aggressive and caused cutoffs mid-sentence.
+                    timeout = 2.0 if first_chunk_received else 2.5
                     message = await asyncio.wait_for(
                         self.websocket.recv(),
                         timeout=timeout
