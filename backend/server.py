@@ -4179,8 +4179,14 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 if tts_session:
                     tts_session.generation_complete = False
                 
+                # 🔥 FIX: Capture and clear accumulated_transcript BEFORE processing to prevent race condition
+                # Without this, new user speech during agent response would accumulate with old transcript,
+                # causing 1-2 word utterances to incorrectly trigger 3+ word interruption detection
+                user_input_for_processing = accumulated_transcript
+                accumulated_transcript = ""  # Clear immediately so new speech doesn't pile up
+                
                 # Process with streaming (TTS generation happens in parallel!)
-                response = await session.process_user_input(accumulated_transcript, stream_callback=stream_sentence_to_tts)
+                response = await session.process_user_input(user_input_for_processing, stream_callback=stream_sentence_to_tts)
                 
                 # 🚫 CANCELLATION CHECK after LLM returns (before TTS playback)
                 current_response_task = call_states.get(call_control_id, {}).get("current_response_task")
@@ -4382,7 +4388,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 logger.info(f"⏱️  [TIMING]   - TOTAL MISSING: ~150-550ms typically")
                 logger.info(f"⏱️  [TIMING]   - REAL USER LATENCY: {total_pause_ms + 300}ms estimated")
                 logger.info(f"⏱️  [TIMING] RESPONSE_TEXT: {len(response_text)} chars, {len(sentence_queue)} sentences")
-                logger.info(f"⏱️  [TIMING] USER_INPUT: '{accumulated_transcript[:60]}...'")
+                logger.info(f"⏱️  [TIMING] USER_INPUT: '{user_input_for_processing[:60]}...'")
                 logger.info(f"⏱️  [TIMING] AI_RESPONSE: '{response_text[:60]}...'")
                 logger.info(f"⏱️  [TIMING] ==========================")
                 logger.info(f"⏱️  ═══════════════════════════════════════════════")
@@ -4421,7 +4427,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                             "node_id": node_id,
                             "node_label": node_label,
                             # FULL TEXT - no truncation
-                            "user_text": accumulated_transcript,
+                            "user_text": user_input_for_processing,
                             "agent_text": response_text,
                             # Detailed timing metrics
                             "latency": {
@@ -4437,7 +4443,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                 "kb_ms": kb_time_ms  # Knowledge base retrieval
                             },
                             # Legacy summary for backwards compatibility
-                            "message": f"E2E latency for this turn: {llm_latency_ms}ms (LLM: {int(response_latency * 1000)}ms) | User: '{accumulated_transcript}' -> Agent: '{response_text}'"
+                            "message": f"E2E latency for this turn: {llm_latency_ms}ms (LLM: {int(response_latency * 1000)}ms) | User: '{user_input_for_processing}' -> Agent: '{response_text}'"
                         }
                     }}
                 )
