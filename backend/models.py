@@ -136,6 +136,14 @@ class AgentSettings(BaseModel):
     chattts_settings: Optional[ChatTTSSettings] = Field(default_factory=ChatTTSSettings)
     assemblyai_settings: Optional[AssemblyAISettings] = Field(default_factory=AssemblyAISettings)
     soniox_settings: Optional[SonioxSettings] = Field(default_factory=SonioxSettings)
+    
+    # Post-Call Webhook Settings
+    post_call_webhook_url: Optional[str] = None  # URL to send call transcript after call ends
+    post_call_webhook_active: Optional[bool] = None  # Whether webhook is enabled (None = use URL presence as default)
+    
+    # Call Started Webhook Settings  
+    call_started_webhook_url: Optional[str] = None  # URL to notify when call is answered
+    call_started_webhook_active: Optional[bool] = None  # Whether webhook is enabled (None = use URL presence as default)
 
 class AgentStats(BaseModel):
     calls_handled: int = 0
