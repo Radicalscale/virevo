@@ -3081,6 +3081,48 @@ async def webhook_trigger_outbound_call(
         
         logger.info(f"📞 Webhook-triggered outbound call initiated: {call_control_id}")
         
+        # CALL INITIATED WEBHOOK: Send notification when call is placed
+        try:
+            agent_settings_for_webhook = agent.get("settings", {}) or {}
+            call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
+            is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active")
+            should_fire_webhook = bool(call_started_webhook_url and is_call_started_webhook_active is not False)
+            
+            logger.info(f"🔍 DEBUG Call Initiated Webhook (External Trigger): url='{call_started_webhook_url}', active={is_call_started_webhook_active}, should_fire={should_fire_webhook}")
+            
+            if should_fire_webhook:
+                logger.info(f"📤 Sending call-initiated webhook to: {call_started_webhook_url}")
+                
+                webhook_payload = {
+                    "event": "call.initiated",
+                    "call_id": call_control_id,
+                    "agent_id": str(agent.get("id")),
+                    "agent_name": agent.get("name", "Unknown Agent"),
+                    "direction": "outbound",
+                    "from_number": final_from_number,
+                    "to_number": to_number,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+                
+                async def send_call_initiated_webhook():
+                    try:
+                        async with httpx.AsyncClient(timeout=30.0) as client:
+                            response = await client.post(
+                                call_started_webhook_url,
+                                json=webhook_payload,
+                                headers={"Content-Type": "application/json"}
+                            )
+                            if response.status_code >= 200 and response.status_code < 300:
+                                logger.info(f"✅ Call-initiated webhook sent successfully (status={response.status_code})")
+                            else:
+                                logger.warning(f"⚠️ Call-initiated webhook returned status {response.status_code}: {response.text[:200]}")
+                    except Exception as webhook_err:
+                        logger.error(f"❌ Failed to send call-initiated webhook: {webhook_err}")
+                
+                asyncio.create_task(send_call_initiated_webhook())
+        except Exception as webhook_err:
+            logger.error(f"Error preparing call-initiated webhook: {webhook_err}")
+        
         return {
             "success": True,
             "call_id": call_control_id,
@@ -3185,6 +3227,10 @@ async def initiate_outbound_call(
             call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
             is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active")
             should_fire_webhook = bool(call_started_webhook_url and is_call_started_webhook_active is not False)
+            
+            # Explicit debug logging for troubleshooting
+            logger.info(f"🔍 DEBUG Call Initiated Webhook (UI Trigger): url='{call_started_webhook_url}', active={is_call_started_webhook_active}, should_fire={should_fire_webhook}")
+            logger.info(f"🔍 DEBUG Agent Settings Webhook Context: {agent_settings_for_webhook}")
             
             logger.info(f"🔍 DEBUG Call Initiated Webhook: url='{call_started_webhook_url}', active={is_call_started_webhook_active}, should_fire={should_fire_webhook}")
             
