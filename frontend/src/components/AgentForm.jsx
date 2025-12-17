@@ -2066,7 +2066,7 @@ const AgentForm = () => {
                     <input
                       type="checkbox"
                       id="webhook-active"
-                      checked={formData.settings?.post_call_webhook_active === true}
+                      checked={formData.settings?.post_call_webhook_url ? formData.settings?.post_call_webhook_active !== false : false}
                       onChange={(e) => setFormData({
                         ...formData,
                         settings: {
@@ -2089,7 +2089,9 @@ const AgentForm = () => {
                     ...formData,
                     settings: {
                       ...formData.settings,
-                      post_call_webhook_url: e.target.value
+                      post_call_webhook_url: e.target.value,
+                      // Auto-enable when URL is entered (for backwards compatibility)
+                      post_call_webhook_active: e.target.value ? (formData.settings?.post_call_webhook_active !== false ? true : formData.settings?.post_call_webhook_active) : formData.settings?.post_call_webhook_active
                     }
                   })}
                   className="bg-gray-900 border-gray-700 text-white mt-1"
@@ -2129,7 +2131,7 @@ const AgentForm = () => {
                     <input
                       type="checkbox"
                       id="call-started-webhook-active"
-                      checked={formData.settings?.call_started_webhook_active === true}
+                      checked={formData.settings?.call_started_webhook_url ? formData.settings?.call_started_webhook_active !== false : false}
                       onChange={(e) => setFormData({
                         ...formData,
                         settings: {
@@ -2152,7 +2154,9 @@ const AgentForm = () => {
                     ...formData,
                     settings: {
                       ...formData.settings,
-                      call_started_webhook_url: e.target.value
+                      call_started_webhook_url: e.target.value,
+                      // Auto-enable when URL is entered (for backwards compatibility)
+                      call_started_webhook_active: e.target.value ? (formData.settings?.call_started_webhook_active !== false ? true : formData.settings?.call_started_webhook_active) : formData.settings?.call_started_webhook_active
                     }
                   })}
                   className="bg-gray-900 border-gray-700 text-white mt-1"
