@@ -7449,6 +7449,46 @@ async def telnyx_webhook(payload: dict):
             except Exception as e:
                 logger.error(f"❌ Error updating call log: {e}")
             
+            # CALL STARTED WEBHOOK: Send notification when call begins (for lead tracking)
+            try:
+                agent_settings_for_webhook = agent.get("settings", {}) or {}
+                call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
+                is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active", True)
+                
+                if call_started_webhook_url and is_call_started_webhook_active:
+                    logger.info(f"📤 Sending call-started webhook to: {call_started_webhook_url}")
+                    
+                    webhook_payload = {
+                        "event": "call.started",
+                        "call_id": call_control_id,
+                        "agent_id": agent.get("id"),
+                        "agent_name": agent.get("name", "Unknown Agent"),
+                        "direction": call_data.get("direction", "outbound"),
+                        "from_number": from_number,
+                        "to_number": to_number,
+                        "start_time": datetime.utcnow().isoformat()
+                    }
+                    
+                    async def send_call_started_webhook():
+                        try:
+                            async with httpx.AsyncClient(timeout=30.0) as client:
+                                response = await client.post(
+                                    call_started_webhook_url,
+                                    json=webhook_payload,
+                                    headers={"Content-Type": "application/json"}
+                                )
+                                if response.status_code >= 200 and response.status_code < 300:
+                                    logger.info(f"✅ Call-started webhook sent successfully (status={response.status_code})")
+                                else:
+                                    logger.warning(f"⚠️ Call-started webhook returned status {response.status_code}: {response.text[:200]}")
+                        except Exception as webhook_err:
+                            logger.error(f"❌ Failed to send call-started webhook: {webhook_err}")
+                    
+                    # Fire and forget - don't block call processing
+                    asyncio.create_task(send_call_started_webhook())
+            except Exception as webhook_err:
+                logger.error(f"Error preparing call-started webhook: {webhook_err}")
+            
             # Get user's Telnyx API keys from database
             user_id = agent.get("user_id")
             logger.info(f"🔧 Getting Telnyx API keys for user: {user_id}")

@@ -2100,6 +2100,70 @@ const AgentForm = () => {
             </div>
           </details>
 
+          {/* Call Started Webhook Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              📞 Call Started Webhook (Optional)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-4">
+              <p className="text-gray-400 text-sm mb-4">
+                Send a notification to an external webhook the moment a call is answered.
+                Useful for tracking when calls are placed to leads, triggering CRM updates, or real-time dashboards.
+              </p>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="call-started-webhook-active"
+                      checked={formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          call_started_webhook_active: e.target.checked
+                        }
+                      })}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <Label htmlFor="call-started-webhook-active" className="text-sm text-gray-300 cursor-pointer">
+                      Enable Webhook
+                    </Label>
+                  </div>
+                </div>
+                <Input
+                  type="url"
+                  placeholder="https://your-webhook.com/call-started"
+                  value={formData.settings?.call_started_webhook_url || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      call_started_webhook_url: e.target.value
+                    }
+                  })}
+                  disabled={!(formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url)}
+                  className={`bg-gray-900 border-gray-700 text-white mt-1 ${(formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url) ? '' : 'opacity-50 cursor-not-allowed'}`}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  When enabled, a POST request will be sent when each call is answered.
+                </p>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">📤</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>Webhook Payload:</strong> The webhook will receive: event ("call.started"), call_id, agent_name,
+                    from_number, to_number, direction, and start_time.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
           {/* Auto QC Settings Section - Only for existing agents */}
           {isEdit && (
             <div className="mt-6">
