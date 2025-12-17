@@ -2054,7 +2054,7 @@ const AgentForm = () => {
                     <input
                       type="checkbox"
                       id="webhook-active"
-                      checked={formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url}
+                      checked={formData.settings?.post_call_webhook_active === true}
                       onChange={(e) => setFormData({
                         ...formData,
                         settings: {
@@ -2080,11 +2080,10 @@ const AgentForm = () => {
                       post_call_webhook_url: e.target.value
                     }
                   })}
-                  disabled={!(formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url)}
-                  className={`bg-gray-900 border-gray-700 text-white mt-1 ${(formData.settings?.post_call_webhook_active ?? !!formData.settings?.post_call_webhook_url) ? '' : 'opacity-50 cursor-not-allowed'}`}
+                  className="bg-gray-900 border-gray-700 text-white mt-1"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  When enabled, a POST request will be sent after each call with the full transcript.
+                  Enter your webhook URL and check "Enable Webhook" to activate.
                 </p>
               </div>
 

@@ -6980,8 +6980,8 @@ async def finalize_call_log(call_id: str, end_reason: str = None, error_message:
                     
                     # Check if post_call_webhook_url is configured in agent settings
                     post_call_webhook_url = agent_settings.get("post_call_webhook_url")
-                    # Check if explicitly enabled (default to True if URL exists but active flag is missing for backward compatibility)
-                    is_webhook_active = agent_settings.get("post_call_webhook_active", True)
+                    # Only fire if explicitly enabled (default to False, not True)
+                    is_webhook_active = agent_settings.get("post_call_webhook_active", False)
                     
                     if post_call_webhook_url and is_webhook_active:
                         logger.info(f"📤 Sending post-call webhook to: {post_call_webhook_url}")
