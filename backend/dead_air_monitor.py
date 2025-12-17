@@ -70,15 +70,19 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
             # So we need to check if the expected playback time has passed
             if session.agent_speaking:
                 try:
-                    from server import call_states
+                    from server import call_states, persistent_tts_manager
                     playback_expected_end = call_states.get(call_control_id, {}).get("playback_expected_end_time", 0)
                     current_time = time.time()
                     
                     # Also check Redis playback count for multi-worker setup
                     playback_count = redis_service.get_playback_count(call_control_id)
                     
-                    # If playback time has passed AND no pending playbacks in Redis
-                    if playback_expected_end > 0 and current_time > playback_expected_end and playback_count == 0:
+                    # 🔥 FIX: Also check if TTS is still generating a multi-sentence response
+                    tts_session = persistent_tts_manager.get_session(call_control_id) if call_control_id else None
+                    generation_in_progress = tts_session and not tts_session.generation_complete
+                    
+                    # If playback time has passed AND no pending playbacks in Redis AND generation is complete
+                    if playback_expected_end > 0 and current_time > playback_expected_end and playback_count == 0 and not generation_in_progress:
                         time_since_end = current_time - playback_expected_end
                         logger.info(f"⏱️ Playback expected end time passed ({time_since_end:.1f}s ago), marking agent as done speaking")
                         session.mark_agent_speaking_end()
@@ -90,7 +94,18 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
             # 🔥 FIX: Don't count silence if audio is expected to still be playing
             # This prevents false "are you still there" triggers during playback
             try:
-                from server import call_states
+                from server import call_states, persistent_tts_manager
+                
+                # 🔥 FIX: Also check if TTS is still generating (multi-sentence response)
+                # The generation_complete flag is False while sentences are still being generated
+                tts_session = persistent_tts_manager.get_session(call_control_id) if call_control_id else None
+                if tts_session and not tts_session.generation_complete:
+                    # Agent is still generating/streaming a multi-sentence response
+                    if int(time.time()) % 5 == 0:
+                        logger.info(f"🔇 MONITOR: Skipping silence check - response generation still in progress")
+                    await asyncio.sleep(0.5)
+                    continue
+                
                 playback_expected_end = call_states.get(call_control_id, {}).get("playback_expected_end_time", 0)
                 current_time = time.time()
                 time_until_audio_done = playback_expected_end - current_time if playback_expected_end > 0 else 0
