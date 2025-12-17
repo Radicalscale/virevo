@@ -89,8 +89,8 @@ class NaturalDeliveryMiddleware:
         # Add slight break after commas for pacing
         # But ensure we don't break simple lists too aggressively
         # Regex: Replace comma not followed by digit (to avoid breaking numbers like 1,000)
-        # UPDATE: Increased break to 0.2s based on feedback "Rushed transitions"
-        return re.sub(r',(?!\d)', ',<break time="0.2s"/>', text)
+        # Tightened from 0.2s to 0.1s - pauses were too long and sounding artificial
+        return re.sub(r',(?!\d)', ',<break time="0.1s"/>', text)
 
     def _apply_ssml_prosody(self, text: str, emotion_code: str) -> str:
         """
