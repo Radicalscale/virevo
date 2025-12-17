@@ -3178,6 +3178,48 @@ async def initiate_outbound_call(
             to_number=request.to_number,
             user_id=current_user["id"]
         )
+
+        # CALL INITIATED WEBHOOK: Send notification when call is placed
+        try:
+            agent_settings_for_webhook = agent.get("settings", {}) or {}
+            call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
+            is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active")
+            should_fire_webhook = bool(call_started_webhook_url and is_call_started_webhook_active is not False)
+            
+            logger.info(f"🔍 DEBUG Call Initiated Webhook: url='{call_started_webhook_url}', active={is_call_started_webhook_active}, should_fire={should_fire_webhook}")
+            
+            if should_fire_webhook:
+                logger.info(f"📤 Sending call-initiated webhook to: {call_started_webhook_url}")
+                
+                webhook_payload = {
+                    "event": "call.initiated",
+                    "call_id": call_control_id,
+                    "agent_id": str(agent.get("id")),
+                    "agent_name": agent.get("name", "Unknown Agent"),
+                    "direction": "outbound",
+                    "from_number": from_number,
+                    "to_number": request.to_number,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+                
+                async def send_call_initiated_webhook():
+                    try:
+                        async with httpx.AsyncClient(timeout=30.0) as client:
+                            response = await client.post(
+                                call_started_webhook_url,
+                                json=webhook_payload,
+                                headers={"Content-Type": "application/json"}
+                            )
+                            if response.status_code >= 200 and response.status_code < 300:
+                                logger.info(f"✅ Call-initiated webhook sent successfully (status={response.status_code})")
+                            else:
+                                logger.warning(f"⚠️ Call-initiated webhook returned status {response.status_code}: {response.text[:200]}")
+                    except Exception as webhook_err:
+                        logger.error(f"❌ Failed to send call-initiated webhook: {webhook_err}")
+                
+                asyncio.create_task(send_call_initiated_webhook())
+        except Exception as webhook_err:
+            logger.error(f"Error preparing call-initiated webhook: {webhook_err}")
         
         # Store in Redis for multi-worker access
         # Sanitize agent data to remove non-serializable fields (MongoDB ObjectId, datetime)
@@ -7458,7 +7500,9 @@ async def telnyx_webhook(payload: dict):
                 # Backwards compatible: fire webhook if URL exists and active is not explicitly False
                 # (undefined/None = enabled for existing configs, only False = disabled)
                 is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active")
-                should_fire_webhook = call_started_webhook_url and is_call_started_webhook_active is not False
+                should_fire_webhook = bool(call_started_webhook_url and is_call_started_webhook_active is not False)
+                
+                logger.info(f"🔍 DEBUG Webhook: url='{call_started_webhook_url}', active={is_call_started_webhook_active}, should_fire={should_fire_webhook}")
                 
                 if should_fire_webhook:
                     logger.info(f"📤 Sending call-started webhook to: {call_started_webhook_url}")
