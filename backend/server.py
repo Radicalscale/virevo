@@ -4850,9 +4850,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                     # ALWAYS filter garbled transcripts (these are echo, not real speech)
                                     if is_garbled:
                                         logger.info(f"🔕 FILTERING garbled/echo '{final_text.strip()}' - NOT calling on_final_transcript")
-                                    # Filter 1-word fillers during agent speech
-                                    elif is_agent_active and (word_count == 1 or is_filler):
-                                        logger.info(f"🔕 FILTERING 1-word/filler '{final_text.strip()}' - NOT calling on_final_transcript")
+                                    # Filter 1-2 word utterances or fillers during agent speech
+                                    elif is_agent_active and (word_count <= 2 or is_filler):
+                                        logger.info(f"🔕 FILTERING {word_count}-word/filler '{final_text.strip()}' - NOT calling on_final_transcript")
                                         # Don't call on_final_transcript - skip this entirely
                                     elif on_final_transcript:
                                         # Not filtered - call on_final_transcript
@@ -4902,9 +4902,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                             session.mark_user_speaking_end()
                                         continue
                                     
-                                    # Filter 1-word fillers during agent speech
-                                    if is_agent_active and (word_count == 1 or is_filler):
-                                        logger.info(f"🔕 SKIPPING endpoint for filtered utterance '{final_text.strip()}' (tts_speaking={tts_is_speaking}, is_active={is_agent_active})")
+                                    # Filter 1-2 word utterances or fillers during agent speech
+                                    if is_agent_active and (word_count <= 2 or is_filler):
+                                        logger.info(f"🔕 SKIPPING endpoint for {word_count}-word/filler '{final_text.strip()}' (tts_speaking={tts_is_speaking}, is_active={is_agent_active})")
                                         accumulated_transcript = ""  # Clear any accumulated text
                                         
                                         # 🔥 CRITICAL FIX: Still mark user as stopped speaking even when filtering
