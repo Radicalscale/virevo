@@ -4174,6 +4174,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                     tts_session.reset_interrupt_flag()
                     logger.info(f"🔄 Reset TTS interrupt flag before new response")
                 
+                # 🔥 FIX: Mark generation as NOT complete to hold floor during multi-sentence response
+                # This prevents "FLOOR RELEASED" from firing between sentences
+                if tts_session:
+                    tts_session.generation_complete = False
+                
                 # Process with streaming (TTS generation happens in parallel!)
                 response = await session.process_user_input(accumulated_transcript, stream_callback=stream_sentence_to_tts)
                 
@@ -4281,6 +4286,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                             agent_generating_response = False
                             call_states[call_control_id]["agent_generating_response"] = False
                             logger.info(f"✅ Agent generation complete (persistent TTS) - response window closed")
+                            
+                            # 🔥 FIX: Mark generation complete so floor can release
+                            # Now the reset_speaking_after_playback timer knows no more sentences are coming
+                            if persistent_tts_session:
+                                persistent_tts_session.generation_complete = True
                             
                             # Mark agent as speaking (first audio already started)
                             if not first_sentence_played:

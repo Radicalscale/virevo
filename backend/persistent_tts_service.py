@@ -67,6 +67,12 @@ class PersistentTTSSession:
         self.is_holding_floor = False
         self.is_speaking = False  # Maintained for backward compatibility, syncs with is_holding_floor
         
+        # 🔥 FIX: Flag to indicate if LLM response generation is complete
+        # Set to False by server.py before process_user_input, True after all sentences queued
+        # Prevents floor release between sentences of a multi-sentence response
+        # Defaults to True (fail-safe: if not managed, floor still releases normally)
+        self.generation_complete = True
+        
         # 🔥 Interruption flag - when True, stop all audio sending immediately
         self.interrupted = False
         
@@ -676,7 +682,14 @@ class PersistentTTSSession:
                         time_remaining = expected_end - current_time
                         
                         if time_remaining <= 0:
-                            # All audio should have finished playing
+                            # 🔥 FIX: Only release floor if generation is complete
+                            # This prevents premature release between sentences
+                            if not self.generation_complete:
+                                # More sentences may be coming, wait a bit longer
+                                await asyncio.sleep(0.2)
+                                continue  # Recheck time_remaining after new audio arrives
+                            
+                            # All audio should have finished playing AND no more coming
                             if not self.interrupted and self.is_holding_floor:
                                 self.is_holding_floor = False
                                 self.is_speaking = False
@@ -719,6 +732,9 @@ class PersistentTTSSession:
         try:
             # 🔥 Set interrupted flag FIRST to stop any ongoing audio sending loops
             self.interrupted = True
+            
+            # 🔥 FIX: Mark generation as complete so floor releases immediately
+            self.generation_complete = True
             
             # 🔊 SINGLE SOURCE OF TRUTH: Agent is no longer speaking
             self.is_holding_floor = False
