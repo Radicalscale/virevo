@@ -49,6 +49,12 @@ const AgentForm = () => {
   const fetchAgent = async () => {
     try {
       const response = await agentAPI.get(id);
+      console.log('🔍 Agent data loaded:', response.data);
+      console.log('🔍 Settings from API:', response.data.settings);
+      console.log('🔍 Webhook URL:', response.data.settings?.call_started_webhook_url);
+      console.log('🔍 Webhook Active:', response.data.settings?.call_started_webhook_active);
+      console.log('🔍 Post-Call Webhook URL:', response.data.settings?.post_call_webhook_url);
+      console.log('🔍 Post-Call Webhook Active:', response.data.settings?.post_call_webhook_active);
       setFormData(response.data);
     } catch (error) {
       console.error('Error fetching agent:', error);
@@ -167,6 +173,12 @@ const AgentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Debug: Log what we're about to save
+    console.log('💾 Saving agent - formData:', formData);
+    console.log('💾 Settings being saved:', formData.settings);
+    console.log('💾 Webhook URL being saved:', formData.settings?.call_started_webhook_url);
+    console.log('💾 Webhook Active being saved:', formData.settings?.call_started_webhook_active);
 
     try {
       if (isEdit) {
