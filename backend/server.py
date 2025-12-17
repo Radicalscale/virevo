@@ -7453,7 +7453,8 @@ async def telnyx_webhook(payload: dict):
             try:
                 agent_settings_for_webhook = agent.get("settings", {}) or {}
                 call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
-                is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active", True)
+                # Only fire if explicitly enabled (default to False, not True)
+                is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active", False)
                 
                 if call_started_webhook_url and is_call_started_webhook_active:
                     logger.info(f"📤 Sending call-started webhook to: {call_started_webhook_url}")

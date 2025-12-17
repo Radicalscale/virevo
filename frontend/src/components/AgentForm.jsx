@@ -2118,7 +2118,7 @@ const AgentForm = () => {
                     <input
                       type="checkbox"
                       id="call-started-webhook-active"
-                      checked={formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url}
+                      checked={formData.settings?.call_started_webhook_active === true}
                       onChange={(e) => setFormData({
                         ...formData,
                         settings: {
@@ -2144,11 +2144,10 @@ const AgentForm = () => {
                       call_started_webhook_url: e.target.value
                     }
                   })}
-                  disabled={!(formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url)}
-                  className={`bg-gray-900 border-gray-700 text-white mt-1 ${(formData.settings?.call_started_webhook_active ?? !!formData.settings?.call_started_webhook_url) ? '' : 'opacity-50 cursor-not-allowed'}`}
+                  className="bg-gray-900 border-gray-700 text-white mt-1"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  When enabled, a POST request will be sent when each call is answered.
+                  Enter your webhook URL and check "Enable Webhook" to activate.
                 </p>
               </div>
 
