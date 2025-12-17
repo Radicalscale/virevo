@@ -6980,10 +6980,12 @@ async def finalize_call_log(call_id: str, end_reason: str = None, error_message:
                     
                     # Check if post_call_webhook_url is configured in agent settings
                     post_call_webhook_url = agent_settings.get("post_call_webhook_url")
-                    # Only fire if explicitly enabled (default to False, not True)
-                    is_webhook_active = agent_settings.get("post_call_webhook_active", False)
+                    # Backwards compatible: fire webhook if URL exists and active is not explicitly False
+                    # (undefined/None = enabled for existing configs, only False = disabled)
+                    is_webhook_active = agent_settings.get("post_call_webhook_active")
+                    should_fire_webhook = post_call_webhook_url and is_webhook_active is not False
                     
-                    if post_call_webhook_url and is_webhook_active:
+                    if should_fire_webhook:
                         logger.info(f"📤 Sending post-call webhook to: {post_call_webhook_url}")
                         
                         # Build webhook payload
@@ -7453,10 +7455,12 @@ async def telnyx_webhook(payload: dict):
             try:
                 agent_settings_for_webhook = agent.get("settings", {}) or {}
                 call_started_webhook_url = agent_settings_for_webhook.get("call_started_webhook_url")
-                # Only fire if explicitly enabled (default to False, not True)
-                is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active", False)
+                # Backwards compatible: fire webhook if URL exists and active is not explicitly False
+                # (undefined/None = enabled for existing configs, only False = disabled)
+                is_call_started_webhook_active = agent_settings_for_webhook.get("call_started_webhook_active")
+                should_fire_webhook = call_started_webhook_url and is_call_started_webhook_active is not False
                 
-                if call_started_webhook_url and is_call_started_webhook_active:
+                if should_fire_webhook:
                     logger.info(f"📤 Sending call-started webhook to: {call_started_webhook_url}")
                     
                     webhook_payload = {
