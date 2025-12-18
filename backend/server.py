@@ -5277,6 +5277,11 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             )
                             logger.info("🔊 [WebSocket Worker] Silence greeting spoken via Telnyx TTS")
                             
+                            # Start silence tracking so dead air monitoring kicks in
+                            # This is critical for check-in/disconnect flow to work
+                            session.start_silence_tracking()
+                            logger.info("⏱️ [WebSocket Worker] Silence tracking started for dead air monitoring")
+                            
                         except asyncio.CancelledError:
                             logger.info("⏱️ [WebSocket Worker] Silence timeout task cancelled")
                         except Exception as e:
@@ -7968,80 +7973,16 @@ async def telnyx_webhook(payload: dict):
                 asyncio.create_task(voicemail_timeout_protection())
                 logger.info(f"🛡️ Voicemail timeout protection started ({max_listen_without_interaction_ms}ms)")
                 
-                # If aiSpeaksAfterSilence is enabled, schedule a delayed greeting
+                # If aiSpeaksAfterSilence is enabled, log it and store settings
+                # NOTE: The actual silence timeout task is scheduled in the WebSocket worker
+                # (where the session lives) to avoid multi-worker issues where this webhook
+                # handler runs on a different worker than the one with the session.
                 if ai_speaks_after_silence:
-                    logger.info(f"⏱️ AI will speak after {silence_timeout_ms}ms of silence")
-                    # Store the setting in call_data for the silence handler
+                    logger.info(f"⏱️ AI will speak after {silence_timeout_ms}ms of silence (scheduled in WebSocket worker)")
+                    # Store the setting in call_data for reference
                     call_data["ai_speaks_after_silence"] = True
                     call_data["silence_timeout_ms"] = silence_timeout_ms
                     call_data["silence_greeting_triggered"] = False
-                    
-                    # Schedule the delayed greeting task
-                    async def trigger_ai_after_silence():
-                        try:
-                            await asyncio.sleep(silence_timeout_ms / 1000.0)
-                            
-                            # Check if call still exists
-                            if call_control_id not in active_telnyx_calls:
-                                logger.info(f"⏱️ Silence timeout: Call no longer active, skipping")
-                                return
-                            
-                            # Check flags from BOTH Redis (for cross-worker state) AND in-memory
-                            redis_data = redis_service.get_call_data(call_control_id) or {}
-                            memory_data = active_telnyx_calls.get(call_control_id, {})
-                            
-                            # User has spoken check - either source
-                            user_has_spoken = redis_data.get("user_has_spoken") or memory_data.get("user_has_spoken")
-                            greeting_triggered = redis_data.get("silence_greeting_triggered") or memory_data.get("silence_greeting_triggered")
-                            
-                            if user_has_spoken or greeting_triggered:
-                                logger.info(f"⏱️ Silence timeout: User already spoke or greeting already triggered, skipping")
-                                return
-                            
-                            # Mark as triggered to prevent duplicate (in both places)
-                            active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True
-                            redis_service.set_call_data(call_control_id, {"silence_greeting_triggered": True})
-                            
-                            logger.info(f"⏱️ Silence timeout reached - AI speaking first greeting")
-                            
-                            # CRITICAL: Get session from IN-MEMORY storage (sessions can't be serialized to Redis)
-                            current_session = memory_data.get("session")
-                            if not current_session:
-                                logger.error(f"❌ Silence timeout: Session not found in memory for {call_control_id} - cannot speak greeting!")
-                                return
-                            
-                            # Generate and speak the greeting
-                            greeting_response = await current_session.process_user_input("")
-                            greeting_text = greeting_response.get("text", "Hello?")
-                            
-                            logger.info(f"💬 AI speaks after silence: {greeting_text}")
-                            
-                            # Save to transcript
-                            await db.call_logs.update_one(
-                                {"call_id": call_control_id},
-                                {"$push": {
-                                    "transcript": {
-                                        "role": "assistant",
-                                        "text": greeting_text,
-                                        "timestamp": datetime.utcnow().isoformat()
-                                    }
-                                }}
-                            )
-                            
-                            # Speak the greeting
-                            telnyx_svc = get_telnyx_service()
-                            agent_config = current_session.agent_config
-                            await telnyx_svc.speak_text(
-                                call_control_id,
-                                greeting_text,
-                                agent_config=agent_config
-                            )
-                            logger.info("🔊 Silence greeting spoken via Telnyx TTS")
-                        except Exception as e:
-                            logger.error(f"❌ Error in silence greeting task: {e}")
-                    
-                    # Start the task
-                    asyncio.create_task(trigger_ai_after_silence())
             
             # Check flow type
             is_press_digit_flow = first_node.get("type") == "press_digit"
