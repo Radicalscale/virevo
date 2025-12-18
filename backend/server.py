@@ -8089,7 +8089,6 @@ async def telnyx_webhook(payload: dict):
                 
                 if user_id:
                     # Run QC analysis in background (fire and forget)
-                    import asyncio
                     asyncio.create_task(process_qc_analysis(
                         call_id=call_control_id,
                         user_id=user_id,
