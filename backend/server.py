@@ -5005,6 +5005,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                         continue
                                 
                                 # Cancel any existing response task before starting new one
+                                # BUT: Don't cancel if call is already ending (hangup in progress)
+                                if call_ending:
+                                    logger.info(f"⏭️  Skipping processing - call is ending")
+                                    continue
+                                    
                                 current_response_task = call_states.get(call_control_id, {}).get("current_response_task")
                                 if current_response_task and not current_response_task.done():
                                     logger.info(f"🛑 Cancelling previous response task before starting new endpoint processing")
