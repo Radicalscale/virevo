@@ -5208,6 +5208,84 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                 session.session_variables.update(custom_variables)
                 
                 logger.info("✅ Session created in WebSocket worker")
+                
+                # ═══════════════════════════════════════════════════════════════════
+                # SCHEDULE SILENCE TIMEOUT IN THIS WORKER (has the session in memory)
+                # ═══════════════════════════════════════════════════════════════════
+                flow = agent.get("call_flow", [])
+                start_node = flow[0] if flow else {}
+                start_node_data = start_node.get("data", {})
+                who_speaks_first = start_node_data.get("whoSpeaksFirst", "ai")
+                ai_speaks_after_silence = start_node_data.get("aiSpeaksAfterSilence", False)
+                silence_timeout_ms = start_node_data.get("silenceTimeout", 2000)
+                
+                if who_speaks_first == "user" and ai_speaks_after_silence:
+                    logger.info(f"⏱️ [WebSocket Worker] Scheduling silence timeout: {silence_timeout_ms}ms")
+                    
+                    async def trigger_ai_after_silence_ws():
+                        """Silence timeout task - runs on WebSocket worker that has the session"""
+                        try:
+                            logger.info(f"⏱️ [WebSocket Worker] Silence timeout task started, waiting {silence_timeout_ms}ms...")
+                            await asyncio.sleep(silence_timeout_ms / 1000.0)
+                            
+                            # Check if user has already spoken
+                            redis_data = redis_service.get_call_data(call_control_id) or {}
+                            call_data_check = active_telnyx_calls.get(call_control_id, {})
+                            
+                            user_has_spoken = redis_data.get("user_has_spoken") or call_data_check.get("user_has_spoken")
+                            greeting_triggered = redis_data.get("silence_greeting_triggered") or call_data_check.get("silence_greeting_triggered")
+                            
+                            if user_has_spoken:
+                                logger.info(f"⏱️ [WebSocket Worker] Silence timeout: User already spoke, skipping greeting")
+                                return
+                            
+                            if greeting_triggered:
+                                logger.info(f"⏱️ [WebSocket Worker] Silence timeout: Greeting already triggered, skipping")
+                                return
+                            
+                            # Mark as triggered
+                            if call_control_id in active_telnyx_calls:
+                                active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True
+                            redis_service.set_call_data(call_control_id, {"silence_greeting_triggered": True})
+                            
+                            logger.info(f"⏱️ [WebSocket Worker] Silence timeout reached - generating greeting!")
+                            
+                            # Generate and speak greeting
+                            greeting_response = await session.process_user_input("")
+                            greeting_text = greeting_response.get("text", "Hello?")
+                            
+                            logger.info(f"💬 [WebSocket Worker] AI speaks after silence: {greeting_text}")
+                            
+                            # Save to transcript
+                            await db.call_logs.update_one(
+                                {"call_id": call_control_id},
+                                {"$push": {
+                                    "transcript": {
+                                        "role": "assistant",
+                                        "text": greeting_text,
+                                        "timestamp": datetime.utcnow().isoformat()
+                                    }
+                                }}
+                            )
+                            
+                            # Speak the greeting
+                            telnyx_svc = get_telnyx_service()
+                            await telnyx_svc.speak_text(
+                                call_control_id,
+                                greeting_text,
+                                agent_config=session.agent_config
+                            )
+                            logger.info("🔊 [WebSocket Worker] Silence greeting spoken via Telnyx TTS")
+                            
+                        except asyncio.CancelledError:
+                            logger.info("⏱️ [WebSocket Worker] Silence timeout task cancelled")
+                        except Exception as e:
+                            logger.error(f"❌ [WebSocket Worker] Error in silence greeting task: {e}")
+                    
+                    # Start the task on THIS worker (which has the session)
+                    asyncio.create_task(trigger_ai_after_silence_ws())
+                    logger.info(f"⏱️ [WebSocket Worker] Silence timeout task scheduled!")
+                    
         else:
             logger.info("✅ Session found in this worker's active_sessions")
         
