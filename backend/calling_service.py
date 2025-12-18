@@ -2292,21 +2292,12 @@ Your response (just the number):"""
                 response = await asyncio.wait_for(call_llm_for_transition(), timeout=1.5)
                 
             except asyncio.TimeoutError:
-                # Timeout! Take first transition as fallback
-                logger.warning(f"⚠️ TRANSITION EVALUATION TIMEOUT (>2s) - taking first transition as fallback")
-                logger.warning(f"⚠️ This prevents 13-second freezes but user experience may be affected")
+                # Timeout! STAY on current node - don't auto-transition
+                # Taking the first transition was causing unexpected jumps (e.g., after empty messages)
+                logger.warning(f"⚠️ TRANSITION EVALUATION TIMEOUT (>1.5s) - staying on current node")
+                logger.warning(f"⚠️ This prevents 13-second freezes. User should re-respond to trigger evaluation.")
                 
-                if transition_options:
-                    first_trans = transition_options[0]
-                    next_node_id = first_trans["next_node_id"]
-                    next_node = self._get_node_by_id(next_node_id, flow_nodes)
-                    
-                    if next_node:
-                        logger.info(f"🔄 Fallback transition: {current_node.get('label')} -> {next_node.get('label')}")
-                        return next_node
-                
-                # If no transitions available, stay on current node
-                logger.warning(f"⚠️ No fallback transition available, staying on current node")
+                # Return current node to stay in place
                 return current_node
             
             ai_response = response.choices[0].message.content.strip()

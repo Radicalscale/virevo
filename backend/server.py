@@ -4616,7 +4616,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         if text.strip():
             if call_control_id in active_telnyx_calls:
                 active_telnyx_calls[call_control_id]["user_has_spoken"] = True
-            redis_service.set_call_data(call_control_id, {"user_has_spoken": True})
+                active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True  # Prevent silence greeting
+            redis_service.set_call_data(call_control_id, {
+                "user_has_spoken": True,
+                "silence_greeting_triggered": True  # Prevent silence greeting from also firing
+            })
             logger.info(f"👤 User has spoken - aiSpeaksAfterSilence timer cancelled if pending")
         
         accumulated_transcript += text
