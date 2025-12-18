@@ -4568,6 +4568,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 logger.info(f"🔊 Agent finished generating, {len(current_playback_ids)} playbacks active - waiting for webhooks to close window and start silence tracking")
                 
                 # Check if we should end call (flow ending node or dead air max checks)
+                logger.info(f"🔍 END CALL CHECK: should_end_call={session.should_end_call}, max_checkins={session.should_end_call_max_checkins()}, max_duration={session.should_end_call_max_duration()}")
                 if session.should_end_call or session.should_end_call_max_checkins() or session.should_end_call_max_duration():
                     call_ending = True
                     
