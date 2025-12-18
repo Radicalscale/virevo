@@ -1435,68 +1435,26 @@ class CallSession:
                 # Generate and stream the response
                 response_text = ""
                 if prompt_type == "script":
-                    # 🔄 REPETITION CHECK: Don't repeat the same script if we already spoke it
-                    # This prevents the silence greeting from being spoken twice
-                    is_repeating = False
-                    last_user_message = ""
-                    if len(self.conversation_history) >= 2:
-                        # Check if the last assistant message was the same script
-                        for msg in reversed(self.conversation_history):
-                            if msg.get("role") == "user" and not last_user_message:
-                                last_user_message = msg.get("content", "")
-                            if msg.get("role") == "assistant":
-                                last_assistant_msg = msg.get("content", "")
-                                if last_assistant_msg.strip() == content.strip():
-                                    is_repeating = True
-                                    logger.info(f"🔄 Script repetition detected - won't repeat '{content[:30]}...'")
-                                break
-                    
-                    if is_repeating:
-                        # Script was already spoken - use goal or global prompt for follow-up
-                        node_goal = node_data.get("goal", "").strip()
-                        global_prompt = self.agent_config.get("system_prompt", "").strip()
+                    # 🚀 STREAMING FIX: Split script into sentences and stream each one
+                    # This allows TTS to start playing the first sentence immediately
+                    # instead of waiting for the entire script to be processed
+                    if stream_callback:
+                        import re
+                        # Split by sentence-ending punctuation (., !, ?) followed by space or end
+                        # Keep the punctuation with the sentence
+                        sentences = re.split(r'(?<=[.!?])\s+', content.strip())
+                        sentences = [s.strip() for s in sentences if s.strip()]
                         
-                        if node_goal:
-                            logger.info(f"🎯 Using node goal for follow-up instead of repeating script")
-                            # Generate response using goal as prompt
-                            goal_prompt = f"""The user responded: "{last_user_message}"
-
-Your goal: {node_goal}
-
-Respond naturally to the user's response. Do NOT repeat your previous greeting. Be conversational and progress the conversation toward your goal."""
-                            response_text = await self._generate_ai_response_streaming(goal_prompt, stream_callback, selected_node)
-                        elif global_prompt:
-                            logger.info(f"🌍 Using global prompt for follow-up instead of repeating script")
-                            response_text = await self._generate_ai_response_streaming(
-                                f"The user said: '{last_user_message}'. Respond naturally.",
-                                stream_callback, selected_node
-                            )
+                        if sentences:
+                            logger.info(f"📤 Streaming script as {len(sentences)} sentence(s)")
+                            for i, sentence in enumerate(sentences):
+                                await stream_callback(sentence)
+                                logger.info(f"📤 Streamed script sentence {i+1}/{len(sentences)}: {sentence[:50]}...")
                         else:
-                            # Fallback - just acknowledge the user
-                            response_text = "Yes, I'm here. How can I help you?"
-                            if stream_callback:
-                                await stream_callback(response_text)
-                    else:
-                        # 🚀 STREAMING FIX: Split script into sentences and stream each one
-                        # This allows TTS to start playing the first sentence immediately
-                        # instead of waiting for the entire script to be processed
-                        if stream_callback:
-                            import re
-                            # Split by sentence-ending punctuation (., !, ?) followed by space or end
-                            # Keep the punctuation with the sentence
-                            sentences = re.split(r'(?<=[.!?])\s+', content.strip())
-                            sentences = [s.strip() for s in sentences if s.strip()]
-                            
-                            if sentences:
-                                logger.info(f"📤 Streaming script as {len(sentences)} sentence(s)")
-                                for i, sentence in enumerate(sentences):
-                                    await stream_callback(sentence)
-                                    logger.info(f"📤 Streamed script sentence {i+1}/{len(sentences)}: {sentence[:50]}...")
-                            else:
-                                # Fallback if no sentences detected
-                                await stream_callback(content)
-                                logger.info(f"📤 Streamed script content (no sentences): {content[:50]}...")
-                        response_text = content
+                            # Fallback if no sentences detected
+                            await stream_callback(content)
+                            logger.info(f"📤 Streamed script content (no sentences): {content[:50]}...")
+                    response_text = content
                 else:
                     # Prompt mode - use AI to generate response based on instructions with streaming
                     response_text = await self._generate_ai_response_streaming(content, stream_callback, selected_node)
