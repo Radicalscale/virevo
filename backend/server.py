@@ -7903,21 +7903,35 @@ async def telnyx_webhook(payload: dict):
                         try:
                             await asyncio.sleep(silence_timeout_ms / 1000.0)
                             
-                            # Check if user has spoken or call ended
-                            current_call_data = redis_service.get_call_data(call_control_id) or active_telnyx_calls.get(call_control_id, {})
-                            if current_call_data.get("user_has_spoken") or current_call_data.get("silence_greeting_triggered"):
+                            # Check if call still exists
+                            if call_control_id not in active_telnyx_calls:
+                                logger.info(f"⏱️ Silence timeout: Call no longer active, skipping")
+                                return
+                            
+                            # Check flags from BOTH Redis (for cross-worker state) AND in-memory
+                            redis_data = redis_service.get_call_data(call_control_id) or {}
+                            memory_data = active_telnyx_calls.get(call_control_id, {})
+                            
+                            # User has spoken check - either source
+                            user_has_spoken = redis_data.get("user_has_spoken") or memory_data.get("user_has_spoken")
+                            greeting_triggered = redis_data.get("silence_greeting_triggered") or memory_data.get("silence_greeting_triggered")
+                            
+                            if user_has_spoken or greeting_triggered:
                                 logger.info(f"⏱️ Silence timeout: User already spoke or greeting already triggered, skipping")
                                 return
                             
-                            # Mark as triggered to prevent duplicate
-                            if call_control_id in active_telnyx_calls:
-                                active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True
+                            # Mark as triggered to prevent duplicate (in both places)
+                            active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True
                             redis_service.set_call_data(call_control_id, {"silence_greeting_triggered": True})
                             
                             logger.info(f"⏱️ Silence timeout reached - AI speaking first greeting")
                             
-                            # Get the greeting from the agent
-                            current_session = current_call_data.get("session")
+                            # CRITICAL: Get session from IN-MEMORY storage (sessions can't be serialized to Redis)
+                            current_session = memory_data.get("session")
+                            if not current_session:
+                                logger.error(f"❌ Silence timeout: Session not found in memory for {call_control_id} - cannot speak greeting!")
+                                return
+                            
                             if current_session:
                                 greeting_response = await current_session.process_user_input("")
                                 greeting_text = greeting_response.get("text", "Hello?")
