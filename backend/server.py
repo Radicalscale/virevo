@@ -7932,33 +7932,33 @@ async def telnyx_webhook(payload: dict):
                                 logger.error(f"❌ Silence timeout: Session not found in memory for {call_control_id} - cannot speak greeting!")
                                 return
                             
-                            if current_session:
-                                greeting_response = await current_session.process_user_input("")
-                                greeting_text = greeting_response.get("text", "Hello?")
-                                
-                                logger.info(f"💬 AI speaks after silence: {greeting_text}")
-                                
-                                # Save to transcript
-                                await db.call_logs.update_one(
-                                    {"call_id": call_control_id},
-                                    {"$push": {
-                                        "transcript": {
-                                            "role": "assistant",
-                                            "text": greeting_text,
-                                            "timestamp": datetime.utcnow().isoformat()
-                                        }
-                                    }}
-                                )
-                                
-                                # Speak the greeting
-                                telnyx_svc = get_telnyx_service()
-                                agent_config = current_session.agent_config
-                                await telnyx_svc.speak_text(
-                                    call_control_id,
-                                    greeting_text,
-                                    agent_config=agent_config
-                                )
-                                logger.info("🔊 Silence greeting spoken via Telnyx TTS")
+                            # Generate and speak the greeting
+                            greeting_response = await current_session.process_user_input("")
+                            greeting_text = greeting_response.get("text", "Hello?")
+                            
+                            logger.info(f"💬 AI speaks after silence: {greeting_text}")
+                            
+                            # Save to transcript
+                            await db.call_logs.update_one(
+                                {"call_id": call_control_id},
+                                {"$push": {
+                                    "transcript": {
+                                        "role": "assistant",
+                                        "text": greeting_text,
+                                        "timestamp": datetime.utcnow().isoformat()
+                                    }
+                                }}
+                            )
+                            
+                            # Speak the greeting
+                            telnyx_svc = get_telnyx_service()
+                            agent_config = current_session.agent_config
+                            await telnyx_svc.speak_text(
+                                call_control_id,
+                                greeting_text,
+                                agent_config=agent_config
+                            )
+                            logger.info("🔊 Silence greeting spoken via Telnyx TTS")
                         except Exception as e:
                             logger.error(f"❌ Error in silence greeting task: {e}")
                     
