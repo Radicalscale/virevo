@@ -4063,18 +4063,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                     if not tts_start_time:
                         tts_start_time = time.time()
                     
-                    # 🎤 VOICE MODULATION: Handle structured payload (text + settings) or raw string
-                    text_to_speak = sentence
-                    voice_settings = None
-                    
-                    if isinstance(sentence, dict):
-                        text_to_speak = sentence.get("text")
-                        voice_settings = sentence.get("voice_settings")
-                        logger.debug(f"🎤 Received voice settings: {voice_settings}")
-                    
-                    full_response_text += text_to_speak + " "
-                    sentence_queue.append((text_to_speak, voice_settings)) # Store tuple in queue
-                    logger.info(f"📤 Sentence arrived from LLM: {text_to_speak[:50]}...")
+                    full_response_text += sentence + " "
+                    sentence_queue.append(sentence)
+                    logger.info(f"📤 Sentence arrived from LLM: {sentence[:50]}...")
                     
                     # ⏱️ [TIMING] First sentence arrival from LLM
                     if len(sentence_queue) == 1:
@@ -4159,13 +4150,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         # Get current voice ID from agent config for dynamic voice updates
                         current_voice_id = session.agent_config.get("settings", {}).get("elevenlabs_settings", {}).get("voice_id")
                         tts_task = asyncio.create_task(
-                            persistent_tts_session.stream_sentence(
-                                sentence=text_to_speak,
-                                is_first=is_first,
-                                is_last=is_last,
-                                current_voice_id=current_voice_id,
-                                voice_settings=voice_settings
-                            )
+                            persistent_tts_session.stream_sentence(sentence, is_first=is_first, is_last=is_last, current_voice_id=current_voice_id)
                         )
                         tts_tasks.append(tts_task)
                     else:

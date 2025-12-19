@@ -184,17 +184,6 @@ class CallSession:
         from natural_delivery_middleware import NaturalDeliveryMiddleware
         self.delivery_middleware = NaturalDeliveryMiddleware()
     
-    def _strip_voice_tags(self, text: str) -> str:
-        """Strip [H]/[S]/[N] voice modulation tags from text before storing in transcripts/history.
-        
-        These tags are used internally for voice modulation but should not appear in:
-        - Conversation history
-        - User-facing transcripts
-        - Database records
-        """
-        import re
-        return re.sub(r'^\[([HSN])\]\s*', '', text.strip())
-    
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
         if name:
@@ -657,11 +646,9 @@ class CallSession:
                 logger.info(f"✅ User responded to regular message, resetting counter")
             
             # Add assistant response to conversation history
-            # Strip [H]/[S]/[N] voice tags before storing
-            clean_response = self._strip_voice_tags(assistant_response)
             assistant_msg = {
                 "role": "assistant",
-                "content": clean_response
+                "content": assistant_response
             }
             
             # For call flow agents, include the current node ID for state tracking
@@ -813,20 +800,16 @@ class CallSession:
                         sentence = sentence.strip()
                         if sentence and stream_callback:
                             # Stream this sentence immediately to TTS
-                            # 🎤 VOICE MODULATION: Process through middleware to get voice settings (Happy/Serious/Neutral)
-                            clean_text, audio_payload = self.delivery_middleware.process(sentence)
-                            await stream_callback(audio_payload)
-                            logger.info(f"📤 Streamed sentence with settings: {clean_text[:50]}...")
+                            await stream_callback(sentence)
+                            logger.info(f"📤 Streamed sentence: {sentence[:50]}...")
                 
                 # Keep the last incomplete part in buffer
                 sentence_buffer = sentences[-1] if len(sentences) % 2 != 0 else ""
         
         # Send any remaining text
         if sentence_buffer.strip() and stream_callback:
-            # 🎤 VOICE MODULATION: Process final fragment
-            clean_text, audio_payload = self.delivery_middleware.process(sentence_buffer.strip())
-            await stream_callback(audio_payload)
-            logger.info(f"📤 Streamed final fragment with settings: {clean_text[:50]}...")
+            await stream_callback(sentence_buffer.strip())
+            logger.info(f"📤 Streamed final fragment: {sentence_buffer[:50]}...")
         
         # ⏱️ TIMING: Total LLM response time
         llm_total_ms = int((time.time() - llm_request_start) * 1000)
@@ -1468,10 +1451,9 @@ class CallSession:
                         if stream_callback:
                             await stream_callback(response_text)
                         # Add to conversation history and return
-                        # Strip [H]/[S]/[N] voice tags before storing
                         self.conversation_history.append({
                             "role": "assistant",
-                            "content": self._strip_voice_tags(response_text),
+                            "content": response_text,
                             "_node_id": self.current_node_id
                         })
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
@@ -4144,19 +4126,16 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
                         sentence = sentence.strip()
                         if sentence and stream_callback:
                             # Stream this sentence immediately to TTS
-                            # 🎤 VOICE MODULATION: Process through middleware to get voice settings
-                            clean_text, audio_payload = self.delivery_middleware.process(sentence)
-                            await stream_callback(audio_payload)
-                            logger.info(f"📤 Streamed sentence with settings: {clean_text[:50]}...")
+                            await stream_callback(sentence)
+                            logger.info(f"📤 Streamed sentence: {sentence[:50]}...")
                 
                 # Keep the last incomplete part in buffer
                 sentence_buffer = sentences[-1] if len(sentences) % 2 != 0 else ""
         
         # Send any remaining text
         if sentence_buffer.strip() and stream_callback:
-            clean_text, audio_payload = self.delivery_middleware.process(sentence_buffer.strip())
-            await stream_callback(audio_payload)
-            logger.info(f"📤 Streamed final fragment with settings: {clean_text[:50]}...")
+            await stream_callback(sentence_buffer.strip())
+            logger.info(f"📤 Streamed final fragment: {sentence_buffer[:50]}...")
         
         # ⏱️ TIMING: Total LLM response time
         llm_total_ms = int((time.time() - llm_request_start) * 1000)
@@ -4204,10 +4183,8 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
             if stream_callback:
                 # Support both string and dictionary payloads for callback
                 # This ensures compatibility if middleware passes structured data
-                # 🎤 VOICE MODULATION: Process through middleware even for endings
-                clean_text, audio_payload = self.delivery_middleware.process(content)
-                await stream_callback(audio_payload)
-                logger.info(f"📤 Streamed ending content with settings: {clean_text[:50]}...")
+                await stream_callback(content)
+                logger.info(f"📤 Streamed ending content: {content[:50]}...")
             return content
         
         if node_type == "logic_split":
@@ -4252,10 +4229,8 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         if prompt_type == "script":
             logger.info("📜 Using SCRIPT mode - will speak content directly")
             if stream_callback:
-                # 🎤 VOICE MODULATION: Process script content through middleware
-                clean_text, audio_payload = self.delivery_middleware.process(content)
-                await stream_callback(audio_payload)
-                logger.info(f"📤 Streamed script content with settings: {clean_text[:50]}...")
+                await stream_callback(content)
+                logger.info(f"📤 Streamed script content: {content[:50]}...")
             return content
         else:
             # Prompt mode - use AI with streaming
