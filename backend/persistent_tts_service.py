@@ -347,7 +347,8 @@ class PersistentTTSSession:
         sentence: str,
         is_first: bool = False,
         is_last: bool = False,
-        current_voice_id: str = None
+        current_voice_id: str = None,
+        voice_settings: dict = None
     ) -> bool:
         """
         Stream a sentence through the persistent WebSocket
@@ -413,10 +414,12 @@ class PersistentTTSSession:
                 stream_start = time.time()
                 
                 # Send text to ElevenLabs for synthesis
+                # 🎤 VOICE MODULATION: Pass dynamic voice settings if provided
                 await self.ws_service.send_text(
                     text=sentence,
                     try_trigger_generation=True,
-                    flush=False
+                    flush=False,
+                    voice_settings=voice_settings
                 )
                 
                 # Send empty string to signal end of input and trigger final generation
