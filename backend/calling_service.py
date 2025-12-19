@@ -798,6 +798,7 @@ class CallSession:
                             sentence += sentences[i + 1]  # Add delimiter
                         
                         sentence = sentence.strip()
+                        if sentence and stream_callback:
                             # Stream this sentence immediately to TTS
                             # 🎤 VOICE MODULATION: Process through middleware to get voice settings (Happy/Serious/Neutral)
                             clean_text, audio_payload = self.delivery_middleware.process(sentence)
