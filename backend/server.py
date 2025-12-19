@@ -4060,12 +4060,38 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                     # NOTE: interrupt flag is reset before process_user_input() is called,
                     # so we don't need to check it here. The check in stream_sentence() handles mid-response interruptions.
                     
+
+                    # 🧼 NATURAL DELIVERY PRE-PROCESSING
+                    # Strip [N]/[H]/[S] tags and add micro-pauses for natural pacing
+                    try:
+                        # Get model ID to determine strategy (Flash vs Turbo)
+                        eleven_config = session.agent_config.get("settings", {}).get("elevenlabs_settings", {})
+                        model_id = eleven_config.get("model", "eleven_flash_v2_5")
+                        
+                        # Process sentence:
+                        # - clean_text: pure text for history/transcript (tags stripped)
+                        # - audio_payload: optimized text for TTS (tags stripped + breaks added)
+                        clean_text, audio_payload = session.delivery_middleware.process(sentence, model_id=model_id)
+                        tts_text = audio_payload["text"]
+                        
+                        # Log if we modified the text
+                        if tts_text != sentence:
+                            logger.info(f"✨ Middleware processed: '{sentence}' -> '{tts_text}'")
+                            
+                    except Exception as e:
+                        logger.error(f"❌ Middleware error: {e}, falling back to raw text")
+                        clean_text = sentence
+                        tts_text = sentence
+
                     if not tts_start_time:
                         tts_start_time = time.time()
                     
-                    full_response_text += sentence + " "
-                    sentence_queue.append(sentence)
-                    logger.info(f"📤 Sentence arrived from LLM: {sentence[:50]}...")
+                    # Use CLEAN text for transcript/history (no [N] tags)
+                    full_response_text += clean_text + " "
+                    
+                    # Use OPTIMIZED text for audio generation
+                    sentence_queue.append(tts_text)
+                    logger.info(f"📤 Sentence arrived from LLM: {tts_text[:50]}...")
                     
                     # ⏱️ [TIMING] First sentence arrival from LLM
                     if len(sentence_queue) == 1:
@@ -4150,14 +4176,14 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         # Get current voice ID from agent config for dynamic voice updates
                         current_voice_id = session.agent_config.get("settings", {}).get("elevenlabs_settings", {}).get("voice_id")
                         tts_task = asyncio.create_task(
-                            persistent_tts_session.stream_sentence(sentence, is_first=is_first, is_last=is_last, current_voice_id=current_voice_id)
+                            persistent_tts_session.stream_sentence(tts_text, is_first=is_first, is_last=is_last, current_voice_id=current_voice_id)
                         )
                         tts_tasks.append(tts_task)
                     else:
                         # Fallback to original REST API method
                         logger.info(f"🔄 Using REST API fallback (no persistent session)")
                         agent_config = session.agent_config
-                        tts_task = asyncio.create_task(generate_tts_audio(sentence, agent_config))
+                        tts_task = asyncio.create_task(generate_tts_audio(tts_text, agent_config))
                         tts_tasks.append(tts_task)
                     
                     tts_ready_time = int((time.time() - tts_start_time) * 1000)
