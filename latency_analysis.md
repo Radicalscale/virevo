@@ -417,3 +417,47 @@ To achieve your 1,500ms E2E goal:
 ---
 
 *Analysis generated: 2025-11-25*
+
+---
+
+## Analysis Date: 2025-12-18
+**Log File:** logs.1766052549515.log
+**Total Calls Analyzed:** 3 conversational turns
+
+### Executive Summary (2025-12-18)
+
+| Metric | Turn 2 (Reschedule) | Turn 3 (Confirm) | Turn 4 (Final) | Average |
+|--------|---------------------|------------------|----------------|---------|
+| **Total E2E Latency** | 12,305ms | 12,022ms | 13,262ms | ~12,530ms 🔴 |
+| **STT Latency** | 1ms | 6ms | 10ms | ~6ms ✅ |
+| **LLM Latency** | 2,755ms | 2,501ms | 3,540ms | ~2,932ms ⚠️ |
+| **TTS Latency** | 9,716ms | 9,811ms | 10,001ms | ~9,842ms 🔴 |
+
+**Critical Regression:**
+- E2E Latency has ballooned to **~12.5 seconds**, up from ~5.9s in Nov 2025.
+- **TTS Latency is the primary driver**, reported as ~10 seconds.
+- **Discrepancy:** Logs show "FIRST AUDIO STARTED" at ~12s, yet also claim "Persistent TTS: Audio already streaming in background!" at ~2.7s. This suggests a **metric calculation error** OR a **blocking behavior** where the system waits for the full stream before logging "start".
+
+### Turn-by-Turn Breakdown
+
+#### Turn 2: Reschedule Appointment
+- **User:** "...word on the ap point ment?"
+- **LLM Response:** "[N] No worries, the appointment's all set..."
+- **Timeline:**
+  - `10:03:09.038`: User stop
+  - `10:03:11.162`: LLM Response (2.75s)
+  - `10:03:11.313`: TTS Start
+  - `10:03:21.198`: **FIRST AUDIO STARTED Log** (+12.3s)
+- **Anomaly:** TTS TTFB was 319ms, but the "E2E" metric logged 12s. This implies the metric might be tracking "All Audio Complete" or there is a massive delay in the playback trigger.
+
+#### Turn 3: Confirmation
+- **User:** "Yeah...."
+- **LLM Response:** "Great, we're all locked in..."
+- **Timeline:**
+  - `10:03:37.204`: **FIRST AUDIO STARTED Log** (+12.0s)
+- **Similar pattern:** Fast STT/LLM, massively delayed "Audio Start" metric.
+
+### Recommendations using 2025-12-18 Data
+1.  **Investigate `FIRST AUDIO STARTED` Metric:** Verify if this timestamp represents the *first chunk sent to Telnyx* or the *completion of the entire sequence*. The logs say "user stopped -> play_audio_url called", which for streaming should happen chunk-by-chunk.
+2.  **Verify Persistent TTS:** The log `Persistent TTS: Audio already streaming in background!` suggests streaming *is* active. If audio is actually playing at T+3s, the T+12s log is a False Negative.
+3.  **LLM Latency:** ~2.9s is still higher than the <1s target. Continue optimization.

@@ -83,6 +83,13 @@ class PersistentTTSSession:
         # 🔒 Lock to serialize WebSocket access (prevents concurrent recv() calls)
         self._stream_lock = asyncio.Lock()
         
+        # 🏃 Pending sentences queue for decoupled sender/receiver
+        # Stores metadata of sentences sent to ElevenLabs but audio not yet received:
+        # (sentence_text, sentence_num, is_first, timestamp)
+        self.pending_sentences = asyncio.Queue()
+        
+        self._audio_receiver_task: Optional[asyncio.Task] = None
+        
         # ⏱️ Timing tracking
         self.first_audio_chunk_time = None
         self.request_start_time = None
@@ -165,6 +172,74 @@ class PersistentTTSSession:
         except Exception as e:
             logger.error(f"🔊 [Call {self.call_control_id}] Comfort noise loop error: {e}")
 
+    async def _audio_receiver_loop(self):
+        """
+        Background task to receive audio chunks from ElevenLabs.
+        Decoupled from sending to prevent blocking LLM generation.
+        """
+        logger.info(f"🎧 [Call {self.call_control_id}] Audio Receiver Loop STARTED")
+        try:
+            while self.connected and self.ws_service:
+                # Wait for a pending sentence (metadata)
+                try:
+                    # Wait for next sentence metadata
+                    current_sentence_meta = await self.pending_sentences.get()
+                    
+                    sentence_text = current_sentence_meta['text']
+                    sentence_num = current_sentence_meta['sentence_num']
+                    is_first = current_sentence_meta['is_first']
+                    send_timestamp = current_sentence_meta.get('timestamp', 0)
+                    
+                    # 📊 DIAGNOSTIC: Queue latency (time from send to receive start)
+                    queue_latency_ms = int((time.time() - send_timestamp) * 1000) if send_timestamp else 0
+                    pending_count = self.pending_sentences.qsize()
+                    audio_queue_count = self.audio_queue.qsize()
+                    
+                    logger.info(f"🎧 [Call {self.call_control_id}] Receiver processing sentence #{sentence_num}: '{sentence_text[:30]}...'")
+                    logger.info(f"📊 [Call {self.call_control_id}] DIAGNOSTIC: queue_latency={queue_latency_ms}ms, pending_sentences={pending_count}, audio_queue={audio_queue_count}, interrupted={self.interrupted}")
+                    
+                    chunk_count = 0
+                    
+                    # Receive audio chunks for this sentence
+                    async for audio_chunk in self.ws_service.receive_audio_chunks():
+                        chunk_count += 1
+                        
+                        # Stop processing chunks if interrupted
+                        if self.interrupted:
+                            logger.info(f"🛑 [Call {self.call_control_id}] Receiver discarding chunk for sentence #{sentence_num} (INTERRUPTED)")
+                            continue
+
+                        # Add to playback queue
+                        await self.audio_queue.put({
+                            'sentence': sentence_text,
+                            'audio_data': audio_chunk,
+                            'format': 'mulaw',
+                            'sentence_num': sentence_num,
+                            'is_first': is_first and chunk_count == 1
+                        })
+                    
+                    if chunk_count > 0:
+                        total_receive_time_ms = int((time.time() - send_timestamp) * 1000) if send_timestamp else 0
+                        logger.info(f"✅ [Call {self.call_control_id}] Receiver finished sentence #{sentence_num}: {chunk_count} chunks in {total_receive_time_ms}ms")
+                    else:
+                        logger.warning(f"⚠️ [Call {self.call_control_id}] Receiver got 0 chunks for sentence #{sentence_num}! interrupted={self.interrupted}")
+                    
+                    # Mark sentence as done in queue
+                    self.pending_sentences.task_done()
+                    
+                except asyncio.CancelledError:
+                    logger.info(f"🛑 [Call {self.call_control_id}] Audio Receiver Loop CANCELLED")
+                    break
+                except Exception as e:
+                    logger.error(f"❌ [Call {self.call_control_id}] Error in Audio Receiver Loop: {e}")
+                    # Brief sleep to prevent tight loops on error
+                    await asyncio.sleep(0.1)
+                
+        except Exception as e:
+            logger.error(f"❌ [Call {self.call_control_id}] Audio Receiver Loop CRASHED: {e}")
+        finally:
+            logger.info(f"👋 [Call {self.call_control_id}] Audio Receiver Loop STOPPED")
+
         
     async def connect(self) -> bool:
         """
@@ -192,6 +267,10 @@ class PersistentTTSSession:
                 
                 # Start playback consumer
                 self.playback_task = asyncio.create_task(self._playback_consumer())
+                
+                # 🎧 Start audio receiver loop (Decoupled from sender)
+                self._audio_receiver_task = asyncio.create_task(self._audio_receiver_loop())
+                logger.info(f"🎧 [Call {self.call_control_id}] Audio receiver loop started")
                 
                 # 💓 Start keep-alive loop to prevent 20-second timeout
                 self._keepalive_task = asyncio.create_task(self._keepalive_loop())
@@ -348,41 +427,22 @@ class PersistentTTSSession:
                     flush=True
                 )
                 
-                # 🔥 STREAMING: Receive audio chunks and queue IMMEDIATELY
-                # No collecting, no batching, no joining. Just pass the raw bytes.
-                chunk_count = 0
-                first_chunk_time = None
+                # 🚀 DECOUPLED: Push to pending queue and return IMMEDIATELY
+                # The _audio_receiver_loop will handle the reception in background
+                await self.pending_sentences.put({
+                    'text': sentence,
+                    'sentence_num': sentence_num,
+                    'is_first': is_first,
+                    'timestamp': time.time()
+                })
                 
-                async for audio_chunk in self.ws_service.receive_audio_chunks():
-                    if first_chunk_time is None:
-                        first_chunk_time = time.time()
-                        ttfb = (first_chunk_time - stream_start) * 1000
-                        logger.info(f"⏱️ [TIMING] TTS_START: Sent to ElevenLabs at T+0ms")
-                        logger.info(f"⏱️ [TIMING] TTS_TTFB: First audio chunk at T+{ttfb:.0f}ms")
-                    
-                    chunk_count += 1
-                    
-                    # Queue raw mulaw bytes for immediate playback
-                    await self.audio_queue.put({
-                        'sentence': sentence,
-                        'audio_data': audio_chunk,  # RAW BYTES (ulaw)
-                        'format': 'mulaw',          # 🔥 NEW FLAG
-                        'sentence_num': sentence_num,
-                        'is_first': is_first and chunk_count == 1
-                    })
-                    
-                    # Log every few chunks (debug only)
-                    if chunk_count % 10 == 0:
-                        logger.debug(f"📦 [Call {self.call_control_id}] Streamed {chunk_count} chunks...")
+                # 📊 DIAGNOSTIC: Show queue state on send
+                pending_count = self.pending_sentences.qsize()
+                audio_queue_count = self.audio_queue.qsize()
+                send_time_ms = int((time.time() - stream_start) * 1000)
                 
-                self._retry_attempted = False  # Reset for next sentence
-                
-                if chunk_count == 0:
-                    logger.warning(f"⚠️ [Call {self.call_control_id}] Finished streaming sentence #{sentence_num} with 0 chunks received! (Time: {(time.time() - stream_start)*1000:.0f}ms)")
-                else:
-                    logger.info(f"✅ [Call {self.call_control_id}] Finished streaming sentence #{sentence_num}: {chunk_count} chunks received")
-                
-                # Queue success marker
+                logger.info(f"🚀 [Call {self.call_control_id}] Sent sentence #{sentence_num} (NON-BLOCKING) in {send_time_ms}ms")
+                logger.info(f"📊 [Call {self.call_control_id}] DIAGNOSTIC: pending_sentences={pending_count}, audio_queue={audio_queue_count}, is_first={is_first}, is_last={is_last}")
                 return True
                 
             except Exception as e:
@@ -730,6 +790,11 @@ class PersistentTTSSession:
         Call this when user interrupts.
         """
         try:
+            # 📊 DIAGNOSTIC: Log queue state at interruption time
+            pending_count = self.pending_sentences.qsize()
+            audio_queue_count = self.audio_queue.qsize()
+            logger.info(f"⚡ [Call {self.call_control_id}] CLEAR_AUDIO called - pending_sentences={pending_count}, audio_queue={audio_queue_count}")
+            
             # 🔥 Set interrupted flag FIRST to stop any ongoing audio sending loops
             self.interrupted = True
             
@@ -810,6 +875,19 @@ class PersistentTTSSession:
         
         if cleared_count > 0:
             logger.info(f"🗑️ [Call {self.call_control_id}] Cancelled {cleared_count} pending audio chunks")
+            
+        # 🏃 Clear pending sentences queue (Decoupled receiver)
+        cleared_sentences = 0
+        while not self.pending_sentences.empty():
+            try:
+                self.pending_sentences.get_nowait()
+                self.pending_sentences.task_done()
+                cleared_sentences += 1
+            except asyncio.QueueEmpty:
+                break
+        
+        if cleared_sentences > 0:
+            logger.info(f"🗑️ [Call {self.call_control_id}] Cancelled {cleared_sentences} pending sentences (sender queue)")
         
         return cleared_count
     
@@ -839,6 +917,15 @@ class PersistentTTSSession:
             except asyncio.CancelledError:
                 pass
             self._keepalive_task = None
+        
+        # 🎧 Cancel audio receiver task
+        if self._audio_receiver_task:
+            self._audio_receiver_task.cancel()
+            try:
+                await self._audio_receiver_task
+            except asyncio.CancelledError:
+                pass
+            self._audio_receiver_task = None
         
         # 🔊 Cancel comfort noise task
         if self._comfort_noise_task:
