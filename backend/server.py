@@ -5272,6 +5272,17 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                                 }}
                             )
                             
+                            # 🔥 FIX: Check if user spoke DURING greeting generation
+                            # This prevents the race condition where user starts speaking
+                            # after silence timeout fires but before TTS playback is sent
+                            redis_data_check = redis_service.get_call_data(call_control_id) or {}
+                            call_data_check = active_telnyx_calls.get(call_control_id, {})
+                            user_spoke_during_gen = redis_data_check.get("user_has_spoken") or call_data_check.get("user_has_spoken")
+                            
+                            if user_spoke_during_gen:
+                                logger.info("⏭️ [WebSocket Worker] User spoke during greeting generation - CANCELLING silence greeting")
+                                return  # Don't speak - user already started the conversation
+                            
                             # Speak the greeting
                             telnyx_svc = get_telnyx_service()
                             await telnyx_svc.speak_text(

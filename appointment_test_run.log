@@ -1,0 +1,302 @@
+⚠️ Could not import RAG service: Read-only file system (os error 30)
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+    Could not extract numbers: var=None, compare=8000.0
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+✅ Loaded agent: JK First Caller-optimizer3-antigrav
+   Model: grok-4-fast-non-reasoning
+✅ Loaded agent: JK First Caller-optimizer3-antigrav
+   Model: grok-4-fast-non-reasoning
+   Flow nodes: 65
+💉 Injecting custom variables: {'customer_name': 'Kendrick', 'email': 'kendrickbowman9@gmail.com'}
+✅ Session initialized
+
+============================================================
+📜 RUNNING SCRIPTED CONVERSATION
+============================================================
+
+
+============================================================
+🎤 TURN 1: User says: "Yeah, this is Kendrick."
+============================================================
+    🔊 TTS: Kendrick?
+
+   📍 NODE: Greeting
+   🤖 RESPONSE: Kendrick?
+
+============================================================
+🎤 TURN 2: User says: "I run a dropshipping store."
+============================================================
+    🔊 TTS: This is Jake...
+    🔊 TTS: I was just, um, wondering if you could possibly help me out for a moment?
+
+   📍 NODE: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+   🤖 RESPONSE: This is Jake... I was just, um, wondering if you could possibly help me out for a moment?
+
+============================================================
+🎤 TURN 3: User says: "I do it full time."
+============================================================
+    🔊 TTS: Well, uh, I don't know if you could yet, but, I'm calling because you filled out...
+    🔊 TTS: I know this call is out of the blue, but do you have just 25 seconds for me to e...
+
+   📍 NODE: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+   🤖 RESPONSE: Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 second...
+
+============================================================
+🎤 TURN 4: User says: "I make about 12000 dollars a month."
+============================================================
+    🔊 TTS: Okay, in a nutshell, we set up passive income websites, and we let them produce ...
+    🔊 TTS: What questions come to mind as soon as you hear something like that?
+
+   📍 NODE: N_IntroduceModel_And_AskQuestions_V3_Adaptive
+   🤖 RESPONSE: Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What questions come to mind as soon as you hear something like that?
+
+============================================================
+🎤 TURN 5: User says: "I have about 25000 saved up."
+============================================================
+    🔊 TTS: ## State Initialization
+- Set `{has_discussed_income_potential}` to `false`.
+
+##...
+
+   📍 NODE: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+   🤖 RESPONSE: ## State Initialization
+- Set `{has_discussed_income_potential}` to `false`.
+
+## Primary Goal
+- Handle user questions using KB, qualifier setter, company info, objection handler, or toolkit.
+- Highlig...
+
+============================================================
+🎤 TURN 6: User says: "I really want to scale to 50k next month."
+============================================================
+    🔊 TTS: ## Primary Goal
+- Elicit user's employment status (employee, business owner, or ...
+
+   📍 NODE: N200_Super_WorkAndIncomeBackground_V3_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+- Elicit user's employment status (employee, business owner, or unemployed) with upbeat tone.
+- Handle interruptions or objections adaptively using KB from Di RE Customer Avatar and Ob...
+
+============================================================
+🎤 TURN 7: User says: "You seem like the experts."
+============================================================
+    🔊 TTS: ## Primary Goal
+Elicit approximate yearly income from Kendrick. Transition immed...
+
+   📍 NODE: N201A_Employed_AskYearlyIncome_V8_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+Elicit approximate yearly income from Kendrick. Transition immediately if disclosed. Do not add extra responses unless handling objections. Let next node address objections post-disclo...
+
+============================================================
+🎤 TURN 8: User says: "Yes, definitely."
+============================================================
+    🔊 TTS: ## Primary Goal
+Ask if the user has had any side hustle income in the last two y...
+
+   📍 NODE: N201B_Employed_AskSideHustle_V4_FullyTuned
+   🤖 RESPONSE: ## Primary Goal
+Ask if the user has had any side hustle income in the last two years. Handle one objection if raised, then escalate to Global Prompt Section 4 for further handling.
+
+## Entry Context
+-...
+
+============================================================
+🎤 TURN 9: User says: "Sure, let's schedule a call."
+============================================================
+    🔊 TTS: ## Primary Goal
+Gather user's side hustle monthly income, convert to yearly esti...
+
+   📍 NODE: N201C_Employed_AskSideHustleAmount_V3_FullyTuned
+   🤖 RESPONSE: ## Primary Goal
+Gather user's side hustle monthly income, convert to yearly estimate, store as {{side_hustle}}. Handle one objection if needed, then escalate.
+
+## Entry Context
+- Activate after user c...
+
+============================================================
+🎤 TURN 10: User says: "I am in Eastern Time."
+============================================================
+    🔊 TTS: ## Primary Goal
+- Elicit user's belief in generating {amount_reference} or more ...
+
+   📍 NODE: N201D_Employed_AskVehicleQ_V5_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+- Elicit user's belief in generating {amount_reference} or more monthly via digital real estate model.
+- Round {amount_reference} to nearest whole dollar when speaking, spell out numbe...
+
+============================================================
+🎤 TURN 11: User says: "Tomorrow afternoon works best."
+============================================================
+    🔊 TTS: ## INSTRUCTION: BRIDGE & PIVOT
+1. **BRIDGE:** Acknowledge the user's previous in...
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: ## INSTRUCTION: BRIDGE & PIVOT
+1. **BRIDGE:** Acknowledge the user's previous input naturally.
+   - CONSTRAINT: Do NOT use stock phrases like "Okay", "Got it", or "I understand".
+2. **THE PIVOT:** Tra...
+
+============================================================
+🎤 TURN 12: User says: "Yes, I have the funds available."
+============================================================
+    🔊 TTS: ## Primary Goal
+- Probe user's motivation for exploring the lead generation coac...
+
+   📍 NODE: N401_AskWhyNow_Initial_V10_AssertiveFrame
+   🤖 RESPONSE: ## Primary Goal
+- Probe user's motivation for exploring the lead generation coaching program now versus later.
+- Use DISC behavioral styles from KB to adapt responses.
+- Handle objections assertively ...
+
+============================================================
+🎤 TURN 13: User says: "How about 3pm?"
+============================================================
+    🔊 TTS: ## Primary Goal
+- Sincerely acknowledge user's "Why now?" response.
+- Deliver ge...
+
+   📍 NODE: N402_Compliment_And_AskYouKnowWhy_V5_FullyTuned
+   🤖 RESPONSE: ## Primary Goal
+- Sincerely acknowledge user's "Why now?" response.
+- Deliver genuine compliment on their clear motivation.
+- Immediately ask "You know why?" to build curiosity.
+- Align with lead gen ...
+
+============================================================
+🎤 TURN 14: User says: "Because you get results?"
+============================================================
+    🔊 TTS: ## Primary Goal
+Deliver a complimentary hook to affirm user's ambition, gauge in...
+
+   📍 NODE: N403_IdentityAffirmation_And_ValueFitQuestion_V8_GoalAligned
+   🤖 RESPONSE: ## Primary Goal
+Deliver a complimentary hook to affirm user's ambition, gauge interest in lead generation coaching, and handle objections using DISC-adapted tactics. Transition to reframe node if unre...
+
+============================================================
+🎤 TURN 15: User says: "Yes, definitely."
+============================================================Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+Grok API key not found
+Error in real-time extraction: 'NoneType' object has no attribute 'create_completion'
+Grok API key not found
+No LLM client available, taking first transition
+Grok API key not found
+
+    🔊 TTS: ## Primary Goal
+Secure user agreement to schedule a deeper strategy session call...
+
+   📍 NODE: N500A_ProposeDeeperDive_V5_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+Secure user agreement to schedule a deeper strategy session call with a senior consultant for the local lead generation coaching program. Do not try to schedule anything here or talk t...
+
+============================================================
+🎤 TURN 16: User says: "Sure, let's schedule."
+============================================================
+    🔊 TTS: ## Primary Goal
+- Obtain the user's timezone to ensure accurate scheduling of th...
+
+   📍 NODE: N500B_AskTimezone_V2_FullyTuned
+   🤖 RESPONSE: ## Primary Goal
+- Obtain the user's timezone to ensure accurate scheduling of the deeper dive call for the lead generation coaching program.
+- Maintain positive momentum from the user's agreement to s...
+
+============================================================
+🎤 TURN 17: User says: "Eastern time."
+============================================================
+    🔊 TTS: ## Primary Goal
+- Elicit the user's typical time range when they are at a desk o...
+
+   📍 NODE: N_AskForCallbackRange_V1_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+- Elicit the user's typical time range when they are at a desk or free for uninterrupted talk, to schedule a follow-up call. say the line exactly "Okay. And when are you typically back...
+
+============================================================
+🎤 TURN 18: User says: "Tomorrow afternoon."
+============================================================
+    🔊 TTS: #Note - you are note setting an appointment here you are getting a time from the...
+
+   📍 NODE: N_Scheduling_AskTime_V2_SmartAmbiguity
+   🤖 RESPONSE: #Note - you are note setting an appointment here you are getting a time from them - you are also never to try to end the call here this node is only for finding a time that we can check the calendar w...
+
+============================================================
+🎤 TURN 19: User says: "3pm works."
+============================================================
+    🔊 TTS: ## Primary Goal
+Confirm the scheduled time works for a Zoom video call from a co...
+
+   📍 NODE: N_ConfirmVideoCallEnvironment_V1_Adaptive
+   🤖 RESPONSE: ## Primary Goal
+Confirm the scheduled time works for a Zoom video call from a computer. Align with lead generation coaching program by Dan Klein and E-pay Kanehara. If confirmed, proceed. If not, hand...
+
+============================================================
+📊 SCRIPT COMPLETE - NODE HISTORY:
+============================================================
+  Turn 1: Greeting
+  Turn 2: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+  Turn 3: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+  Turn 4: N_IntroduceModel_And_AskQuestions_V3_Adaptive
+  Turn 5: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+  Turn 6: N200_Super_WorkAndIncomeBackground_V3_Adaptive
+  Turn 7: N201A_Employed_AskYearlyIncome_V8_Adaptive
+  Turn 8: N201B_Employed_AskSideHustle_V4_FullyTuned
+  Turn 9: N201C_Employed_AskSideHustleAmount_V3_FullyTuned
+  Turn 10: N201D_Employed_AskVehicleQ_V5_Adaptive
+  Turn 11: N_AskCapital_5k_V1_Adaptive
+  Turn 12: N401_AskWhyNow_Initial_V10_AssertiveFrame
+  Turn 13: N402_Compliment_And_AskYouKnowWhy_V5_FullyTuned
+  Turn 14: N403_IdentityAffirmation_And_ValueFitQuestion_V8_GoalAligned
+  Turn 15: N500A_ProposeDeeperDive_V5_Adaptive
+  Turn 16: N500B_AskTimezone_V2_FullyTuned
+  Turn 17: N_AskForCallbackRange_V1_Adaptive
+  Turn 18: N_Scheduling_AskTime_V2_SmartAmbiguity
+  Turn 19: N_ConfirmVideoCallEnvironment_V1_Adaptive

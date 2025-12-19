@@ -550,8 +550,8 @@ const FlowBuilder = () => {
                   <Card
                     onClick={() => setSelectedNode(node)}
                     className={`p-4 cursor-pointer transition-all ${isSelected
-                        ? 'bg-gray-800 border-blue-500 shadow-lg shadow-blue-500/20'
-                        : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                      ? 'bg-gray-800 border-blue-500 shadow-lg shadow-blue-500/20'
+                      : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                       }`}
                     style={{ borderLeftColor: nodeType?.color, borderLeftWidth: '4px' }}
                   >
@@ -642,8 +642,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, whoSpeaksFirst: 'ai' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.whoSpeaksFirst === 'ai'
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="flex items-center">
@@ -662,8 +662,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, whoSpeaksFirst: 'user' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.whoSpeaksFirst === 'user'
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="flex items-center">
@@ -1936,8 +1936,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, mode: 'script' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'script'
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="text-center">
@@ -1951,8 +1951,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, mode: 'prompt' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'prompt'
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-purple-500 bg-purple-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="text-center">
@@ -2009,8 +2009,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, mode: 'script' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'script'
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-blue-500 bg-blue-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="text-center">
@@ -2024,8 +2024,8 @@ const FlowBuilder = () => {
                           data: { ...selectedNode.data, mode: 'prompt' }
                         })}
                         className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNode.data.mode === 'prompt'
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                          ? 'border-purple-500 bg-purple-500/10'
+                          : 'border-gray-700 hover:border-gray-600'
                           }`}
                       >
                         <div className="text-center">
@@ -2111,6 +2111,40 @@ const FlowBuilder = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Dynamic Rephrase - Only for Script Mode */}
+                  {selectedNode.data.mode === 'script' && (
+                    <div className="border border-orange-700/30 rounded-lg p-4 bg-orange-900/10">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedNode.data.dynamic_rephrase || false}
+                          onChange={(e) => updateNode(selectedNode.id, {
+                            data: { ...selectedNode.data, dynamic_rephrase: e.target.checked }
+                          })}
+                          className="mt-1 w-4 h-4 text-orange-600 bg-gray-900 border-gray-700 rounded focus:ring-orange-500"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-orange-400">🔄</span>
+                            <label className="text-white font-medium text-sm cursor-pointer" onClick={(e) => {
+                              e.preventDefault();
+                              updateNode(selectedNode.id, {
+                                data: { ...selectedNode.data, dynamic_rephrase: !selectedNode.data.dynamic_rephrase }
+                              });
+                            }}>
+                              Dynamic Rephrase on Retry
+                            </label>
+                          </div>
+                          <p className="text-xs text-orange-300 leading-relaxed">
+                            🔁 <strong>If no transition matches</strong> and agent stays on this node, rephrase the script naturally instead of repeating word-for-word
+                            <br />
+                            💡 <strong>Best for:</strong> Greetings, confirmations, or any script that might need retrying
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <div className="flex items-center justify-between mb-2">

@@ -1,6 +1,6 @@
-# Comprehensive Call Feature Documentation
+# Comprehensive Call Feature Documentation (V2.0)
 
-This document provides a complete technical breakdown of the AI voice calling system, covering call flow architecture, node types, live call mechanics, streaming, interruption handling, and latency optimization.
+This document provides a complete technical breakdown of the AI voice calling system, covering call flow architecture, node types, live call mechanics, streaming, interruption handling, and V2 optimizations (Non-Blocking TTS, Automated Testing).
 
 ---
 
@@ -12,8 +12,9 @@ This document provides a complete technical breakdown of the AI voice calling sy
 4. [Interruption Handling](#4-interruption-handling)
 5. [End Nodes & Call Termination](#5-end-nodes--call-termination)
 6. [Webhook System](#6-webhook-system)
-7. [Audio Streaming Pipeline](#7-audio-streaming-pipeline)
+7. [Audio Streaming Pipeline (V2 Non-Blocking)](#7-audio-streaming-pipeline-v2-non-blocking)
 8. [Latency Optimization](#8-latency-optimization)
+9. [Automated Optimization & Testing](#9-automated-optimization--testing)
 
 ---
 
@@ -105,9 +106,9 @@ else:
     "type": "conversation",
     "data": {
         "label": "Node Name",
-        "mode": "script" | "prompt",      # Script = exact text, Prompt = AI-generated
+        "mode": "script" | "prompt",      # Script = exact text, Prompt = AI-generated instruction
         "script": "...",                   # Text for script mode
-        "content": "...",                  # Instructions for prompt mode
+        "content": "## INSTRUCTION: BRIDGE & PIVOT...", # Instructions for prompt mode
         "goal": "...",                     # Objective for AI to achieve
         "extract_variables": [...],        # Variables to extract from user
         "transitions": [...],              # Conditions for moving to next node
@@ -120,10 +121,10 @@ else:
 
 **Mode Differences:**
 
-| Mode | Behavior | Latency |
-|------|----------|---------|
-| `script` | Returns exact text instantly | ~10ms |
-| `prompt` | Calls LLM to generate response | 500-2000ms |
+| Mode | Behavior | Latency | Use Case |
+|------|----------|---------|----------|
+| `script` | Returns exact text instantly | ~10ms | Greetings, fixed disclaimers |
+| `prompt` | Calls LLM to generate response based on instructions | 500-2000ms | Dynamic conversation, Bridge & Pivot logic |
 
 **Code Location:** `calling_service.py:_process_call_flow_streaming()` (lines 1431-1460)
 
@@ -442,7 +443,7 @@ In-call webhooks with variable substitution:
 
 ---
 
-## 7. Audio Streaming Pipeline
+## 7. Audio Streaming Pipeline (V2 Non-Blocking)
 
 ### 7.1 TTS Streaming Architecture
 
@@ -450,38 +451,25 @@ In-call webhooks with variable substitution:
 
 ```mermaid
 graph LR
-    LLM[LLM Stream] -->|Sentence| PTT[PersistentTTSSession]
+    LLM[LLM Stream] -->|Sentence| Queue[Pending Queue]
+    Queue -->|Background Task| PTT[PersistentTTSSession]
     PTT -->|Text| EL[ElevenLabs WebSocket]
     EL -->|PCM Chunks| PTT
     PTT -->|PCM→MP3| FF[FFmpeg]
     FF -->|MP3| TX[Telnyx play_audio_url]
 ```
 
-### 7.2 Dual-Stream Architecture
+### 7.2 Non-Blocking Async Queue (New in V2)
 
-**File:** `natural_delivery_middleware.py`
+**Problem:** Previously, the `stream_sentence()` call would block the main execution flow until audio was fully buffered or sent, adding 500ms+ latency per sentence loop.
 
-The Natural Delivery Middleware provides two output streams:
+**V2 Solution:**
+1.  **Decoupling:** `stream_sentence()` now strictly adds the sentence to a `self.pending_sentences` (`asyncio.Queue`). It returns immediately (`~0ms`).
+2.  **Background Consumer:** A dedicated task `_audio_receiver_loop()` constantly consumes this queue.
+    *   It handles the WebSocket communication with ElevenLabs.
+    *   It manages interruptions and "clear queue" signals correctly.
 
-1. **Logic Stream**: Clean text for history and variable extraction
-2. **Audio Stream**: Text with SSML/voice settings for TTS
-
-**Emotion Tags:**
-```python
-# LLM outputs tags like [H], [S], [N]
-"[H] Great! I can help with that."  # Happy
-"[S] I understand, let's reset."     # Serious  
-"[N] The price is $99 per month."    # Neutral
-```
-
-**Voice Settings by Emotion:**
-```python
-EMOTION_MAP = {
-    "H": {"stability": 0.30, "style": 0.75},  # Happy: expressive
-    "S": {"stability": 0.50, "style": 0.30},  # Serious: grounded
-    "N": {"stability": 0.40, "style": 0.20}   # Neutral: engaged
-}
-```
+**Benefit:** The Main Agent Logic (LLM generation) can process upcoming tokens/sentences *while* the previous sentence is still being sent to TTS. This parallelization significantly reduces "stutter" between sentences.
 
 ### 7.3 Sentence-by-Sentence Streaming
 
@@ -491,6 +479,7 @@ EMOTION_MAP = {
 # Stream callback triggered per sentence (lines 1441-1456)
 async def stream_sentence_to_tts(sentence):
     if persistent_tts_session:
+        # Pushes to queue and returns INSTANTLY
         await persistent_tts_session.stream_sentence(
             sentence, 
             is_first=is_first, 
@@ -499,23 +488,24 @@ async def stream_sentence_to_tts(sentence):
 ```
 
 **Benefits:**
-- First sentence plays while LLM generates rest
-- Reduces perceived latency by 500-1500ms
-- Enables interruption mid-response
+- First sentence plays while LLM generating rest.
+- **V2 Update:** Subsequent sentences are pre-fetched due to non-blocking queue.
+- Enables interruption mid-response.
 
 ---
 
 ## 8. Latency Optimization
 
-### 8.1 Latency Components
+### 8.1 Latency Components (Optimized V2 Estimates)
 
-| Component | Target | Typical | Bottleneck |
+| Component | Target | Typical (V2) | Bottleneck |
 |-----------|--------|---------|------------|
 | STT Endpoint Detection | 300ms | 600-800ms | Soniox silence detection |
 | LLM TTFT | 200-500ms | 500-1000ms | Model/context size |
 | Transition Evaluation | 0-200ms | 500-1500ms | LLM call |
 | TTS TTFB (WebSocket) | 150-250ms | 200-300ms | ElevenLabs processing |
 | Audio Playback Start | 100-200ms | 150-200ms | FFmpeg + Telnyx |
+| **TTS Blocking Overhead** | **0ms** | **0ms** | **Eliminated via Async Queue** |
 
 ### 8.2 Key Optimizations
 
@@ -545,81 +535,30 @@ response = await asyncio.wait_for(call_llm_for_transition(), timeout=1.5)
 asyncio.create_task(self._extract_variables_background(...))
 ```
 
-**6. Cached System Prompt**
-- Built once at session start
-- Enables Grok's prefix caching for faster TTFT
-
-### 8.3 Dead Air Prevention
-
-**File:** `dead_air_monitor.py`, `calling_service.py`
-
-Monitors silence and sends check-in messages:
-
-```python
-# Configurable settings in agent config
-dead_air_settings = {
-    "silence_timeout_normal": 7,      # Seconds before check-in
-    "silence_timeout_hold_on": 25,    # Extended if user says "hold on"
-    "max_checkins_before_disconnect": 2,
-    "checkin_message": "Are you still there?"
-}
-```
+**6. Non-Blocking Audio Queue (V2)**
+- `stream_sentence` calls are now fire-and-forget logic side.
 
 ---
 
-## 9. Post-Call Quality Control & Integrations
+## 9. Automated Optimization & Testing (New System)
 
-### 9.1 Auto-QC System
+### 9.1 The Debug Harness (`debug_agent_nodes.py`)
+A standalone CLI tool for verifying agent logic without telephony costs.
+*   **Capabilities:**
+    *   **Mock Environment:** Simulates `CallSession` with mock Telnyx/TTS.
+    *   **Variable Injection:** Inject custom `customer_name`, `email`, etc. via CLI args (`--vars`).
+    *   **End-to-End Verification:** Scripted conversation inputs (`--script`) verify complex routing logic (e.g., "Bridge & Pivot" confirmations).
+    *   **Logic Verification Mode:** If API keys are missing, falls back to "First Transition" logic to verify path continuity.
+
+### 9.2 Prompt Engineering Strategy: "Bridge & Pivot"
+Used to de-robotize specific nodes (like Capital Requirements).
+*   **Bridge:** Acknowledge user input specifically natural language.
+*   **Pivot:** Transition to the business logic question.
+*   **Constraints:** Explicit "Negative Constraints" (e.g., "Do NOT use stock phrases like 'Okay'") are injected into Node Instructions.
+
+### 9.3 Post-Call Quality Control
 **File:** `qc_agents/orchestrator.py`
-
 Immediately after call termination, a multi-agent Quality Control system analyzes the transcript:
-
-1.  **Commitment Detector**: Scores user intent and commitment (0-100).
-2.  **Conversion Pathfinder**: Analyzes the effectiveness of the conversation path.
-3.  **Excellence Replicator**: Compares agent performance against "excellence" benchmarks.
-
-**Log Signature:**
-```
-INFO - 🔍 [AUTO-QC] Running full QC analysis...
-INFO - ⭐ Running Excellence Replicator on call...
-INFO - 📊 Scores: Commitment=50, Conversion=100, Excellence=50
-```
-
-### 9.2 CRM Synchronization
-**File:** `server.py` (via `finalize_call_log`)
-
-Results are synced to the external CRM system:
-*   **Lead Status Update**: E.g., setting status to 'contacted'.
-*   **Risk Assessment**: Updates lead risk level based on QC scores.
-*   **Analytics**: Pushes QC scores to campaign dashboards.
-
----
-
-## Key Files Reference
-
-| File | Purpose |
-|------|---------|
-| `server.py` | Main API, Telnyx webhooks, audio stream handling |
-| `calling_service.py` | CallSession class, node processing, transitions |
-| `persistent_tts_service.py` | ElevenLabs WebSocket management, streaming |
-| `natural_delivery_middleware.py` | Emotion tags, voice settings |
-| `interruption_system.py` | Rambler detection (advanced) |
-| `soniox_service.py` | Speech-to-text streaming |
-| `telnyx_service.py` | Telnyx API wrapper (play, hangup, transfer) |
-| `dead_air_monitor.py` | Silence detection and check-ins |
-| `voicemail_detector.py` | Voicemail/IVR detection |
-
----
-
-## Summary
-
-The call system operates as a state machine where:
-
-1. **Start Node** initializes the call and determines who speaks first
-2. **Conversation Nodes** handle the interactive dialogue (script or AI-generated)
-3. **Function Nodes** execute webhooks for external integrations
-4. **Transitions** use LLM to evaluate user responses against conditions
-5. **Interruption handling** allows natural back-and-forth by detecting real interruptions while ignoring acknowledgments and echoes
-6. **End Nodes** gracefully terminate calls after speaking goodbye messages
-7. **Streaming TTS** maintains low perceived latency by playing audio sentence-by-sentence
-8. **Webhooks** notify external systems at call start, during calls (function nodes), and at call end
+1.  **Commitment Detector**: Scores user intent.
+2.  **Conversion Pathfinder**: Analyzes flow effectiveness.
+3.  **Excellence Replicator**: Benchmarks performance.

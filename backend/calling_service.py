@@ -1432,6 +1432,37 @@ class CallSession:
                 timestamp_str = datetime.now().strftime("%H:%M:%S.%f")[:-3]
                 logger.info(f"⏱️ [{timestamp_str}] 📄 About to process content (mode={prompt_type}, length={len(content)})")
                 
+                # 🔥 FIX: Check if we STAYED on the same node (no transition matched)
+                # This prevents re-speaking script content when user's response didn't trigger a transition
+                stayed_on_same_node = (
+                    not is_first_message and 
+                    pre_processing_node_id is not None and
+                    selected_node.get("id") == pre_processing_node_id
+                )
+                
+                if stayed_on_same_node and prompt_type == "script":
+                    dynamic_rephrase = node_data.get("dynamic_rephrase", False)
+                    
+                    if dynamic_rephrase:
+                        # Generate a rephrased version of the script
+                        logger.info(f"🔄 Dynamic rephrase enabled - generating natural variation of script")
+                        response_text = await self._generate_rephrased_script(content, user_message)
+                        if stream_callback:
+                            await stream_callback(response_text)
+                        # Add to conversation history and return
+                        self.conversation_history.append({
+                            "role": "assistant",
+                            "content": response_text,
+                            "_node_id": self.current_node_id
+                        })
+                        logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
+                        return response_text
+                    else:
+                        # No rephrase - skip speaking entirely, wait for user's next input
+                        logger.info(f"⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content")
+                        # Don't add to history - we didn't say anything
+                        return ""
+                
                 # Generate and stream the response
                 response_text = ""
                 if prompt_type == "script":
@@ -3704,6 +3735,82 @@ Examples:
                 "success": False,
                 "message": "I had trouble understanding. Could you please repeat that?"
             }
+    
+    async def _generate_rephrased_script(self, original_script: str, user_message: str) -> str:
+        """Generate a natural rephrase of the script for retry scenarios.
+        
+        Used when agent stays on same script node (no transition matched) and 
+        dynamic_rephrase is enabled. Creates a natural variation instead of 
+        repeating the exact same words.
+        """
+        try:
+            # Get LLM provider and appropriate client using user's API keys
+            llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
+            if not llm_provider:
+                llm_provider = "openai"  # Default
+            
+            llm_model = self.agent_config.get("settings", {}).get("llm_model") or "gpt-4o-mini"
+            
+            from api_key_service import get_api_key
+            api_key = await get_api_key(self.user_id, llm_provider)
+            
+            if llm_provider == "openai":
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
+            elif llm_provider == "anthropic":
+                from anthropic import AsyncAnthropic
+                client = AsyncAnthropic(api_key=api_key)
+                # Use Anthropic's API format
+                response = await client.messages.create(
+                    model=llm_model,
+                    max_tokens=150,
+                    messages=[{
+                        "role": "user", 
+                        "content": f"""The user responded: "{user_message}"
+
+The agent needs to say something similar to: "{original_script}"
+
+But the agent just said this exact phrase. Generate a natural variation that:
+- Conveys the same intent/meaning
+- Sounds natural (not robotic)
+- Is concise (similar length or shorter)
+- Can acknowledge the user's response briefly if appropriate
+
+Respond with ONLY the rephrased text, no quotes or explanation."""
+                    }]
+                )
+                return response.content[0].text.strip()
+            else:
+                # Default to OpenAI-compatible
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
+            
+            # OpenAI format
+            response = await client.chat.completions.create(
+                model=llm_model,
+                messages=[{
+                    "role": "user", 
+                    "content": f"""The user responded: "{user_message}"
+
+The agent needs to say something similar to: "{original_script}"
+
+But the agent just said this exact phrase. Generate a natural variation that:
+- Conveys the same intent/meaning
+- Sounds natural (not robotic)
+- Is concise (similar length or shorter)
+- Can acknowledge the user's response briefly if appropriate
+
+Respond with ONLY the rephrased text, no quotes or explanation."""
+                }],
+                max_tokens=150,
+                temperature=0.8
+            )
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating rephrased script: {e}")
+            # Fallback to slightly modified original
+            return f"Let me say that again - {original_script}"
     
     async def _generate_ai_response_streaming(self, content: str, stream_callback=None, current_node: dict = None) -> str:
         """Generate AI response with streaming support"""
