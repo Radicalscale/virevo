@@ -184,6 +184,17 @@ class CallSession:
         from natural_delivery_middleware import NaturalDeliveryMiddleware
         self.delivery_middleware = NaturalDeliveryMiddleware()
     
+    def _strip_voice_tags(self, text: str) -> str:
+        """Strip [H]/[S]/[N] voice modulation tags from text before storing in transcripts/history.
+        
+        These tags are used internally for voice modulation but should not appear in:
+        - Conversation history
+        - User-facing transcripts
+        - Database records
+        """
+        import re
+        return re.sub(r'^\[([HSN])\]\s*', '', text.strip())
+    
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
         if name:
@@ -646,9 +657,11 @@ class CallSession:
                 logger.info(f"✅ User responded to regular message, resetting counter")
             
             # Add assistant response to conversation history
+            # Strip [H]/[S]/[N] voice tags before storing
+            clean_response = self._strip_voice_tags(assistant_response)
             assistant_msg = {
                 "role": "assistant",
-                "content": assistant_response
+                "content": clean_response
             }
             
             # For call flow agents, include the current node ID for state tracking
@@ -1455,9 +1468,10 @@ class CallSession:
                         if stream_callback:
                             await stream_callback(response_text)
                         # Add to conversation history and return
+                        # Strip [H]/[S]/[N] voice tags before storing
                         self.conversation_history.append({
                             "role": "assistant",
-                            "content": response_text,
+                            "content": self._strip_voice_tags(response_text),
                             "_node_id": self.current_node_id
                         })
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")

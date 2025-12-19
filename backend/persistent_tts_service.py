@@ -414,12 +414,12 @@ class PersistentTTSSession:
                 stream_start = time.time()
                 
                 # Send text to ElevenLabs for synthesis
-                # 🎤 VOICE MODULATION: Pass dynamic voice settings if provided
+                # NOTE: voice_settings are set at connection time only - ElevenLabs does not support
+                # changing voice_settings mid-stream (causes policy violation disconnection)
                 await self.ws_service.send_text(
                     text=sentence,
                     try_trigger_generation=True,
-                    flush=False,
-                    voice_settings=voice_settings
+                    flush=False
                 )
                 
                 # Send empty string to signal end of input and trigger final generation
