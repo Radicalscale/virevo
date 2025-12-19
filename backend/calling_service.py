@@ -4128,6 +4128,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
                             sentence += sentences[i + 1]  # Add delimiter
                         
                         sentence = sentence.strip()
+                        if sentence and stream_callback:
                             # Stream this sentence immediately to TTS
                             # 🎤 VOICE MODULATION: Process through middleware to get voice settings
                             clean_text, audio_payload = self.delivery_middleware.process(sentence)
@@ -4138,6 +4139,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
                 sentence_buffer = sentences[-1] if len(sentences) % 2 != 0 else ""
         
         # Send any remaining text
+        if sentence_buffer.strip() and stream_callback:
             clean_text, audio_payload = self.delivery_middleware.process(sentence_buffer.strip())
             await stream_callback(audio_payload)
             logger.info(f"📤 Streamed final fragment with settings: {clean_text[:50]}...")
@@ -4185,6 +4187,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         # Handle different node types
         if node_type == "ending":
             self.should_end_call = True
+            if stream_callback:
                 # Support both string and dictionary payloads for callback
                 # This ensures compatibility if middleware passes structured data
                 # 🎤 VOICE MODULATION: Process through middleware even for endings
