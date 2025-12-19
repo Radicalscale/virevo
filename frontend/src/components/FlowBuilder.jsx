@@ -2143,6 +2143,25 @@ const FlowBuilder = () => {
                           </p>
                         </div>
                       </div>
+
+                      {/* Rephrase Prompt Guidance - Only shows when checkbox is checked */}
+                      {selectedNode.data.dynamic_rephrase && (
+                        <div className="mt-3 pt-3 border-t border-orange-700/30">
+                          <label className="text-xs text-gray-300 mb-1 block">Rephrase Instructions (Optional)</label>
+                          <textarea
+                            value={selectedNode.data.rephrase_prompt || ''}
+                            onChange={(e) => updateNode(selectedNode.id, {
+                              data: { ...selectedNode.data, rephrase_prompt: e.target.value }
+                            })}
+                            className="bg-gray-900 border border-orange-700/50 text-white text-xs w-full px-3 py-2 rounded"
+                            rows={3}
+                            placeholder="e.g., 'If user seems confused, ask more directly. Keep the same friendly tone but vary the wording.'"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Guide how the AI rephrases this script when retrying
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 

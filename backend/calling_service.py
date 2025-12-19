@@ -1445,8 +1445,9 @@ class CallSession:
                     
                     if dynamic_rephrase:
                         # Generate a rephrased version of the script
+                        rephrase_prompt = node_data.get("rephrase_prompt", "")
                         logger.info(f"🔄 Dynamic rephrase enabled - generating natural variation of script")
-                        response_text = await self._generate_rephrased_script(content, user_message)
+                        response_text = await self._generate_rephrased_script(content, user_message, rephrase_prompt)
                         if stream_callback:
                             await stream_callback(response_text)
                         # Add to conversation history and return
@@ -3736,12 +3737,17 @@ Examples:
                 "message": "I had trouble understanding. Could you please repeat that?"
             }
     
-    async def _generate_rephrased_script(self, original_script: str, user_message: str) -> str:
+    async def _generate_rephrased_script(self, original_script: str, user_message: str, custom_prompt: str = "") -> str:
         """Generate a natural rephrase of the script for retry scenarios.
         
         Used when agent stays on same script node (no transition matched) and 
         dynamic_rephrase is enabled. Creates a natural variation instead of 
         repeating the exact same words.
+        
+        Args:
+            original_script: The original script text to rephrase
+            user_message: What the user said
+            custom_prompt: Optional custom instructions for how to rephrase
         """
         try:
             # Get LLM provider and appropriate client using user's API keys
@@ -3760,13 +3766,9 @@ Examples:
             elif llm_provider == "anthropic":
                 from anthropic import AsyncAnthropic
                 client = AsyncAnthropic(api_key=api_key)
-                # Use Anthropic's API format
-                response = await client.messages.create(
-                    model=llm_model,
-                    max_tokens=150,
-                    messages=[{
-                        "role": "user", 
-                        "content": f"""The user responded: "{user_message}"
+                
+                # Build the prompt with optional custom instructions
+                base_prompt = f"""The user responded: "{user_message}"
 
 The agent needs to say something similar to: "{original_script}"
 
@@ -3774,10 +3776,18 @@ But the agent just said this exact phrase. Generate a natural variation that:
 - Conveys the same intent/meaning
 - Sounds natural (not robotic)
 - Is concise (similar length or shorter)
-- Can acknowledge the user's response briefly if appropriate
-
-Respond with ONLY the rephrased text, no quotes or explanation."""
-                    }]
+- Can acknowledge the user's response briefly if appropriate"""
+                
+                if custom_prompt:
+                    base_prompt += f"\n\nAdditional guidance: {custom_prompt}"
+                
+                base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
+                
+                # Use Anthropic's API format
+                response = await client.messages.create(
+                    model=llm_model,
+                    max_tokens=150,
+                    messages=[{"role": "user", "content": base_prompt}]
                 )
                 return response.content[0].text.strip()
             else:
@@ -3785,12 +3795,8 @@ Respond with ONLY the rephrased text, no quotes or explanation."""
                 from openai import AsyncOpenAI
                 client = AsyncOpenAI(api_key=api_key)
             
-            # OpenAI format
-            response = await client.chat.completions.create(
-                model=llm_model,
-                messages=[{
-                    "role": "user", 
-                    "content": f"""The user responded: "{user_message}"
+            # Build the prompt with optional custom instructions
+            base_prompt = f"""The user responded: "{user_message}"
 
 The agent needs to say something similar to: "{original_script}"
 
@@ -3798,10 +3804,17 @@ But the agent just said this exact phrase. Generate a natural variation that:
 - Conveys the same intent/meaning
 - Sounds natural (not robotic)
 - Is concise (similar length or shorter)
-- Can acknowledge the user's response briefly if appropriate
-
-Respond with ONLY the rephrased text, no quotes or explanation."""
-                }],
+- Can acknowledge the user's response briefly if appropriate"""
+            
+            if custom_prompt:
+                base_prompt += f"\n\nAdditional guidance: {custom_prompt}"
+            
+            base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
+            
+            # OpenAI format
+            response = await client.chat.completions.create(
+                model=llm_model,
+                messages=[{"role": "user", "content": base_prompt}],
                 max_tokens=150,
                 temperature=0.8
             )
