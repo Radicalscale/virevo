@@ -5252,6 +5252,16 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                                 active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True
                             redis_service.set_call_data(call_control_id, {"silence_greeting_triggered": True})
                             
+                            # 🔥 FIX: Check if user already spoke during the 2s wait
+                            # This catches the race condition where user speaks just before timeout expires
+                            redis_data_precheck = redis_service.get_call_data(call_control_id) or {}
+                            call_data_precheck = active_telnyx_calls.get(call_control_id, {})
+                            user_already_spoke = redis_data_precheck.get("user_has_spoken") or call_data_precheck.get("user_has_spoken")
+                            
+                            if user_already_spoke:
+                                logger.info(f"⏭️ [WebSocket Worker] User already spoke during silence wait - SKIPPING greeting generation")
+                                return  # User already spoke, don't generate greeting
+                            
                             logger.info(f"⏱️ [WebSocket Worker] Silence timeout reached - generating greeting!")
                             
                             # Generate and speak greeting
