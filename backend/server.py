@@ -107,19 +107,30 @@ app.mount("/api/tts-audio", StaticFiles(directory="/tmp"), name="tts-audio")
 # Pre-generate comfort noise on startup for immediate availability
 @app.on_event("startup")
 async def startup_event():
-    """Pre-generate comfort noise file on server startup"""
+    """Pre-generate comfort noise files on server startup (both MP3 and mulaw)"""
     try:
-        from comfort_noise import generate_continuous_comfort_noise
+        from comfort_noise import generate_continuous_comfort_noise, get_comfort_noise_mulaw
         import os
         
+        # 1. Pre-generate MP3 comfort noise for REST API playback
         comfort_noise_path = "/tmp/comfort_noise_continuous.mp3"
         if not os.path.exists(comfort_noise_path) or os.path.getsize(comfort_noise_path) == 0:
             logger.info("🎵 Pre-generating comfort noise file on startup (5 minutes for seamless loops)...")
             # Generate 5-minute file so it rarely loops during typical calls
             generate_continuous_comfort_noise(duration_seconds=300, output_path=comfort_noise_path)
-            logger.info("✅ Comfort noise file ready for immediate use")
+            logger.info("✅ Comfort noise MP3 ready for immediate use")
         else:
-            logger.info("✅ Comfort noise file already exists")
+            logger.info("✅ Comfort noise MP3 already exists")
+        
+        # 2. Pre-generate mulaw comfort noise for WebSocket streaming
+        # This prevents ~800ms blocking delay on first TTS response
+        logger.info("🎵 Pre-warming mulaw comfort noise for WebSocket streaming...")
+        mulaw_noise = get_comfort_noise_mulaw()
+        if mulaw_noise:
+            logger.info(f"✅ Mulaw comfort noise ready ({len(mulaw_noise)} bytes)")
+        else:
+            logger.warning("⚠️ Failed to pre-warm mulaw comfort noise")
+            
     except Exception as e:
         logger.error(f"Error pre-generating comfort noise: {e}")
 
