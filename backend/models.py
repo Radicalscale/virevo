@@ -161,8 +161,8 @@ class AutoQCSettings(BaseModel):
 class FlowNode(BaseModel):
     id: str
     type: str
-    label: str = ""
-    data: Dict[str, Any] = Field(default_factory=dict)  # Made optional with empty dict default
+    label: str
+    data: Dict[str, Any]
 
 class AgentCreate(BaseModel):
     name: str
