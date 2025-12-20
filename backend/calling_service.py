@@ -4023,6 +4023,9 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
             # Regular mode: Full history
             conversation_history = self.conversation_history
         
+        # Standard Prompt Structure: System (Global) -> System (Dynamic/Goal) -> History
+        # Note: We tried moving Dynamic to the end (Recency Bias) and injecting as User, 
+        # but Grok-4-Fast ignore it. Reverting to standard structure for stability.
         messages = [
             {"role": "system", "content": cached_system_prompt, "cache_control": {"type": "ephemeral"}},
             {"role": "system", "content": dynamic_context}

@@ -1,0 +1,754 @@
+⚠️ Could not import RAG service: Read-only file system (os error 30)
+================================================================================
+RUNNING SCENARIO: skeptical_appointment.txt
+================================================================================
+✅ Loaded Agent: JK First Caller-optimizer3-antigrav
+DEBUG TRANSITIONS for 1766180529241: 3
+ - Confirms name (Yes|Speaking|Th...
+ - Wrong number (No John here|Wro...
+ - Does not conform (Any other re...
+⚠️ No global prompt found - using default
+
+[1] 👤 USER: Yeah, I'm here. Who is this?
+⏱️ [20:47:59.809] 📥 process_user_input() ENTRY - text: 'Yeah, I'm here. Who is this?...'
+⏱️ [20:47:59.809] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:47:59.809] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:47:59.809] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 1, Is first: True
+⏱️ [20:47:59.809] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:47 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 1 chars) - will return text instantly
+Using flow node: Greeting (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:47:59.809] 📄 About to process content (mode=script, length=1)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 2 in conversation history
+LLM response (0.00s): ?
+Total latency: 0.00s
+[1] 🤖 AGENT (Greeting): ?
+
+[2] 👤 USER: Okay... what exactly do you guys do?
+⏱️ [20:47:59.809] 📥 process_user_input() ENTRY - text: 'Okay... what exactly do you guys do?...'
+⏱️ [20:47:59.809] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:47:59.809] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:47:59.809] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 3, Is first: False
+🔍 Using explicitly set current_node_id: 2
+⏱️ [20:47:59.809] 🔀 About to call _follow_transition() for: Okay... what exactly do you gu...
+Evaluating transitions from Greeting for message: Okay... what exactly do you guys do?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:47:59.847] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:00.513] 🔀 TRANSITION EVALUATION COMPLETE - took 665ms
+🤖 AI transition decision: '2'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc) - don...', 'Does not conform (Any other response / Resistance)...']
+Selected transition index: 2
+Transition: Greeting -> Greeting_CatchAll_ConfirmName
+⏱️ [TIMING] TRANSITION_EVAL: 704ms
+⏱️ [20:48:00.514] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:47 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:48:00.514] 📄 About to process content (mode=script, length=80)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.70s): I apologize, I just want to ensure I have the right person. Am I speaking with ?
+Total latency: 0.70s
+[2] 🤖 AGENT (Greeting_CatchAll_ConfirmName): I apologize, I just want to ensure I have the right person. Am I speaking with ?
+
+[3] 👤 USER: I've heard this before. Is this some kind of scam?
+⏱️ [20:48:00.514] 📥 process_user_input() ENTRY - text: 'I've heard this before. Is this some kind of scam?...'
+⏱️ [20:48:00.514] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:00.514] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:00.514] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 5, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:48:00.514] 🔀 About to call _follow_transition() for: I've heard this before. Is thi...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: I've heard this before. Is this some kind of scam?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:00.558] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:01.029] 🔀 TRANSITION EVALUATION COMPLETE - took 471ms
+🤖 AI transition decision: '2'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc). P...', 'Wrong number (No John here|Wrong number|etc) - don...', 'Does not conform (Any other response / Resistance ...']
+Selected transition index: 2
+Transition: Greeting_CatchAll_ConfirmName -> Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+⏱️ [TIMING] TRANSITION_EVAL: 515ms
+⏱️ [20:48:01.029] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 89 chars) - will return text instantly
+Using flow node: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation) (type: conversation, mode: script)
+⏱️ [20:48:01.029] 📄 About to process content (mode=script, length=89)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763159750250 in conversation history
+LLM response (0.52s): This is Jake... I was just, um, wondering if you could possibly help me out for a moment?
+Total latency: 0.52s
+[3] 🤖 AGENT (Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)): This is Jake... I was just, um, wondering if you could possibly help me out for a moment?
+
+[4] 👤 USER: How much does it cost to start?
+⏱️ [20:48:01.030] 📥 process_user_input() ENTRY - text: 'How much does it cost to start?...'
+⏱️ [20:48:01.030] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:01.030] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:01.030] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 7, Is first: False
+🔍 Using explicitly set current_node_id: 1763159750250
+⏱️ [20:48:01.030] 🔀 About to call _follow_transition() for: How much does it cost to start...
+Evaluating transitions from Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation) for message: How much does it cost to start?
+🎤 AUTO-TRANSITION AFTER RESPONSE enabled - user spoke, transitioning to: 1763161849799
+✅ Auto-transitioned (after response) to: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+📝 User's response captured: 'How much does it cost to start?...'
+⏱️ [TIMING] TRANSITION_EVAL: 0ms
+⏱️ [20:48:01.030] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 260 chars) - will return text instantly
+Using flow node: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic (type: conversation, mode: script)
+⏱️ [20:48:01.030] 📄 About to process content (mode=script, length=260)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161849799 in conversation history
+LLM response (0.00s): Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?
+Total latency: 0.00s
+[4] 🤖 AGENT (Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic): Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?
+
+[5] 👤 USER: Just give me a ballpark number before we go further.
+⏱️ [20:48:01.030] 📥 process_user_input() ENTRY - text: 'Just give me a ballpark number before we go furthe...'
+⏱️ [20:48:01.030] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:01.030] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:01.030] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 9, Is first: False
+🔍 Using explicitly set current_node_id: 1763161849799
+⏱️ [20:48:01.030] 🔀 About to call _follow_transition() for: Just give me a ballpark number...
+Evaluating transitions from Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic for message: Just give me a ballpark number before we go further.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:01.072] 🔀 TRANSITION EVALUATION START - Calling LLM for 4 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:01.448] 🔀 TRANSITION EVALUATION COMPLETE - took 376ms
+🤖 AI transition decision: '1'
+📊 Available transitions: ['Agrees|consents (yes|sure|okay|hear more|call cons...', 'Any objection or non compliance that isn\'t a "I do...', 'NO (flat out)|No recall (done quickly) AND no othe...', "I'm Busy, or requests to call back responses from ..."]
+Selected transition index: 1
+Transition: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic -> Node ID: N003B_DeframeInitialObjection_V7_GoalOriented
+⏱️ [TIMING] TRANSITION_EVAL: 418ms
+⏱️ [20:48:01.448] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: Node ID: N003B_DeframeInitialObjection_V7_GoalOriented (type: conversation, mode: prompt)
+⏱️ [20:48:01.448] 📄 About to process content (mode=prompt, length=5890)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'Node ID: N003B_DeframeInitialObjection_V7_GoalOriented': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (9/9 messages)
+⏱️ [20:48:01.491] 💬 LLM REQUEST START: 9 conversation turns, 8172 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (6715 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 5, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## Primary Goal
+De-frame user's initial objection to elicit a statement of curiosity ...
+📝 [CONVERSATION HISTORY] (9 messages)
+📝   assistant: Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stackin...
+📝   user: Just give me a ballpark number before we go further....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:02.093] 💬 LLM FIRST TOKEN: 601ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 1088ms for 252 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161961589 in conversation history
+LLM response (1.55s): [N] I understand wanting to know upfront—starting with the core program is around two thousand dollars, but it includes everything to build and rank your first site for passive leads. What draws you to exploring a setup like that for recurring revenue?
+Total latency: 1.55s
+[5] 🤖 AGENT (Node ID: N003B_DeframeInitialObjection_V7_GoalOriented): [N] I understand wanting to know upfront—starting with the core program is around two thousand dollars, but it includes everything to build and rank your first site for passive leads. What draws you to exploring a setup like that for recurring revenue?
+
+[6] 👤 USER: Fine. I make about 120k a year.
+⏱️ [20:48:02.581] 📥 process_user_input() ENTRY - text: 'Fine. I make about 120k a year....'
+⏱️ [20:48:02.581] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:02.581] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:02.581] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 11, Is first: False
+🔍 Using explicitly set current_node_id: 1763161961589
+⏱️ [20:48:02.581] 🔀 About to call _follow_transition() for: Fine. I make about 120k a year...
+Evaluating transitions from Node ID: N003B_DeframeInitialObjection_V7_GoalOriented for message: Fine. I make about 120k a year.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:02.623] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:03.060] 🔀 TRANSITION EVALUATION COMPLETE - took 436ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['The user says no and asks to be called back or say...', '(excluding if they explicitly ask how much money c...', 'The user explicitly asks how much money they can m...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To skillfully de-frame the user's initial objection **in order to elicit a statement of curiosity or...
+⏱️ [TIMING] TRANSITION_EVAL: 479ms
+⏱️ [20:48:03.060] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: Node ID: N003B_DeframeInitialObjection_V7_GoalOriented (type: conversation, mode: prompt)
+⏱️ [20:48:03.061] 📄 About to process content (mode=prompt, length=5890)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'Node ID: N003B_DeframeInitialObjection_V7_GoalOriented': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/11 messages)
+⏱️ [20:48:03.098] 💬 LLM REQUEST START: 11 conversation turns, 8172 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (6715 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 6, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## Primary Goal
+De-frame user's initial objection to elicit a statement of curiosity ...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] I understand wanting to know upfront—starting with the core program is around two thousand dolla...
+📝   user: Fine. I make about 120k a year....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:03.666] 💬 LLM FIRST TOKEN: 567ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 1276ms for 380 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161961589 in conversation history
+LLM response (1.79s): [N] That's a solid income, and this program can help layer on passive revenue without disrupting your current setup—many students with full-time jobs like yours build sites that generate leads for local businesses, earning an extra three hundred fifty to fifteen thousand monthly after ranking. What excites you about adding that kind of hands-off income stream to your portfolio?
+Total latency: 1.79s
+[6] 🤖 AGENT (Node ID: N003B_DeframeInitialObjection_V7_GoalOriented): [N] That's a solid income, and this program can help layer on passive revenue without disrupting your current setup—many students with full-time jobs like yours build sites that generate leads for local businesses, earning an extra three hundred fifty to fifteen thousand monthly after ranking. What excites you about adding that kind of hands-off income stream to your portfolio?
+
+[7] 👤 USER: I have about 30k in savings.
+⏱️ [20:48:04.375] 📥 process_user_input() ENTRY - text: 'I have about 30k in savings....'
+⏱️ [20:48:04.375] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:04.375] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:04.375] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 13, Is first: False
+🔍 Using explicitly set current_node_id: 1763161961589
+⏱️ [20:48:04.375] 🔀 About to call _follow_transition() for: I have about 30k in savings....
+Evaluating transitions from Node ID: N003B_DeframeInitialObjection_V7_GoalOriented for message: I have about 30k in savings.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:04.415] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:04.808] 🔀 TRANSITION EVALUATION COMPLETE - took 392ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['The user says no and asks to be called back or say...', '(excluding if they explicitly ask how much money c...', 'The user explicitly asks how much money they can m...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To skillfully de-frame the user's initial objection **in order to elicit a statement of curiosity or...
+⏱️ [TIMING] TRANSITION_EVAL: 433ms
+⏱️ [20:48:04.808] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: Node ID: N003B_DeframeInitialObjection_V7_GoalOriented (type: conversation, mode: prompt)
+⏱️ [20:48:04.808] 📄 About to process content (mode=prompt, length=5890)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'Node ID: N003B_DeframeInitialObjection_V7_GoalOriented': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/13 messages)
+⏱️ [20:48:04.851] 💬 LLM REQUEST START: 13 conversation turns, 8172 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (6715 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 7, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## Primary Goal
+De-frame user's initial objection to elicit a statement of curiosity ...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] That's a solid income, and this program can help layer on passive revenue without disrupting you...
+📝   user: I have about 30k in savings....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:05.542] 💬 LLM FIRST TOKEN: 691ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 1030ms for 405 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161961589 in conversation history
+LLM response (1.51s): [N] With thirty thousand in savings, you're in a strong position to invest in something like this without risk— the program comes with a one hundred twenty percent refund guarantee if it doesn't deliver, plus access to over seven thousand five hundred students who've built passive income streams. What aspect of creating websites that rank and generate recurring leads for businesses appeals to you most?
+Total latency: 1.51s
+[7] 🤖 AGENT (Node ID: N003B_DeframeInitialObjection_V7_GoalOriented): [N] With thirty thousand in savings, you're in a strong position to invest in something like this without risk— the program comes with a one hundred twenty percent refund guarantee if it doesn't deliver, plus access to over seven thousand five hundred students who've built passive income streams. What aspect of creating websites that rank and generate recurring leads for businesses appeals to you most?
+
+[8] 👤 USER: My credit is around 720.
+⏱️ [20:48:05.882] 📥 process_user_input() ENTRY - text: 'My credit is around 720....'
+⏱️ [20:48:05.882] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:05.882] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:05.882] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 15, Is first: False
+🔍 Using explicitly set current_node_id: 1763161961589
+⏱️ [20:48:05.882] 🔀 About to call _follow_transition() for: My credit is around 720....
+Evaluating transitions from Node ID: N003B_DeframeInitialObjection_V7_GoalOriented for message: My credit is around 720.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:05.926] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:06.343] 🔀 TRANSITION EVALUATION COMPLETE - took 417ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['The user says no and asks to be called back or say...', '(excluding if they explicitly ask how much money c...', 'The user explicitly asks how much money they can m...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To skillfully de-frame the user's initial objection **in order to elicit a statement of curiosity or...
+⏱️ [TIMING] TRANSITION_EVAL: 461ms
+⏱️ [20:48:06.343] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: Node ID: N003B_DeframeInitialObjection_V7_GoalOriented (type: conversation, mode: prompt)
+⏱️ [20:48:06.343] 📄 About to process content (mode=prompt, length=5890)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'Node ID: N003B_DeframeInitialObjection_V7_GoalOriented': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/15 messages)
+⏱️ [20:48:06.430] 💬 LLM REQUEST START: 15 conversation turns, 8172 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (6715 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 8, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## Primary Goal
+De-frame user's initial objection to elicit a statement of curiosity ...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] With thirty thousand in savings, you're in a strong position to invest in something like this wi...
+📝   user: My credit is around 720....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:06.812] 💬 LLM FIRST TOKEN: 381ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 759ms for 317 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161961589 in conversation history
+LLM response (1.31s): [N] A seven hundred twenty credit score is excellent and opens up flexible financing options for the program if needed, allowing you to start building and ranking sites for passive leads without upfront strain. What interests you about generating recurring revenue from local business leads once the sites are set up?
+Total latency: 1.31s
+[8] 🤖 AGENT (Node ID: N003B_DeframeInitialObjection_V7_GoalOriented): [N] A seven hundred twenty credit score is excellent and opens up flexible financing options for the program if needed, allowing you to start building and ranking sites for passive leads without upfront strain. What interests you about generating recurring revenue from local business leads once the sites are set up?
+
+[9] 👤 USER: I just want to build something for my family.
+⏱️ [20:48:07.190] 📥 process_user_input() ENTRY - text: 'I just want to build something for my family....'
+⏱️ [20:48:07.190] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:07.190] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:07.190] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 17, Is first: False
+🔍 Using explicitly set current_node_id: 1763161961589
+⏱️ [20:48:07.190] 🔀 About to call _follow_transition() for: I just want to build something...
+Evaluating transitions from Node ID: N003B_DeframeInitialObjection_V7_GoalOriented for message: I just want to build something for my family.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:07.234] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:07.625] 🔀 TRANSITION EVALUATION COMPLETE - took 391ms
+🤖 AI transition decision: '1'
+📊 Available transitions: ['The user says no and asks to be called back or say...', '(excluding if they explicitly ask how much money c...', 'The user explicitly asks how much money they can m...']
+Selected transition index: 1
+Transition: Node ID: N003B_DeframeInitialObjection_V7_GoalOriented -> N_IntroduceModel_And_AskQuestions_V3_Adaptive
+⏱️ [TIMING] TRANSITION_EVAL: 435ms
+⏱️ [20:48:07.626] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 164 chars) - will return text instantly
+Using flow node: N_IntroduceModel_And_AskQuestions_V3_Adaptive (type: conversation, mode: script)
+⏱️ [20:48:07.626] 📄 About to process content (mode=script, length=164)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763163400676 in conversation history
+LLM response (0.44s): Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What questions come to mind as soon as you hear something like that?
+Total latency: 0.44s
+[9] 🤖 AGENT (N_IntroduceModel_And_AskQuestions_V3_Adaptive): Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What questions come to mind as soon as you hear something like that?
+
+[10] 👤 USER: Sure, tomorrow at 3pm works.
+⏱️ [20:48:07.626] 📥 process_user_input() ENTRY - text: 'Sure, tomorrow at 3pm works....'
+⏱️ [20:48:07.626] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:07.626] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:07.626] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 19, Is first: False
+🔍 Using explicitly set current_node_id: 1763163400676
+⏱️ [20:48:07.626] 🔀 About to call _follow_transition() for: Sure, tomorrow at 3pm works....
+Evaluating transitions from N_IntroduceModel_And_AskQuestions_V3_Adaptive for message: Sure, tomorrow at 3pm works.
+🎤 AUTO-TRANSITION AFTER RESPONSE enabled - user spoke, transitioning to: 1763206946898
+✅ Auto-transitioned (after response) to: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+📝 User's response captured: 'Sure, tomorrow at 3pm works....'
+⏱️ [TIMING] TRANSITION_EVAL: 0ms
+⏱️ [20:48:07.626] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive (type: conversation, mode: conversation)
+📚 Q&A/KB node detected by label - skipping pre-response mandatory check, will check on transition
+⏱️ [20:48:07.626] 📄 About to process content (mode=conversation, length=483)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_KB_Q&A_With_StrategicNarrative_V3_Adaptive': use_parallel_llm=False
+⏱️ [20:48:07.670] 💬 LLM REQUEST START: 19 conversation turns, 2766 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1309 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 10, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+
+
+
+### PREMATURE BOOKING / SCHEDULING REQUESTS:
+If the user asks to book an appointm...
+📝 [CONVERSATION HISTORY] (19 messages)
+📝   assistant: Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What...
+📝   user: Sure, tomorrow at 3pm works....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:08.266] 💬 LLM FIRST TOKEN: 596ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 1248ms for 305 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763206946898 in conversation history
+LLM response (1.29s): [S] I appreciate you wanting to jump ahead and lock in a time, but booking tomorrow wouldn't be the best move without us first nailing down if this passive income setup truly fits your family goals. What specifically about building something lasting for them draws you to this kind of website opportunity?
+Total latency: 1.29s
+[10] 🤖 AGENT (N_KB_Q&A_With_StrategicNarrative_V3_Adaptive): [S] I appreciate you wanting to jump ahead and lock in a time, but booking tomorrow wouldn't be the best move without us first nailing down if this passive income setup truly fits your family goals. What specifically about building something lasting for them draws you to this kind of website opportunity?
+
+[11] 👤 USER: I am in Central time.
+⏱️ [20:48:08.918] 📥 process_user_input() ENTRY - text: 'I am in Central time....'
+⏱️ [20:48:08.918] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:08.918] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:08.918] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 21, Is first: False
+🔍 Using explicitly set current_node_id: 1763206946898
+⏱️ [20:48:08.918] 🔀 About to call _follow_transition() for: I am in Central time....
+Evaluating transitions from N_KB_Q&A_With_StrategicNarrative_V3_Adaptive for message: I am in Central time.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:08.955] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:09.958] 🔀 TRANSITION EVALUATION COMPLETE - took 1003ms
+🤖 AI transition decision: '1'
+📊 Available transitions: ['...would you honestly be upset if you had an extra...', 'User has answered income questions, provided finan...']
+Selected transition index: 1
+Transition: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive -> Logic Split - Income
+⏱️ [TIMING] TRANSITION_EVAL: 1040ms
+⏱️ [20:48:09.958] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+🔍 Auto-detected PROMPT mode (instruction markers found)
+Using flow node: Logic Split - Income (type: logic_split, mode: prompt)
+🔀 Logic Split node reached - evaluating conditions
+🔀 Evaluating 1 conditions
+  Condition 1: amount_reference greater_than 8000
+    Variable value: 
+    Could not extract numbers: var=None, compare=8000.0
+    Result: False
+ℹ️ No conditions matched - using default path: 1763197118793
+✅ Condition matched - moving to node: N_AskCapital_5k_V1_Adaptive
+📋 Processing node streaming - Type: conversation, Mode: prompt, Content length: 921 chars
+🤖 Using PROMPT mode - will generate AI response
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:10.001] 💬 LLM REQUEST START: 21 conversation turns, 3204 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1747 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 11, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## INSTRUCTION: BRIDGE & PIVOT
+1. **BRIDGE:** Acknowledge the user's previous input ...
+📝 [CONVERSATION HISTORY] (21 messages)
+📝   assistant: [S] I appreciate you wanting to jump ahead and lock in a time, but booking tomorrow wouldn't be the ...
+📝   user: I am in Central time....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:10.537] 💬 LLM FIRST TOKEN: 535ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 778ms for 352 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.86s): [S] I appreciate you clarifying your time zone, but booking a time right now wouldn't be the best move without us first nailing down if this passive income setup truly fits your family goals. To move forward with something like this, we typically look for about five thousand dollars in liquid capital to get started—do you have that amount accessible?
+Total latency: 1.86s
+[11] 🤖 AGENT (N_AskCapital_5k_V1_Adaptive): [S] I appreciate you clarifying your time zone, but booking a time right now wouldn't be the best move without us first nailing down if this passive income setup truly fits your family goals. To move forward with something like this, we typically look for about five thousand dollars in liquid capital to get started—do you have that amount accessible?
+
+[12] 👤 USER: Sounds good.
+⏱️ [20:48:10.780] 📥 process_user_input() ENTRY - text: 'Sounds good....'
+⏱️ [20:48:10.780] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:48:10.780] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:48:10.780] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 23, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:48:10.780] 🔀 About to call _follow_transition() for: Sounds good....
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: Sounds good.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:48:10.822] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:11.232] 🔀 TRANSITION EVALUATION COMPLETE - took 409ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 451ms
+⏱️ [20:48:11.232] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:48 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:48:11.232] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/23 messages)
+⏱️ [20:48:11.273] 💬 LLM REQUEST START: 23 conversation turns, 3204 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (1457 chars):
+📝   Preview: You are a phone agent conducting natural conversations.
+
+# COMMUNICATION STYLE
+- Speak naturally and conversationally
+- Keep responses concise (1-2 sentences when possible)
+- Use natural pauses, not XML tags
+- Be friendly and professional
+
+# STRICT RULES
+- NO format markers or meta-text
+- NO XML tags like <speak> or <break>
+- NO phrases like '--- AI TURN ---' or 'AGENT_SCRIPT_LINE_INPUT:'
+- Just speak naturally as a human would
+
+# CRITICAL - AVOID REPETITION
+- Review the conversation history car...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1747 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 12, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: 
+Variables: {"now": "Friday, December 19, 2025 at 8:48 PM EST", "customer_name": "", "callerName": ""}
+
+# YOUR TASK RIGHT NOW
+## INSTRUCTION: BRIDGE & PIVOT
+1. **BRIDGE:** Acknowledge the user's previous input ...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [S] I appreciate you clarifying your time zone, but booking a time right now wouldn't be the best mo...
+📝   user: Sounds good....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:48:11.675] 💬 LLM FIRST TOKEN: 402ms (grok grok-4-fast-non-reasoning)
+⏱️ [TIMING] LLM_TOTAL: 1073ms for 243 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.57s): [S] That's encouraging to hear—having that five thousand in liquid capital accessible means we can get you started on building those passive income sites for your family without any hurdles. How soon are you looking to dive in and set this up?
+Total latency: 1.57s
+[12] 🤖 AGENT (N_AskCapital_5k_V1_Adaptive): [S] That's encouraging to hear—having that five thousand in liquid capital accessible means we can get you started on building those passive income sites for your family without any hurdles. How soon are you looking to dive in and set this up?
+
+================================================================================
+SCENARIO COMPLETE
+================================================================================

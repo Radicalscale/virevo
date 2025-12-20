@@ -1,0 +1,32 @@
+# Scenario 2: Negotiation Booking (Date Constraints)
+# Goal: Verify agent rejects dates too far out and accepts closer ones.
+
+# --- Intro ---
+User: Hello?
+User: Yes, this is Kendrick.
+User: Sure, what is this about?
+User: That sounds interesting.
+User: I work in software sales.
+
+# --- Qualification Phase ---
+User: I make about $150,000 a year.
+User: I have access to around $50,000.
+User: Just me.
+User: I have plenty of time, maybe 20 hours a week.
+User: 800.
+
+# --- Pitch/Pre-Close ---
+User: I am definitely interested in hearing more.
+User: Eastern time.
+
+# --- Negotiation Phase ---
+# Agent asks for time.
+# User asks for next month (Assuming current sim date is Dec 19)
+User: Can we schedule this for January 25th?
+
+# Expectation: Agent resists ("We usually schedule 48-72 hours out").
+# User pivot to closer date
+User: Oh, okay. How about tomorrow at 10am then?
+
+# Expectation: Agent accepts.
+User: That works perfectly.

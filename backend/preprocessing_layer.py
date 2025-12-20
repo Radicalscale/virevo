@@ -62,7 +62,8 @@ def detect_objection_type(user_input: str) -> str:
         return "price"
     
     # Time/stall objections
-    if re.search(r'\b(think about|think it over|later|not ready|busy|time|maybe)\b', text):
+    # Avoid matching "book a time" or "schedule a time"
+    if re.search(r'\b(think about|think it over|later|not ready|busy|no time|bad time|don\'t have time|maybe)\b', text):
         return "time"
     
     # Value/understanding questions

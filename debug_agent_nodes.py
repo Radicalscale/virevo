@@ -26,6 +26,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 from pymongo import MongoClient
 from bson import ObjectId
 
+# Configure logging to capture Backend Prompt Logs
+import logging
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger(__name__)
+# Enable calling service logs
+logging.getLogger("backend.calling_service").setLevel(logging.INFO)
+
 # MongoDB connection
 MONGO_URL = 'mongodb+srv://radicalscale_db_user:BqTnIhsbVjhh01Bq@andramada.rznsqrc.mongodb.net/?appName=Andramada'
 
@@ -170,14 +177,22 @@ class AgentDebugger:
         """Initialize a mock call session"""
         from calling_service import CallSession
         
-        # Create mock API key getter
+        # BRIDGE: Async wrapper for SYNC database lookup
+        # This solves the "await dict" error because pymongo is sync but CallSession expects async
         async def mock_get_api_key(key_name: str) -> Optional[str]:
-            # Get from agent settings or return test values
-            settings = self.agent_config.get('settings', {})
-            if key_name == 'openai':
-                return settings.get('openai_api_key') or os.environ.get('OPENAI_API_KEY')
-            elif key_name == 'grok':
-                return settings.get('grok_api_key') or os.environ.get('GROK_API_KEY')
+            try:
+                from key_encryption import decrypt_api_key
+                # Sync DB lookup
+                user_id = self.agent_config.get("user_id")
+                key_doc = self.db.api_keys.find_one({
+                    "user_id": user_id,
+                    "service_name": key_name,
+                    "is_active": True
+                })
+                if key_doc and "api_key" in key_doc:
+                    return decrypt_api_key(key_doc["api_key"])
+            except Exception as e:
+                print(f"❌ MockKey Error: {e}")
             return None
         
         # Create session

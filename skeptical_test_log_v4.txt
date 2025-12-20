@@ -1,0 +1,428 @@
+⚠️ Could not import RAG service: Read-only file system (os error 30)
+================================================================================
+RUNNING SCENARIO: skeptical_appointment.txt
+================================================================================
+✅ Loaded Agent: JK First Caller-optimizer3-antigrav
+DEBUG TRANSITIONS for 1766180529241: 3
+ - Confirms name (Yes|Speaking|Th...
+ - Wrong number (No John here|Wro...
+ - Does not conform (Any other re...
+⚠️ No global prompt found - using default
+
+[1] 👤 USER: Yeah, I'm here. Who is this?
+⏱️ [20:46:09.389] 📥 process_user_input() ENTRY - text: 'Yeah, I'm here. Who is this?...'
+⏱️ [20:46:09.389] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:09.389] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:09.389] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 1, Is first: True
+⏱️ [20:46:09.389] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 1 chars) - will return text instantly
+Using flow node: Greeting (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:09.389] 📄 About to process content (mode=script, length=1)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 2 in conversation history
+LLM response (0.00s): ?
+Total latency: 0.00s
+[1] 🤖 AGENT (Greeting): ?
+
+[2] 👤 USER: Okay... what exactly do you guys do?
+⏱️ [20:46:09.389] 📥 process_user_input() ENTRY - text: 'Okay... what exactly do you guys do?...'
+⏱️ [20:46:09.389] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:09.389] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:09.389] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 3, Is first: False
+🔍 Using explicitly set current_node_id: 2
+⏱️ [20:46:09.389] 🔀 About to call _follow_transition() for: Okay... what exactly do you gu...
+Evaluating transitions from Greeting for message: Okay... what exactly do you guys do?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:09.429] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:09.981] 🔀 TRANSITION EVALUATION COMPLETE - took 551ms
+🤖 AI transition decision: '2'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc) - don...', 'Does not conform (Any other response / Resistance)...']
+Selected transition index: 2
+Transition: Greeting -> Greeting_CatchAll_ConfirmName
+⏱️ [TIMING] TRANSITION_EVAL: 591ms
+⏱️ [20:46:09.981] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:09.981] 📄 About to process content (mode=script, length=80)
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.59s): I apologize, I just want to ensure I have the right person. Am I speaking with ?
+Total latency: 0.59s
+[2] 🤖 AGENT (Greeting_CatchAll_ConfirmName): I apologize, I just want to ensure I have the right person. Am I speaking with ?
+
+[3] 👤 USER: I've heard this before. Is this some kind of scam?
+⏱️ [20:46:09.982] 📥 process_user_input() ENTRY - text: 'I've heard this before. Is this some kind of scam?...'
+⏱️ [20:46:09.982] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:09.982] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:09.982] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 5, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:09.982] 🔀 About to call _follow_transition() for: I've heard this before. Is thi...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: I've heard this before. Is this some kind of scam?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:10.023] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:10.285] 🔀 TRANSITION EVALUATION COMPLETE - took 261ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 303ms
+⏱️ [20:46:10.285] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:10.285] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.30s): 
+Total latency: 0.30s
+[3] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[4] 👤 USER: How much does it cost to start?
+⏱️ [20:46:10.285] 📥 process_user_input() ENTRY - text: 'How much does it cost to start?...'
+⏱️ [20:46:10.285] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:10.285] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:10.285] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 7, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:10.286] 🔀 About to call _follow_transition() for: How much does it cost to start...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: How much does it cost to start?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:10.328] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:10.581] 🔀 TRANSITION EVALUATION COMPLETE - took 252ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 295ms
+⏱️ [20:46:10.581] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:10.581] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.30s): 
+Total latency: 0.30s
+[4] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[5] 👤 USER: Just give me a ballpark number before we go further.
+⏱️ [20:46:10.581] 📥 process_user_input() ENTRY - text: 'Just give me a ballpark number before we go furthe...'
+⏱️ [20:46:10.581] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:10.581] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:10.581] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 9, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:10.581] 🔀 About to call _follow_transition() for: Just give me a ballpark number...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: Just give me a ballpark number before we go further.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:10.624] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:10.869] 🔀 TRANSITION EVALUATION COMPLETE - took 244ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 287ms
+⏱️ [20:46:10.869] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:10.869] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.29s): 
+Total latency: 0.29s
+[5] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[6] 👤 USER: Fine. I make about 120k a year.
+⏱️ [20:46:10.869] 📥 process_user_input() ENTRY - text: 'Fine. I make about 120k a year....'
+⏱️ [20:46:10.869] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:10.869] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:10.869] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 11, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:10.869] 🔀 About to call _follow_transition() for: Fine. I make about 120k a year...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: Fine. I make about 120k a year.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:10.910] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:11.962] 🔀 TRANSITION EVALUATION COMPLETE - took 1051ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 1092ms
+⏱️ [20:46:11.962] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:11.963] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (1.09s): 
+Total latency: 1.09s
+[6] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[7] 👤 USER: I have about 30k in savings.
+⏱️ [20:46:11.963] 📥 process_user_input() ENTRY - text: 'I have about 30k in savings....'
+⏱️ [20:46:11.963] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:11.963] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:11.963] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 13, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:11.963] 🔀 About to call _follow_transition() for: I have about 30k in savings....
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: I have about 30k in savings.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:12.007] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:12.275] 🔀 TRANSITION EVALUATION COMPLETE - took 267ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 312ms
+⏱️ [20:46:12.275] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:12.276] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.31s): 
+Total latency: 0.31s
+[7] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[8] 👤 USER: My credit is around 720.
+⏱️ [20:46:12.276] 📥 process_user_input() ENTRY - text: 'My credit is around 720....'
+⏱️ [20:46:12.276] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:12.276] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:12.276] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 15, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:12.276] 🔀 About to call _follow_transition() for: My credit is around 720....
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: My credit is around 720.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:12.317] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:12.589] 🔀 TRANSITION EVALUATION COMPLETE - took 272ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 313ms
+⏱️ [20:46:12.589] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:12.590] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.31s): 
+Total latency: 0.31s
+[8] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[9] 👤 USER: I just want to build something for my family.
+⏱️ [20:46:12.590] 📥 process_user_input() ENTRY - text: 'I just want to build something for my family....'
+⏱️ [20:46:12.590] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:12.590] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:12.590] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 17, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:12.590] 🔀 About to call _follow_transition() for: I just want to build something...
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: I just want to build something for my family.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:12.643] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:12.945] 🔀 TRANSITION EVALUATION COMPLETE - took 301ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 354ms
+⏱️ [20:46:12.945] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:12.945] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.36s): 
+Total latency: 0.36s
+[9] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[10] 👤 USER: Sure, tomorrow at 3pm works.
+⏱️ [20:46:12.945] 📥 process_user_input() ENTRY - text: 'Sure, tomorrow at 3pm works....'
+⏱️ [20:46:12.945] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:12.945] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:12.945] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 19, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:12.945] 🔀 About to call _follow_transition() for: Sure, tomorrow at 3pm works....
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: Sure, tomorrow at 3pm works.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:12.981] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:13.248] 🔀 TRANSITION EVALUATION COMPLETE - took 266ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 302ms
+⏱️ [20:46:13.248] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:13.248] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.30s): 
+Total latency: 0.30s
+[10] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[11] 👤 USER: I am in Central time.
+⏱️ [20:46:13.248] 📥 process_user_input() ENTRY - text: 'I am in Central time....'
+⏱️ [20:46:13.248] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:13.248] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:13.248] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 21, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:13.248] 🔀 About to call _follow_transition() for: I am in Central time....
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: I am in Central time.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:13.285] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:13.621] 🔀 TRANSITION EVALUATION COMPLETE - took 335ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 372ms
+⏱️ [20:46:13.621] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:13.621] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.37s): 
+Total latency: 0.37s
+[11] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+[12] 👤 USER: Sounds good.
+⏱️ [20:46:13.621] 📥 process_user_input() ENTRY - text: 'Sounds good....'
+⏱️ [20:46:13.621] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:46:13.621] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:46:13.621] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 23, Is first: False
+🔍 Using explicitly set current_node_id: 1766180529241
+⏱️ [20:46:13.621] 🔀 About to call _follow_transition() for: Sounds good....
+Evaluating transitions from Greeting_CatchAll_ConfirmName for message: Sounds good.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:46:13.674] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:46:13.941] 🔀 TRANSITION EVALUATION COMPLETE - took 266ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc)...']
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: Verify user identity strictly....
+⏱️ [TIMING] TRANSITION_EVAL: 320ms
+⏱️ [20:46:13.942] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:46 PM EST in content
+🔧 Replaced {{customer_name}} with  in content
+🔧 Replaced {{callerName}} with  in content
+✅ Using explicit SCRIPT mode (length: 80 chars) - will return text instantly
+Using flow node: Greeting_CatchAll_ConfirmName (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:46:13.942] 📄 About to process content (mode=script, length=80)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call scenario_test_session (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1766180529241 in conversation history
+LLM response (0.32s): 
+Total latency: 0.32s
+[12] 🤖 AGENT (Greeting_CatchAll_ConfirmName): 
+
+================================================================================
+SCENARIO COMPLETE
+================================================================================

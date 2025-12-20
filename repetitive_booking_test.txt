@@ -1,0 +1,28 @@
+# Repetitive Booking Test
+# Goal: Verify if agent repeats the exact same deflection line when insisted upon.
+
+# Turn 1: Greeting
+User: Hello?
+
+# Turn 2: Confirm Name
+User: Yes, this is Kendrick.
+
+# Turn 3: Context
+User: Sure, what is this about?
+
+# Turn 4: Interest
+User: That sounds interesting.
+
+# Turn 5: Qualification Answer
+User: I work in software sales.
+
+# Turn 6: Premature Booking Attempt 1
+# User tries to skip to booking
+User: Can we just book a time for Tuesday at 2pm?
+
+# Turn 7: Premature Booking Attempt 2 (Insistence)
+# User pushes back on the deflection
+User: I understand, but I really just want to get it on the calendar now. Can we do that?
+
+# Turn 8: Compliance (Optional, to see if it recovers)
+User: Okay, fine. What questions do you have?

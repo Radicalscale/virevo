@@ -1,0 +1,45 @@
+# Scenario: Reschedule Loop Verification (Robust)
+# Goal: Test handling of unavailable time followed by successful booking
+# Base: Standard Booking Path to ensure we reach the booking nodes correctly.
+
+# --- Intro & Deflection Checks Passed ---
+User: Hello?
+User: Yes, this is Kendrick.
+User: Sure, what is this about?
+User: That sounds interesting.
+User: I work in software sales.
+
+# --- Qualification Phase ---
+# Income
+User: I make about $120,000 a year base.
+# Capital
+User: I have about $20,000 in savings right now.
+# Business Partner
+User: No, it's just me making the decisions.
+# Time Commitment
+User: I can probably deduce about 10 hours a week.
+# Credit Score 
+User: My credit is good, around 750.
+
+# --- Transition to Pitch/Booking ---
+# Agent should be proposing the deep dive / scheduling now
+User: That makes sense. I see why you called.
+
+# Timezone Check
+User: I am in Eastern time.
+
+# --- Booking Request (Bad Time) ---
+# We ask for "Tuesday at 2pm" which we know returns UNAVAILABLE (offering Sunday slots).
+User: Sure, Tuesday at 2pm works for me.
+
+# --- Reschedule Loop ---
+# Agent response expectation: "Tuesday at 2pm isn't available... Sunday at X..."
+# User proposes a new time. 
+User: okay how about tomorrow at 4pm?
+
+# --- Final Confirmation ---
+# If "Tomorrow" works, agent will say "Checking... Locked in" (or similar success msg)
+# If "Tomorrow" fails, agent will say "Unavailable... Sunday..."
+# Either way, verifying this transition logic is the goal.
+# User: Great, bye.
+User: I see.

@@ -1,0 +1,1559 @@
+✅ Loaded agent: JK First Caller-optimizer3-antigrav
+   Model: grok-4-fast-non-reasoning
+✅ Loaded agent: JK First Caller-optimizer3-antigrav
+   Model: grok-4-fast-non-reasoning
+   Flow nodes: 66
+⚠️ Could not import RAG service: Read-only file system (os error 30)
+📋 Built cached system prompt: 5684 chars (global) + 1402 chars (technical)
+💉 Injecting custom variables: {'customer_name': 'Kendrick', 'email': 'kendrickbowman9@gmail.com'}
+✅ Session initialized
+
+============================================================
+📜 RUNNING SCRIPTED CONVERSATION
+============================================================
+
+
+============================================================
+🎤 TURN 10: User says: "Assistant: (Greeting)"
+============================================================
+⏱️ [20:12:12.473] 📥 process_user_input() ENTRY - text: 'Assistant: (Greeting)...'
+⏱️ [20:12:12.473] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:12.473] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:12.473] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 1, Is first: True
+⏱️ [20:12:12.473] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 9 chars) - will return text instantly
+Using flow node: Greeting (type: conversation, mode: script)
+📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+⏱️ [20:12:12.473] 📄 About to process content (mode=script, length=9)
+📤 Streaming script as 1 sentence(s)
+    🔊 TTS: Kendrick?
+📤 Streamed script sentence 1/1: Kendrick?...
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 2 in conversation history
+LLM response (0.00s): Kendrick?
+Total latency: 0.00s
+
+   📍 NODE: Greeting
+   🤖 RESPONSE: Kendrick?
+
+============================================================
+🎤 TURN 11: User says: "User: Yes, this is Kendrick."
+============================================================
+⏱️ [20:12:12.974] 📥 process_user_input() ENTRY - text: 'User: Yes, this is Kendrick....'
+⏱️ [20:12:12.974] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:12.974] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:12.974] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 3, Is first: False
+🔍 Using explicitly set current_node_id: 2
+⏱️ [20:12:12.974] 🔀 About to call _follow_transition() for: User: Yes, this is Kendrick....
+Evaluating transitions from Greeting for message: User: Yes, this is Kendrick.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:13.015] 🔀 TRANSITION EVALUATION START - Calling LLM for 3 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:13.755] 🔀 TRANSITION EVALUATION COMPLETE - took 739ms
+🤖 AI transition decision: '0'
+📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she|etc)...', 'Wrong number (No John here|Wrong number|etc) - don...', 'Does not conform (Any other response / Resistance)...']
+Selected transition index: 0
+Transition: Greeting -> Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+⏱️ [TIMING] TRANSITION_EVAL: 781ms
+⏱️ [20:12:13.756] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 89 chars) - will return text instantly
+Using flow node: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation) (type: conversation, mode: script)
+⏱️ [20:12:13.756] 📄 About to process content (mode=script, length=89)
+📤 Streaming script as 2 sentence(s)
+    🔊 TTS: This is Jake...
+📤 Streamed script sentence 1/2: This is Jake......
+    🔊 TTS: I was just, um, wondering if you could possibly help me out for a moment?
+📤 Streamed script sentence 2/2: I was just, um, wondering if you could possibly he...
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763159750250 in conversation history
+LLM response (0.78s): This is Jake... I was just, um, wondering if you could possibly help me out for a moment?
+Total latency: 0.78s
+
+   📍 NODE: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+   🤖 RESPONSE: This is Jake... I was just, um, wondering if you could possibly help me out for a moment?
+
+============================================================
+🎤 TURN 12: User says: "Assistant: (Intro)"
+============================================================
+⏱️ [20:12:14.257] 📥 process_user_input() ENTRY - text: 'Assistant: (Intro)...'
+⏱️ [20:12:14.257] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:14.258] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:14.258] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 5, Is first: False
+🔍 Using explicitly set current_node_id: 1763159750250
+⏱️ [20:12:14.258] 🔀 About to call _follow_transition() for: Assistant: (Intro)...
+Evaluating transitions from Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation) for message: Assistant: (Intro)
+🎤 AUTO-TRANSITION AFTER RESPONSE enabled - user spoke, transitioning to: 1763161849799
+✅ Auto-transitioned (after response) to: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+📝 User's response captured: 'Assistant: (Intro)...'
+⏱️ [TIMING] TRANSITION_EVAL: 0ms
+⏱️ [20:12:14.258] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 260 chars) - will return text instantly
+Using flow node: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic (type: conversation, mode: script)
+⏱️ [20:12:14.258] 📄 About to process content (mode=script, length=260)
+📤 Streaming script as 2 sentence(s)
+    🔊 TTS: Well, uh, I don't know if you could yet, but, I'm calling because you filled out...
+📤 Streamed script sentence 1/2: Well, uh, I don't know if you could yet, but, I'm ...
+    🔊 TTS: I know this call is out of the blue, but do you have just 25 seconds for me to e...
+📤 Streamed script sentence 2/2: I know this call is out of the blue, but do you ha...
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161849799 in conversation history
+LLM response (0.00s): Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 seconds for me to explain why I'm reaching out today specifically?
+Total latency: 0.00s
+
+   📍 NODE: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+   🤖 RESPONSE: Well, uh, I don't know if you could yet, but, I'm calling because you filled out an ad about stacking income without stacking hours. I know this call is out of the blue, but do you have just 25 second...
+
+============================================================
+🎤 TURN 13: User says: "User: I'm doing well."
+============================================================
+⏱️ [20:12:14.759] 📥 process_user_input() ENTRY - text: 'User: I'm doing well....'
+⏱️ [20:12:14.759] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:14.759] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:14.759] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 7, Is first: False
+🔍 Using explicitly set current_node_id: 1763161849799
+⏱️ [20:12:14.759] 🔀 About to call _follow_transition() for: User: I'm doing well....
+Evaluating transitions from Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic for message: User: I'm doing well.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:14.804] 🔀 TRANSITION EVALUATION START - Calling LLM for 4 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:15.129] 🔀 TRANSITION EVALUATION COMPLETE - took 324ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Agrees|consents (yes|sure|okay|hear more|call cons...', 'Any objection or non compliance that isn\'t a "I do...', 'NO (flat out)|No recall (done quickly) AND no othe...', "I'm Busy, or requests to call back responses from ..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched for script-mode node. Staying on current node to clarify/re-ask.
+⏱️ [TIMING] TRANSITION_EVAL: 370ms
+⏱️ [20:12:15.130] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 260 chars) - will return text instantly
+Using flow node: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic (type: conversation, mode: script)
+⏱️ [20:12:15.130] 📄 About to process content (mode=script, length=260)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161849799 in conversation history
+LLM response (0.37s): 
+Total latency: 0.37s
+
+   📍 NODE: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+   🤖 RESPONSE: 
+
+============================================================
+🎤 TURN 14: User says: "Assistant: (Bridge)"
+============================================================
+⏱️ [20:12:15.632] 📥 process_user_input() ENTRY - text: 'Assistant: (Bridge)...'
+⏱️ [20:12:15.632] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:15.632] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:15.632] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 9, Is first: False
+🔍 Using explicitly set current_node_id: 1763161849799
+⏱️ [20:12:15.632] 🔀 About to call _follow_transition() for: Assistant: (Bridge)...
+Evaluating transitions from Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic for message: Assistant: (Bridge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:15.670] 🔀 TRANSITION EVALUATION START - Calling LLM for 4 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:16.033] 🔀 TRANSITION EVALUATION COMPLETE - took 362ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Agrees|consents (yes|sure|okay|hear more|call cons...', 'Any objection or non compliance that isn\'t a "I do...', 'NO (flat out)|No recall (done quickly) AND no othe...', "I'm Busy, or requests to call back responses from ..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched for script-mode node. Staying on current node to clarify/re-ask.
+⏱️ [TIMING] TRANSITION_EVAL: 400ms
+⏱️ [20:12:16.033] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 260 chars) - will return text instantly
+Using flow node: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic (type: conversation, mode: script)
+⏱️ [20:12:16.033] 📄 About to process content (mode=script, length=260)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161849799 in conversation history
+LLM response (0.40s): 
+Total latency: 0.40s
+
+   📍 NODE: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+   🤖 RESPONSE: 
+
+============================================================
+🎤 TURN 15: User says: "User: I make about $120k a year."
+============================================================
+⏱️ [20:12:16.535] 📥 process_user_input() ENTRY - text: 'User: I make about $120k a year....'
+⏱️ [20:12:16.535] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:16.535] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:16.535] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 11, Is first: False
+🔍 Using explicitly set current_node_id: 1763161849799
+⏱️ [20:12:16.535] 🔀 About to call _follow_transition() for: User: I make about $120k a yea...
+Evaluating transitions from Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic for message: User: I make about $120k a year.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:16.572] 🔀 TRANSITION EVALUATION START - Calling LLM for 4 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:17.025] 🔀 TRANSITION EVALUATION COMPLETE - took 453ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ['Agrees|consents (yes|sure|okay|hear more|call cons...', 'Any objection or non compliance that isn\'t a "I do...', 'NO (flat out)|No recall (done quickly) AND no othe...', "I'm Busy, or requests to call back responses from ..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched for script-mode node. Staying on current node to clarify/re-ask.
+⏱️ [TIMING] TRANSITION_EVAL: 490ms
+⏱️ [20:12:17.026] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 260 chars) - will return text instantly
+Using flow node: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic (type: conversation, mode: script)
+⏱️ [20:12:17.026] 📄 About to process content (mode=script, length=260)
+⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763161849799 in conversation history
+LLM response (0.49s): 
+Total latency: 0.49s
+
+   📍 NODE: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+   🤖 RESPONSE: 
+
+============================================================
+🎤 TURN 16: User says: "Assistant: (Income Acknowledge)"
+============================================================
+⏱️ [20:12:17.527] 📥 process_user_input() ENTRY - text: 'Assistant: (Income Acknowledge)...'
+⏱️ [20:12:17.527] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:17.527] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:17.527] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 13, Is first: False
+🔍 Using explicitly set current_node_id: 1763161849799
+⏱️ [20:12:17.527] 🔀 About to call _follow_transition() for: Assistant: (Income Acknowledge...
+Evaluating transitions from Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic for message: Assistant: (Income Acknowledge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:17.562] 🔀 TRANSITION EVALUATION START - Calling LLM for 4 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:18.021] 🔀 TRANSITION EVALUATION COMPLETE - took 458ms
+🤖 AI transition decision: '0'
+📊 Available transitions: ['Agrees|consents (yes|sure|okay|hear more|call cons...', 'Any objection or non compliance that isn\'t a "I do...', 'NO (flat out)|No recall (done quickly) AND no othe...', "I'm Busy, or requests to call back responses from ..."]
+Selected transition index: 0
+Transition: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic -> N_IntroduceModel_And_AskQuestions_V3_Adaptive
+⏱️ [TIMING] TRANSITION_EVAL: 494ms
+⏱️ [20:12:18.022] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+✅ Using explicit SCRIPT mode (length: 164 chars) - will return text instantly
+Using flow node: N_IntroduceModel_And_AskQuestions_V3_Adaptive (type: conversation, mode: script)
+⏱️ [20:12:18.022] 📄 About to process content (mode=script, length=164)
+📤 Streaming script as 2 sentence(s)
+    🔊 TTS: Okay, in a nutshell, we set up passive income websites, and we let them produce ...
+📤 Streamed script sentence 1/2: Okay, in a nutshell, we set up passive income webs...
+    🔊 TTS: What questions come to mind as soon as you hear something like that?
+📤 Streamed script sentence 2/2: What questions come to mind as soon as you hear so...
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763163400676 in conversation history
+LLM response (0.50s): Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What questions come to mind as soon as you hear something like that?
+Total latency: 0.50s
+
+   📍 NODE: N_IntroduceModel_And_AskQuestions_V3_Adaptive
+   🤖 RESPONSE: Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What questions come to mind as soon as you hear something like that?
+
+============================================================
+🎤 TURN 17: User says: "User: I have about $20k saved up."
+============================================================
+⏱️ [20:12:18.524] 📥 process_user_input() ENTRY - text: 'User: I have about $20k saved up....'
+⏱️ [20:12:18.524] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:18.524] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:18.524] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 15, Is first: False
+🔍 Using explicitly set current_node_id: 1763163400676
+⏱️ [20:12:18.524] 🔀 About to call _follow_transition() for: User: I have about $20k saved ...
+Evaluating transitions from N_IntroduceModel_And_AskQuestions_V3_Adaptive for message: User: I have about $20k saved up.
+🎤 AUTO-TRANSITION AFTER RESPONSE enabled - user spoke, transitioning to: 1763206946898
+✅ Auto-transitioned (after response) to: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+📝 User's response captured: 'User: I have about $20k saved up....'
+⏱️ [TIMING] TRANSITION_EVAL: 0ms
+⏱️ [20:12:18.524] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive (type: conversation, mode: conversation)
+📚 Q&A/KB node detected by label - skipping pre-response mandatory check, will check on transition
+⏱️ [20:12:18.525] 📄 About to process content (mode=conversation, length=483)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_KB_Q&A_With_StrategicNarrative_V3_Adaptive': use_parallel_llm=False
+⏱️ [20:12:18.576] 💬 LLM REQUEST START: 15 conversation turns, 8508 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1422 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 8, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail....
+📝 [CONVERSATION HISTORY] (15 messages)
+📝   assistant: Okay, in a nutshell, we set up passive income websites, and we let them produce income for you. What...
+📝   user: User: I have about $20k saved up....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:19.000] 💬 LLM FIRST TOKEN: 424ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] That's a solid starting point for getting things rolling.
+📤 Streamed sentence: [N] That's a solid starting point for getting thin...
+    🔊 TTS: With that amount,
+📤 Streamed sentence: With that amount,...
+    🔊 TTS: we can typically set up your first couple of sites to start generating leads and...
+📤 Streamed sentence: we can typically set up your first couple of sites...
+    🔊 TTS: What kind of monthly income goal are you aiming for with this?
+📤 Streamed final fragment: What kind of monthly income goal are you aiming fo...
+⏱️ [TIMING] LLM_TOTAL: 998ms for 242 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763206946898 in conversation history
+LLM response (1.05s): [N] That's a solid starting point for getting things rolling. With that amount, we can typically set up your first couple of sites to start generating leads and income right away. What kind of monthly income goal are you aiming for with this?
+Total latency: 1.05s
+
+   📍 NODE: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+   🤖 RESPONSE: [N] That's a solid starting point for getting things rolling. With that amount, we can typically set up your first couple of sites to start generating leads and income right away. What kind of monthly...
+
+============================================================
+🎤 TURN 18: User says: "Assistant: (Capital Acknowledge)"
+============================================================
+⏱️ [20:12:20.076] 📥 process_user_input() ENTRY - text: 'Assistant: (Capital Acknowledge)...'
+⏱️ [20:12:20.076] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:20.076] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:20.076] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 17, Is first: False
+🔍 Using explicitly set current_node_id: 1763206946898
+⏱️ [20:12:20.076] 🔀 About to call _follow_transition() for: Assistant: (Capital Acknowledg...
+Evaluating transitions from N_KB_Q&A_With_StrategicNarrative_V3_Adaptive for message: Assistant: (Capital Acknowledge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:20.189] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:20.611] 🔀 TRANSITION EVALUATION COMPLETE - took 421ms
+🤖 AI transition decision: '1'
+📊 Available transitions: ['...would you honestly be upset if you had an extra...', 'User has answered income questions, provided finan...']
+Selected transition index: 1
+Transition: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive -> Logic Split - Income
+⏱️ [TIMING] TRANSITION_EVAL: 534ms
+⏱️ [20:12:20.611] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+🔍 Auto-detected PROMPT mode (instruction markers found)
+Using flow node: Logic Split - Income (type: logic_split, mode: prompt)
+🔀 Logic Split node reached - evaluating conditions
+🔀 Evaluating 1 conditions
+  Condition 1: amount_reference greater_than 8000
+    Variable value: 
+    Could not extract numbers: var=None, compare=8000.0
+    Result: False
+ℹ️ No conditions matched - using default path: 1763197118793
+✅ Condition matched - moving to node: N_AskCapital_5k_V1_Adaptive
+📋 Processing node streaming - Type: conversation, Mode: prompt, Content length: 921 chars
+🤖 Using PROMPT mode - will generate AI response
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:20.656] 💬 LLM REQUEST START: 17 conversation turns, 8946 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1860 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 9, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail....
+📝 [CONVERSATION HISTORY] (17 messages)
+📝   assistant: [N] That's a solid starting point for getting things rolling. With that amount, we can typically set...
+📝   user: Assistant: (Capital Acknowledge)...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:21.294] 💬 LLM FIRST TOKEN: 637ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Twenty thousand saved up gives you a strong foundation to launch effectively...
+📤 Streamed sentence: [N] Twenty thousand saved up gives you a strong fo...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 1019ms for 227 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.60s): [N] Twenty thousand saved up gives you a strong foundation to launch effectively. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.60s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Twenty thousand saved up gives you a strong foundation to launch effectively. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that a...
+
+============================================================
+🎤 TURN 19: User says: "User: I can probably deduce about 10 hours a week."
+============================================================
+⏱️ [20:12:22.178] 📥 process_user_input() ENTRY - text: 'User: I can probably deduce about 10 hours a week....'
+⏱️ [20:12:22.178] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:22.178] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:22.178] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 19, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:22.178] 🔀 About to call _follow_transition() for: User: I can probably deduce ab...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: I can probably deduce about 10 hours a week.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:22.229] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:22.611] 🔀 TRANSITION EVALUATION COMPLETE - took 382ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 433ms
+⏱️ [20:12:22.612] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:22.612] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/19 messages)
+⏱️ [20:12:22.648] 💬 LLM REQUEST START: 19 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 10, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Twenty thousand saved up gives you a strong foundation to launch effectively. For this model, we...
+📝   user: User: I can probably deduce about 10 hours a week....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:23.177] 💬 LLM FIRST TOKEN: 528ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Ten hours a week is a realistic commitment that fits well with how we struct...
+📤 Streamed sentence: [N] Ten hours a week is a realistic commitment tha...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 814ms for 235 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.28s): [N] Ten hours a week is a realistic commitment that fits well with how we structure this. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.28s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Ten hours a week is a realistic commitment that fits well with how we structure this. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you hav...
+
+============================================================
+🎤 TURN 20: User says: "Assistant: (Time Acknowledge)"
+============================================================
+⏱️ [20:12:23.964] 📥 process_user_input() ENTRY - text: 'Assistant: (Time Acknowledge)...'
+⏱️ [20:12:23.964] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:23.965] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:23.965] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 21, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:23.965] 🔀 About to call _follow_transition() for: Assistant: (Time Acknowledge)...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: Assistant: (Time Acknowledge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:24.013] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:24.455] 🔀 TRANSITION EVALUATION COMPLETE - took 441ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 490ms
+⏱️ [20:12:24.455] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:24.455] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/21 messages)
+⏱️ [20:12:24.506] 💬 LLM REQUEST START: 21 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 11, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Ten hours a week is a realistic commitment that fits well with how we structure this. For this m...
+📝   user: Assistant: (Time Acknowledge)...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:25.040] 💬 LLM FIRST TOKEN: 533ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Dedicating ten hours a week aligns perfectly with the flexibility of our set...
+📤 Streamed sentence: [N] Dedicating ten hours a week aligns perfectly w...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 751ms for 229 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.29s): [N] Dedicating ten hours a week aligns perfectly with the flexibility of our setup. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.29s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Dedicating ten hours a week aligns perfectly with the flexibility of our setup. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that...
+
+============================================================
+🎤 TURN 21: User says: "User: My credit is good, around 750."
+============================================================
+⏱️ [20:12:25.760] 📥 process_user_input() ENTRY - text: 'User: My credit is good, around 750....'
+⏱️ [20:12:25.760] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:25.760] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:25.760] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 23, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:25.760] 🔀 About to call _follow_transition() for: User: My credit is good, aroun...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: My credit is good, around 750.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:25.807] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:26.237] 🔀 TRANSITION EVALUATION COMPLETE - took 430ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 477ms
+⏱️ [20:12:26.237] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:26.237] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/23 messages)
+⏱️ [20:12:26.280] 💬 LLM REQUEST START: 23 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 12, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Dedicating ten hours a week aligns perfectly with the flexibility of our setup. For this model, ...
+📝   user: User: My credit is good, around 750....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:26.942] 💬 LLM FIRST TOKEN: 661ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] A 750 credit score is excellent and opens up solid options if needed.
+📤 Streamed sentence: [N] A 750 credit score is excellent and opens up s...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 777ms for 219 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.30s): [N] A 750 credit score is excellent and opens up solid options if needed. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.30s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] A 750 credit score is excellent and opens up solid options if needed. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount ac...
+
+============================================================
+🎤 TURN 22: User says: "Assistant: (Credit Acknowledge)"
+============================================================
+⏱️ [20:12:27.559] 📥 process_user_input() ENTRY - text: 'Assistant: (Credit Acknowledge)...'
+⏱️ [20:12:27.560] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:27.560] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:27.560] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 25, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:27.560] 🔀 About to call _follow_transition() for: Assistant: (Credit Acknowledge...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: Assistant: (Credit Acknowledge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:27.610] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:28.005] 🔀 TRANSITION EVALUATION COMPLETE - took 395ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 445ms
+⏱️ [20:12:28.005] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:28.006] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/25 messages)
+⏱️ [20:12:28.051] 💬 LLM REQUEST START: 25 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 13, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] A 750 credit score is excellent and opens up solid options if needed. For this model, we typical...
+📝   user: Assistant: (Credit Acknowledge)...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:28.614] 💬 LLM FIRST TOKEN: 563ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] A 750 credit score is a strong asset that can help with any financing if it ...
+📤 Streamed sentence: [N] A 750 credit score is a strong asset that can ...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 771ms for 240 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.26s): [N] A 750 credit score is a strong asset that can help with any financing if it comes to that. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.26s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] A 750 credit score is a strong asset that can help with any financing if it comes to that. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do yo...
+
+============================================================
+🎤 TURN 23: User says: "User: That makes sense. I see why you called."
+============================================================
+⏱️ [20:12:29.323] 📥 process_user_input() ENTRY - text: 'User: That makes sense. I see why you called....'
+⏱️ [20:12:29.324] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:29.324] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:29.324] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 27, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:29.324] 🔀 About to call _follow_transition() for: User: That makes sense. I see ...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: That makes sense. I see why you called.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:29.372] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:29.799] 🔀 TRANSITION EVALUATION COMPLETE - took 427ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 475ms
+⏱️ [20:12:29.799] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:29.799] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/27 messages)
+⏱️ [20:12:29.846] 💬 LLM REQUEST START: 27 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 14, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] A 750 credit score is a strong asset that can help with any financing if it comes to that. For t...
+📝   user: User: That makes sense. I see why you called....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:30.364] 💬 LLM FIRST TOKEN: 517ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Glad it's clicking for you.
+📤 Streamed sentence: [N] Glad it's clicking for you....
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 644ms for 177 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.17s): [N] Glad it's clicking for you. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.17s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Glad it's clicking for you. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+
+============================================================
+🎤 TURN 24: User says: "Assistant: (Compliment)"
+============================================================
+⏱️ [20:12:30.991] 📥 process_user_input() ENTRY - text: 'Assistant: (Compliment)...'
+⏱️ [20:12:30.991] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:30.991] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:30.991] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 29, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:30.991] 🔀 About to call _follow_transition() for: Assistant: (Compliment)...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: Assistant: (Compliment)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:31.027] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:31.321] 🔀 TRANSITION EVALUATION COMPLETE - took 294ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 330ms
+⏱️ [20:12:31.322] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:31.322] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/29 messages)
+⏱️ [20:12:31.364] 💬 LLM REQUEST START: 29 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 15, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Glad it's clicking for you. For this model, we typically look for about five thousand dollars in...
+📝   user: Assistant: (Compliment)...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:31.884] 💬 LLM FIRST TOKEN: 519ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Appreciate that insight.
+📤 Streamed sentence: [N] Appreciate that insight....
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 872ms for 174 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.25s): [N] Appreciate that insight. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.25s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Appreciate that insight. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+
+============================================================
+🎤 TURN 25: User says: "User: I am in Eastern time."
+============================================================
+⏱️ [20:12:32.738] 📥 process_user_input() ENTRY - text: 'User: I am in Eastern time....'
+⏱️ [20:12:32.738] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:32.738] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:32.738] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 31, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:32.738] 🔀 About to call _follow_transition() for: User: I am in Eastern time....
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: I am in Eastern time.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:32.785] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:33.297] 🔀 TRANSITION EVALUATION COMPLETE - took 512ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 559ms
+⏱️ [20:12:33.298] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:33.298] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/31 messages)
+⏱️ [20:12:33.335] 💬 LLM REQUEST START: 31 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 16, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Appreciate that insight. For this model, we typically look for about five thousand dollars in li...
+📝   user: User: I am in Eastern time....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:34.007] 💬 LLM FIRST TOKEN: 672ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Got it,
+📤 Streamed sentence: [N] Got it,...
+    🔊 TTS: Eastern time works fine for us.
+📤 Streamed sentence: Eastern time works fine for us....
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 789ms for 189 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.39s): [N] Got it, Eastern time works fine for us. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.39s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Got it, Eastern time works fine for us. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+
+============================================================
+🎤 TURN 26: User says: "Assistant: (Timezone Acknowledge)"
+============================================================
+⏱️ [20:12:34.625] 📥 process_user_input() ENTRY - text: 'Assistant: (Timezone Acknowledge)...'
+⏱️ [20:12:34.625] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:34.625] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:34.625] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 33, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:34.625] 🔀 About to call _follow_transition() for: Assistant: (Timezone Acknowled...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: Assistant: (Timezone Acknowledge)
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:34.688] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:35.148] 🔀 TRANSITION EVALUATION COMPLETE - took 459ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 522ms
+⏱️ [20:12:35.148] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:35.148] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/33 messages)
+⏱️ [20:12:35.187] 💬 LLM REQUEST START: 33 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: C type - adjust your response accordingly
+CONVERSATION STATUS: Turn 17, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Got it, Eastern time works fine for us. For this model, we typically look for about five thousan...
+📝   user: Assistant: (Timezone Acknowledge)...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:35.709] 💬 LLM FIRST TOKEN: 522ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Noted on the Eastern time zone.
+📤 Streamed sentence: [N] Noted on the Eastern time zone....
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 840ms for 181 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.40s): [N] Noted on the Eastern time zone. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.40s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Noted on the Eastern time zone. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+
+============================================================
+🎤 TURN 27: User says: "User: Sure, Tuesday at 2pm works for me."
+============================================================
+⏱️ [20:12:36.528] 📥 process_user_input() ENTRY - text: 'User: Sure, Tuesday at 2pm works for me....'
+⏱️ [20:12:36.529] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:36.529] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:36.529] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 35, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:36.529] 🔀 About to call _follow_transition() for: User: Sure, Tuesday at 2pm wor...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: Sure, Tuesday at 2pm works for me.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:36.580] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:36.967] 🔀 TRANSITION EVALUATION COMPLETE - took 387ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 438ms
+⏱️ [20:12:36.967] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:36.967] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/35 messages)
+⏱️ [20:12:37.016] 💬 LLM REQUEST START: 35 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 18, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] Noted on the Eastern time zone. For this model, we typically look for about five thousand dollar...
+📝   user: User: Sure, Tuesday at 2pm works for me....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:37.389] 💬 LLM FIRST TOKEN: 372ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] I appreciate you wanting to jump ahead on scheduling.
+📤 Streamed sentence: [N] I appreciate you wanting to jump ahead on sche...
+    🔊 TTS: But booking a time right now wouldn't be the best move without us first nailing ...
+📤 Streamed sentence: But booking a time right now wouldn't be the best ...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 605ms for 313 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.09s): [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be the best move without us first nailing down if this fits your goals. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.09s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be the best move without us first nailing down if this fits your goals. For this model, we typically loo...
+
+============================================================
+🎤 TURN 32: User says: "User: okay how about tomorrow at 4pm?"
+============================================================
+⏱️ [20:12:38.123] 📥 process_user_input() ENTRY - text: 'User: okay how about tomorrow at 4pm?...'
+⏱️ [20:12:38.123] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:38.123] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:38.123] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 37, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:38.123] 🔀 About to call _follow_transition() for: User: okay how about tomorrow ...
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: okay how about tomorrow at 4pm?
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:38.169] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:38.549] 🔀 TRANSITION EVALUATION COMPLETE - took 380ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 426ms
+⏱️ [20:12:38.549] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:38.549] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/37 messages)
+⏱️ [20:12:38.587] 💬 LLM REQUEST START: 37 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 19, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be t...
+📝   user: User: okay how about tomorrow at 4pm?...
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:39.690] 💬 LLM FIRST TOKEN: 1102ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] I appreciate you wanting to jump ahead on scheduling.
+📤 Streamed sentence: [N] I appreciate you wanting to jump ahead on sche...
+    🔊 TTS: But booking a time right now wouldn't be the best move without us first nailing ...
+📤 Streamed sentence: But booking a time right now wouldn't be the best ...
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 1263ms for 313 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.73s): [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be the best move without us first nailing down if this fits your goals. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.73s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be the best move without us first nailing down if this fits your goals. For this model, we typically loo...
+
+============================================================
+🎤 TURN 34: User says: "User: clear."
+============================================================
+⏱️ [20:12:40.351] 📥 process_user_input() ENTRY - text: 'User: clear....'
+⏱️ [20:12:40.351] ⏩ About to call _process_call_flow_streaming()
+⏱️ [20:12:40.351] 🔀 Agent type: call_flow, calling flow processor...
+⏱️ [20:12:40.351] 🔀 _process_call_flow_streaming() ENTRY
+Flow processing - History length: 39, Is first: False
+🔍 Using explicitly set current_node_id: 1763197118793
+⏱️ [20:12:40.351] 🔀 About to call _follow_transition() for: User: clear....
+Evaluating transitions from N_AskCapital_5k_V1_Adaptive for message: User: clear.
+Failed to decrypt key, assuming unencrypted: 
+⏱️ [20:12:40.431] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:40.792] 🔀 TRANSITION EVALUATION COMPLETE - took 360ms
+🤖 AI transition decision: '-1'
+📊 Available transitions: ["If the user's response indicates they have the cap...", "They indicate they don't have at least $5k (ie, No..."]
+Selected transition index: -1
+No specific condition matched, looking for default transition...
+⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+🎯 Goal: To determine if the user has or does not have the absolute minimum of $5k in liquid capital....
+⏱️ [TIMING] TRANSITION_EVAL: 440ms
+⏱️ [20:12:40.792] ✅ Node selected, about to process content...
+🔧 Replaced {{now}} with Friday, December 19, 2025 at 8:12 PM EST in content
+🔧 Replaced {{customer_name}} with Kendrick in content
+🔧 Replaced {{callerName}} with  in content
+🔧 Replaced {{from_number}} with +18885550123 in content
+🔧 Replaced {{to_number}} with +17708336397 in content
+🔧 Replaced {{email}} with kendrickbowman9@gmail.com in content
+Using flow node: N_AskCapital_5k_V1_Adaptive (type: conversation, mode: prompt)
+⏱️ [20:12:40.792] 📄 About to process content (mode=prompt, length=921)
+Failed to decrypt key, assuming unencrypted: 
+🔍 Node 'N_AskCapital_5k_V1_Adaptive': use_parallel_llm=True
+⚡ Parallel mode: Using condensed history (10/39 messages)
+⏱️ [20:12:40.869] 💬 LLM REQUEST START: 39 conversation turns, 8947 system chars (KB cached)
+📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (7086 chars):
+📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in peri...
+📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1861 chars):
+📝   Preview: 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREPROCESSED CONTEXT (to help you prioritize and focus):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USER COMMUNICATION STYLE: S type - adjust your response accordingly
+CONVERSATION STATUS: Turn 20, objection handling phase
+
+This context is provided to help you focus. You still need to:
+1. Generate a natural, contextual response
+2. Evaluate transitions per your node instructions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# CURRENT CONTEXT
+Customer: Kendrick
+Variables: {"now": "Friday, December 19, 2025 at 8:12 PM EST", "customer_name": "Kendrick", "callerName": "", "from_number": "+18885550123", "to_number": "+17708336397", "email": "kendrickbowman9@gmail...
+📝 [CONVERSATION HISTORY] (10 messages)
+📝   assistant: [N] I appreciate you wanting to jump ahead on scheduling. But booking a time right now wouldn't be t...
+📝   user: User: clear....
+📝 ═══════════════════════════════════════════
+HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+⏱️ [20:12:41.404] 💬 LLM FIRST TOKEN: 534ms (grok grok-4-fast-non-reasoning)
+    🔊 TTS: [N] Good to know we're on the same page.
+📤 Streamed sentence: [N] Good to know we're on the same page....
+    🔊 TTS: For this model,
+📤 Streamed sentence: For this model,...
+    🔊 TTS: we typically look for about five thousand dollars in liquid capital to get start...
+📤 Streamed sentence: we typically look for about five thousand dollars ...
+    🔊 TTS: Do you have that amount accessible right now?
+📤 Streamed final fragment: Do you have that amount accessible right now?...
+⏱️ [TIMING] LLM_TOTAL: 676ms for 186 chars (grok grok-4-fast-non-reasoning)
+🔊 Silence tracking reset for call debug_20251219_201212 (user responded)
+✅ User responded to regular message, resetting counter
+💾 Storing node ID 1763197118793 in conversation history
+LLM response (1.20s): [N] Good to know we're on the same page. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+Total latency: 1.20s
+
+   📍 NODE: N_AskCapital_5k_V1_Adaptive
+   🤖 RESPONSE: [N] Good to know we're on the same page. For this model, we typically look for about five thousand dollars in liquid capital to get started. Do you have that amount accessible right now?
+
+============================================================
+📊 SCRIPT COMPLETE - NODE HISTORY:
+============================================================
+  Turn 10: Greeting
+  Turn 11: Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+  Turn 12: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+  Turn 13: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+  Turn 14: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+  Turn 15: Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+  Turn 16: N_IntroduceModel_And_AskQuestions_V3_Adaptive
+  Turn 17: N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+  Turn 18: N_AskCapital_5k_V1_Adaptive
+  Turn 19: N_AskCapital_5k_V1_Adaptive
+  Turn 20: N_AskCapital_5k_V1_Adaptive
+  Turn 21: N_AskCapital_5k_V1_Adaptive
+  Turn 22: N_AskCapital_5k_V1_Adaptive
+  Turn 23: N_AskCapital_5k_V1_Adaptive
+  Turn 24: N_AskCapital_5k_V1_Adaptive
+  Turn 25: N_AskCapital_5k_V1_Adaptive
+  Turn 26: N_AskCapital_5k_V1_Adaptive
+  Turn 27: N_AskCapital_5k_V1_Adaptive
+  Turn 32: N_AskCapital_5k_V1_Adaptive
+  Turn 34: N_AskCapital_5k_V1_Adaptive

@@ -1,0 +1,39 @@
+# Scenario 1: Standard Booking (Happy Path)
+# Goal: Verify agent allows booking after full qualification.
+
+# --- Intro & Deflection Checks Passed ---
+User: Hello?
+User: Yes, this is Kendrick.
+User: Sure, what is this about?
+User: That sounds interesting.
+User: I work in software sales.
+
+# --- Qualification Phase ---
+# Income
+User: I make about $120,000 a year base.
+# Capital
+User: I have about $20,000 in savings right now.
+# Business Partner
+User: No, it's just me making the decisions.
+# Time Commitment
+User: I can probably deduce about 10 hours a week.
+# Credit Score 
+User: My credit is good, around 750.
+
+# --- Transition to Pitch/Booking ---
+# Agent should be proposing the deep dive / scheduling now
+User: That makes sense. I see why you called.
+
+# Timezone Check
+User: I am in Eastern time.
+
+# --- Booking Request ---
+# This is NOT premature anymore. We are qualified.
+User: Sunday at 12pm works for me.
+
+
+
+
+# --- Confirm to trigger webhook transition ---
+User: Sounds great, lock it in!
+Great, bye.
