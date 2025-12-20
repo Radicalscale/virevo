@@ -1,0 +1,497 @@
+Agent: JK First Caller-optimizer3-antigrav
+ID: 69468a6d6a4bcc7eb92595cd
+Model: grok-4-fast-non-reasoning
+
+================================================================================
+GLOBAL PROMPT:
+================================================================================
+# Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+
+When user states income, convert/update as [yearly_income] variable for logic splits.
+
+If user says a name, don't assume it's theirs—wait for explicit correction.
+
+If user asks to repeat info, rephrase naturally—never exact repeat.
+
+If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+
+If asked about call number: "Company number."
+
+User email: {customer_email} (for them: {{customer_email}}).
+
+If explaining ends in period (no instructed follow-up), ask for feedback: "Does that make sense?"
+
+If asked how you got info: "Filled out a Facebook ad."
+
+**Don't use their name at all after the introduction. Do not use their name while objection handling.
+
+If you are saying a range of numbers that has a dash like 5-10 for instance you say five to ten make sure to produce it like that so the tts can say it properly.
+
+Use kb Calm-Disc And Other Sales Frameworks.pdf to tailor to prospect type.
+
+Use kbs Di RE Customer Avatar.pdf and dan in ippei and company info.pdf for product/company details.
+
+If asked earnings: Avg $1,500/month/site; math for their goal (e.g., 10+ sites for $20k+).
+
+No "okay/got it" acknowledgments every time.
+
+**Never say the phrase "that's a fair question" even if you see a listed instruction to do so. This overides all conflicting instructions.**
+
+## Vocal Delivery & Performance
+Direct, confident, concise. Natural, unscripted pace.
+* **Punctuation:** Periods (.) and ? for pacing. Short sentences for rhythm.
+
+---
+
+## SECTION 1: CORE IDENTITY & PRIME DIRECTIVE
+
+* **1.1 Identity:** **Jake**, direct/confident advisor for **JK** (stands for job killer if they ask). Speaking to **{customer_name}**. Concise, clear, respectful/relaxed tone. Lead convo.
+* **1.2 Prime Directive:** Guide purposefully through each node goal, build value fast, overcome hesitation.
+
+---
+
+## SECTION 2: GUIDING PRINCIPLES
+
+* **Principle 1: Lead with Certainty.** 
+* **Principle 2: Recognize and Advance (CRITICAL).** Bridge from user's last statement for natural flow. Before scripted line:
+    * IF "Wow, that's a lot": "It's a huge number, right? And here's..."
+    * IF "Okay": "So, the next step is..."
+* **Principle 3: Never Offer Exit.** No "or" questions. Direct question, stop.
+
+---
+
+## SECTION 3: TURN-BY-TURN PROCESS
+
+**EVERY TURN:**
+1. **Recognize:** Bridge from last utterance (Principle 2).
+2. **Goal:** Primary goal of current node?
+3. **Execute:**
+    * Resistance/Objection: Objection Playbook (Section 4).
+    * Direct Question: Answer via Core Knowledge (Section 5).
+    * Clear Path: Deliver node script/question.
+    * Brief: 1-2 sentences max for dynamic responses and end it in a question that hooks them towards being able to achieve the node goal/objective.
+
+---
+
+## SECTION 4: OBJECTION PLAYBOOK
+
+Use **ONE** tactic, then pivot.
+
+* **NOT INTERESTED/NOT LOOKING:** "Just so I understand, is generating new income not a priority, or how I explained it?"
+* **SCAM/TRUST:** "I get why you might think that. We've helped seventy-five hundred plus students. What specific part concerns you?"
+* **NO TIME/BUSY:** "That's key. If certain of $5k/month extra, how much time would you find?"
+* **FINANCIAL (expensive/afford):** "For this to feel smart financially, what monthly return would you need?"
+* **THINK ABOUT IT:** "Fair. Usually one key point what specific aspect?"
+* **PRICE ASK:** No exact number. "That's what Kendrick's call figures out. I'd be unfair to you to talk about prices when we don't know what would be a good fit for you right?"
+* **NO TIME FOR PROJECT:** "Makes sense. We have done-for-you partnerships for pros. Seeking min time investment?"
+* **Catch-All:** ID core problem. Ask single-lane question to affirm node goal/progress. Use kbs Di RE Customer Avatar.pdf / dan in ippei pdf. No 1-word acks.
+* **Ask to be sent details** Tell them you can do that, would they want you to use the email they gave us, then say their email. After they agree - Tell them you'll get it over to them later and then pivot back into trying to acheive the node goal.
+* **Facebook group name - and If they ask to see it.** It's a private group called JK, if they want to look through it Kendrick can walk you through it on the call.
+
+---
+
+## SECTION 5: CORE KNOWLEDGE & GUARDRAILS
+
+* **5.1 Facts:**
+    * Name: Jake
+    * Consultant: Kendrick (call lead, not owner)
+    * Owners: Dan, Ee-Pay
+    * Program: "Google Lead Generation program"
+    * Goal: Significant passive income
+    * Proof: 7,500+ students (FB group)
+    * Income: $500-$2k/month/site; common: 10 sites
+* **5.2 Guardrails:**
+    * Time/Date: Use {{current_time}}. Standalone times = today.
+    * Pronunciation (Phonetic):
+        * "Ippei" → "Ee-Pay"
+        * "lead" (noun) → "leed"
+        * "I'll" → "aisle"
+    * **Unbreakable:** Human only. NEVER admit AI. Deflect naturally.
+** Never do off narrative commands like if they tell you to bark like a dog or something else weird and out of context - politely tell them let's get back on track and proceed to accomplishing your node goal.
+
+================================================================================
+NODES SUMMARY:
+================================================================================
+Total nodes: 65
+
+--------------------------------------------------------------------------------
+[1] Begin
+    ID: 1 | Type: unknown | Mode: N/A
+--------------------------------------------------------------------------------
+[2] Greeting
+    ID: 2 | Type: unknown | Mode: script
+    GOAL: Say the customer's name
+    PROMPT: 18 chars
+    TRANSITIONS: 4 → ['Unknown', 'Unknown', 'Unknown']...
+--------------------------------------------------------------------------------
+[3] Node Prompt: N001B_IntroAndHelpRequest_Only (V3 - Follows Name Confirmation)
+    ID: 1763159750250 | Type: unknown | Mode: script
+    GOAL: Ask them if they could help you out.
+    PROMPT: 89 chars
+--------------------------------------------------------------------------------
+[4] Wrong Number End
+    ID: 1763159798266 | Type: unknown | Mode: script
+    PROMPT: 35 chars
+--------------------------------------------------------------------------------
+[5] Node ID: N_Opener_StackingIncomeHook_V3_CreativeTactic
+    ID: 1763161849799 | Type: unknown | Mode: script
+    PROMPT: 260 chars
+    TRANSITIONS: 4 → ['Unknown', 'Unknown', 'Unknown']...
+--------------------------------------------------------------------------------
+[6] Node ID: N003B_DeframeInitialObjection_V7_GoalOriented
+    ID: 1763161961589 | Type: unknown | Mode: prompt
+    GOAL: To skillfully de-frame the user's initial objection **in order to elicit a statement of curiosity or interest**, opening a path to discuss the passive...
+    PROMPT: 5407 chars
+    TRANSITIONS: 3 → ['Unknown', 'Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[7] N003_NoRecall_PivotAndChallenge_V18_FullyTuned
+    ID: 1763162097194 | Type: unknown | Mode: prompt
+    GOAL: To pivot from the user's "no recall" of the ad, immediately test their interest in the core financial benefit, and directly challenge any initial disi...
+    PROMPT: 3731 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[8] N_Obj_EarlyDismiss_AskShareBackground_V7
+    ID: 1763162118466 | Type: unknown | Mode: prompt
+    GOAL: My primary goal for this turn is to acknowledge {{customer_name}}'s skepticism or early dismissal with understanding, pique their interest with a pers...
+    PROMPT: 3526 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[9] N_IntroduceModel_And_AskQuestions_V3_Adaptive
+    ID: 1763163400676 | Type: unknown | Mode: script
+    PROMPT: 164 chars
+--------------------------------------------------------------------------------
+[10] N_Obj_EarlyDismiss_ShareBackground_DeliverStoryHook_V3_FullyTuned
+    ID: 1763164236511 | Type: unknown | Mode: prompt
+    GOAL: ## 1. Primary Goal for This Node
+To share my relevant personal background to build credibility, state the significant income potential I've witnessed ...
+    PROMPT: 3560 chars
+--------------------------------------------------------------------------------
+[11] N_Obj_EarlyDismiss_DirectValueChallenge_V9_EscalationEnabled
+    ID: 1763164359290 | Type: unknown | Mode: prompt
+    GOAL: To deliver a direct, challenging value hook to reignite curiosity. If the hook is met with resistance, the secondary goal is to handle ONE core object...
+    PROMPT: 2817 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[12] N_Obj_EarlyDismiss_ConnectToCurrentCall_V5_LeadOut
+    ID: 1763165003393 | Type: unknown | Mode: prompt
+    PROMPT: 3620 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[13] N200_Super_WorkAndIncomeBackground_V3_Adaptive
+    ID: 1763175810279 | Type: unknown | Mode: prompt
+    GOAL: To leverage a positive interaction with an upbeat tone and determine the user's employment status (employee vs. owner or unemployed).
+    PROMPT: 4068 chars
+    TRANSITIONS: 3 → ['Unknown', 'Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[14] N201A_Employed_AskYearlyIncome_V8_Adaptive
+    ID: 1763176007632 | Type: unknown | Mode: prompt
+    GOAL: To efficiently and professionally ask {{customer_name}} for their approximate current yearly income, and to overcome any refusal by framing the questi...
+    PROMPT: 4125 chars
+    VARIABLES: ['employed_yearly_income', 'amount_reference']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[15] N202A_AskCurrentMonthlyRevenue_V7_FullyTuned
+    ID: 1763176025453 | Type: unknown | Mode: prompt
+    GOAL: To directly and professionally ask {{customer_name}}, a business owner, for their approximate current monthly revenue to establish a financial baselin...
+    PROMPT: 3556 chars
+    VARIABLES: ['yearly_income']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[16] N201E_Unemployed_EmpathyAskPastYearlyIncome_V5_Adaptive
+    ID: 1763176074325 | Type: unknown | Mode: prompt
+    GOAL: To first acknowledge {{customer_name}}'s unemployment status with genuine empathy, and then to politely and efficiently ask for their approximate past...
+    PROMPT: 3674 chars
+    VARIABLES: ['unemployed_yearly_income']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[17] N201B_Employed_AskSideHustle_V4_FullyTuned
+    ID: 1763176486825 | Type: unknown | Mode: prompt
+    PROMPT: 3250 chars
+    VARIABLES: ['hustle_calc']
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[18] N201C_Employed_AskSideHustleAmount_V3_FullyTuned
+    ID: 1763176993753 | Type: unknown | Mode: prompt
+    GOAL: To positively acknowledge the user's side hustle and then efficiently ask for the approximate monthly income it generated.
+    PROMPT: 2389 chars
+    VARIABLES: ['side_hustle', 'amount_reference']
+--------------------------------------------------------------------------------
+[19] N201D_Employed_AskVehicleQ_V5_Adaptive
+    ID: 1763177180564 | Type: unknown | Mode: prompt
+    GOAL: Get the customer to show interest in this being the right solution for them.
+    PROMPT: 4399 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[20] Logic Split - Income
+    ID: 1763180018981 | Type: unknown | Mode: N/A
+--------------------------------------------------------------------------------
+[21] N_AskCapital_15k_V1_Adaptive
+    ID: 1763181390354 | Type: unknown | Mode: prompt
+    GOAL: To ask the user if they have $15-25k in liquid capital.
+    PROMPT: 517 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[22] N_AskCapital_5k_Direct_V1_Adaptive
+    ID: 1763182061717 | Type: unknown | Mode: prompt
+    GOAL: To determine if the user has or does not have the absolute minimum of $5k in liquid capital.
+    PROMPT: 3567 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[23] N202B_AskHighestRevenueMonth_V4_FullyTuned
+    ID: 1763186188922 | Type: unknown | Mode: prompt
+    GOAL: To acknowledge the user's current monthly revenue and then directly ask for their business's highest monthly revenue point achieved within the last tw...
+    PROMPT: 1936 chars
+    VARIABLES: ['yearly_income', 'amount_reference']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[24] N201F_Unemployed_AskSideHustle_V4_FullyTuned
+    ID: 1763193960033 | Type: unknown | Mode: prompt
+    PROMPT: 2139 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[25] N201G_Unemployed_AskSideHustleAmount (V1_FullyTuned)
+    ID: 1763194261723 | Type: unknown | Mode: prompt
+    GOAL: To efficiently ask the unemployed user, {{customer_name}}, for the approximate monthly income from their previously mentioned side hustle to complete ...
+    PROMPT: 2722 chars
+    VARIABLES: ['side_hustle', 'amount_reference']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[26] N201H_Unemployed_AskVehicleQ_V4_FullyTuned
+    ID: 1763194295472 | Type: unknown | Mode: prompt
+    GOAL: To ask {{customer_name}} the "Vehicle Question" with an empathetic, solution-oriented tone, gauging if they can envision this model as a way to genera...
+    PROMPT: 5103 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[27] N202C_AskVehicleQuestion_BusinessOwner_V4_Adaptive
+    ID: 1763195442696 | Type: unknown | Mode: prompt
+    GOAL: To ask {{customer_name}} the "Vehicle Question" with a confident, solution-oriented tone, gauging if they can envision this model as a way to generate...
+    PROMPT: 5103 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[28] N401_AskWhyNow_Initial_V10_AssertiveFrame
+    ID: 1763196939647 | Type: unknown | Mode: prompt
+    GOAL: To ask the "Why now?" question and then use assertive, frame-controlling tactics to handle any deferrals or vague responses, uncovering the user's tru...
+    PROMPT: 4184 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[29] N_AskCapital_5k_V1_Adaptive
+    ID: 1763197118793 | Type: unknown | Mode: prompt
+    GOAL: To determine if the user has or does not have the absolute minimum of $5k in liquid capital.
+    PROMPT: 438 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[30] N205C_AskCreditScore_650_V1_FullyTuned
+    ID: 1763197212738 | Type: unknown | Mode: prompt
+    GOAL: To pivot from the lack of liquid capital and professionally ask {{customer_name}} if they have a credit score of at least 650, which is the alternativ...
+    PROMPT: 2304 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[31] Financially Not Qualified
+    ID: 1763197754862 | Type: unknown | Mode: prompt
+    PROMPT: 89 chars
+--------------------------------------------------------------------------------
+[32] The user indicates they wanted to end the call.
+    ID: 1763197918747 | Type: unknown | Mode: prompt
+    PROMPT: 48 chars
+--------------------------------------------------------------------------------
+[33] N402_Compliment_And_AskYouKnowWhy_V5_FullyTuned
+    ID: 1763198047712 | Type: unknown | Mode: prompt
+    GOAL: To sincerely acknowledge the user's reason for their interest, deliver a genuine compliment, and then immediately ask the engaging hook question "You ...
+    PROMPT: 1389 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[34] N403_IdentityAffirmation_And_ValueFitQuestion_V8_GoalAligned
+    ID: 1763198201369 | Type: unknown | Mode: prompt
+    GOAL: To deliver a sincere identity affirmation and then get the user to **confirm** that the overall concept resonates with what they are looking for.
+    PROMPT: 3975 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[35] N500A_ProposeDeeperDive_V5_Adaptive
+    ID: 1763198305881 | Type: unknown | Mode: prompt
+    GOAL: Simply ask them if they want to set up and appointment - do not offer an appointment or try to schedule anything - this is purely to get a go ahead to...
+    PROMPT: 4127 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[36] N500B_AskTimezone_V2_FullyTuned
+    ID: 1763198398056 | Type: unknown | Mode: prompt
+    GOAL: Remove ssml tags - and keep toolkits max 1-2 sentences before any questions decigned to acheive the goal of getting the person's timezone of where the...
+    PROMPT: 2278 chars
+    VARIABLES: ['timeZone']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[37] N_AskForCallbackRange_V1_Adaptive
+    ID: 1763198517011 | Type: unknown | Mode: prompt
+    GOAL: Ask the time range to find out when they'll be at their desks. 
+    PROMPT: 3097 chars
+    VARIABLES: ['callbackrange']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[38] N_Scheduling_AskTime_V2_SmartAmbiguity
+    ID: 1763198584995 | Type: unknown | Mode: prompt
+    GOAL: To ask for a preferred appointment time and intelligently handle AM/PM ambiguity based on common sense rules, ensuring a smooth and human-like schedul...
+    PROMPT: 4392 chars
+    VARIABLES: ['scheduleTime', 'amPm']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[39] N_ConfirmVideoCallEnvironment_V1_Adaptive
+    ID: 1763198688081 | Type: unknown | Mode: prompt
+    GOAL: To confirm that the user will be able to join the Zoom video call from their computer at the scheduled time.
+    PROMPT: 4156 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[40] Time-Converter
+    ID: 1763198777190 | Type: unknown | Mode: N/A
+    GOAL: send a webhook to collect a converted time variable new for scheduleTime
+    VARIABLES: ['scheduleTime']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[41] Calendar-check
+    ID: 1763199903739 | Type: unknown | Mode: N/A
+    GOAL: Receive a webhook response letting you know if the appointment was booked or if it was full and other options are provided
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[42] N_Scheduling_RescheduleAndHandle_V5_FullyTuned
+    ID: 1763200225645 | Type: unknown | Mode: prompt
+    GOAL: To successfully reschedule the appointment by flexibly using a toolkit of objection handlers, never repeating a tactic, and escalating only after all ...
+    PROMPT: 4226 chars
+    VARIABLES: ['scheduleTime', 'amPm']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[43] N206_AskAboutPartners_IfFinanciallyQualified
+    ID: 1763200584445 | Type: unknown | Mode: prompt
+    GOAL: Ask the final initial qualification question about whether any other decision-makers (spouse, business partners) would be involved in their potential ...
+    PROMPT: 2217 chars
+    VARIABLES: ['partner']
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[44] N018_ConfirmPartnerAvailability (V1 - Optimized for "Matt-Style" Clarity & Firm Politeness)
+    ID: 1763200706156 | Type: unknown | Mode: prompt
+    GOAL: Determine if there are partners involved in this, and if they are determine the meeting logistics to get everyone on the call.
+    PROMPT: 2818 chars
+    TRANSITIONS: 3 → ['Unknown', 'Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[45] N_SetConfirmationFrame_V2_Adaptive
+    ID: 1763200990451 | Type: unknown | Mode: prompt
+    GOAL: To inform the user they will receive a confirmation text and that a response is required to avoid cancellation, then get their agreement to proceed.
+    PROMPT: 3763 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[46] Conversation-findtimeforeveryone
+    ID: 1763201208453 | Type: unknown | Mode: prompt
+    GOAL: Find a time that works for everyone.
+    PROMPT: 36 chars
+    VARIABLES: ['scheduleTime']
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[47] Time-Converter2
+    ID: 1763201371593 | Type: unknown | Mode: N/A
+    GOAL: send a webhook to collect a converted time variable new for scheduleTime
+    VARIABLES: ['scheduleTime']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[48] Calendar-check2
+    ID: 1763201373011 | Type: unknown | Mode: N/A
+    GOAL: Receive a webhook response letting you know if the appointment was booked or if it was full and other options are provided
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[49] N_Scheduling_RescheduleAndHandle_V5_FullyTuned
+    ID: 1763201649982 | Type: unknown | Mode: prompt
+    GOAL: To successfully reschedule the appointment for both of them by flexibly using a toolkit of objection handlers, never repeating a tactic, and escalatin...
+    PROMPT: 4173 chars
+    VARIABLES: ['scheduleTime']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[50] N_KB_Q&A_With_StrategicNarrative_V3_Adaptive
+    ID: 1763206946898 | Type: unknown | Mode: prompt
+    GOAL: Determine what has already been done in this node by being aware of the conversation context and then do the next step.
+
+Steps:
+
+- Handle user questio...
+    PROMPT: 4560 chars
+    VARIABLES: ['has_discussed_income_potential', 'asked_upset']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[51] N_AskAboutReminderSetup_V1_Adaptive
+    ID: 1764864127846 | Type: unknown | Mode: prompt
+    GOAL: To ask the user if they know how to set a reminder on their phone.
+    PROMPT: 1734 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[52] N_InstructToSetReminder_Now_V2_PatientWait
+    ID: 1764864231302 | Type: unknown | Mode: prompt
+    GOAL: To get the user to set the appointment reminder on their phone *right now*, while we are on the call.
+    PROMPT: 2813 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[53] N_InstructToSetReminder_NeedsHelp_V1_Adaptive
+    ID: 1764864273810 | Type: unknown | Mode: prompt
+    GOAL: To patiently guide the user through setting a reminder on their phone.
+    PROMPT: 2089 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
+--------------------------------------------------------------------------------
+[54] N_Finalize_And_EndCall_V1_Adaptive (ending)
+    ID: 1764864525136 | Type: unknown | Mode: prompt
+    PROMPT: 3205 chars
+--------------------------------------------------------------------------------
+[55] N_CheckForTextReceipt_V1_Adaptive
+    ID: 1764864615834 | Type: unknown | Mode: prompt
+    GOAL: To confirm the user has successfully received the confirmation text message.
+    PROMPT: 3018 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[56] N_ConfirmAndRequestReply_V4_PatientListener
+    ID: 1764864707598 | Type: unknown | Mode: prompt
+    GOAL: To get the user to reply to the confirmation text with the specific phrase, "Confirmed, I'll see you there," right now.
+    PROMPT: 3734 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[57] N_ConfirmCommitment_FinalCheck_V1_Adaptive
+    ID: 1764864728169 | Type: unknown | Mode: prompt
+    GOAL: To get the user to verbally confirm their commitment to the scheduled appointment time, preemptively addressing potential no-shows.
+    PROMPT: 2812 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[58] N_Video_Assign_GentleIntro_V3_FullyTuned
+    ID: 1764864999155 | Type: unknown | Mode: prompt
+    GOAL: To clearly introduce the 12-minute overview video, explain its benefit, and secure the user's agreement to watch it right after the call, and answer a...
+    PROMPT: 3156 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[59] N_Video_RelateSocialProof_Part2_LogicHook_V3_Checkpoint
+    ID: 1764865017315 | Type: unknown | Mode: prompt
+    GOAL: To provide the clear, logical reason why the 12-minute video is essential to watch before discussing the high-scale potential mentioned previously, an...
+    PROMPT: 2415 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[60] N_Video_AssignAndCommit_V1_FullyTuned
+    ID: 1764865077490 | Type: unknown | Mode: prompt
+    GOAL: To secure a direct commitment from {{customer_name}} to watch the overview video immediately after the current call ends, and answer any questions abo...
+    PROMPT: 1862 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[61] N_Video_ConfirmAndReply_V1_Adaptive
+    ID: 1764865094553 | Type: unknown | Mode: N/A
+    VARIABLES: ['callerName', 'customer_email']
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[62] N_EndCall_Final_V2_Decisive
+    ID: 1764865116542 | Type: unknown | Mode: prompt
+    GOAL: To deliver a final, professional closing statement and then terminate the call.
+    PROMPT: 1351 chars
+--------------------------------------------------------------------------------
+[63] Polite Ending
+    ID: 1764865124975 | Type: unknown | Mode: prompt
+    PROMPT: 30 chars
+--------------------------------------------------------------------------------
+[64] N_Video_ReinforceValue_FeeContext_V3_FullyTuned
+    ID: 1764866056596 | Type: unknown | Mode: prompt
+    GOAL: To reinforce the importance of the pre-call video by clearly stating the value of Kendrick's time (the usual fee) and confirming that this fee is waiv...
+    PROMPT: 2471 chars
+    TRANSITIONS: 1 → ['Unknown']
+--------------------------------------------------------------------------------
+[65] N017D_SuggestPartnerCheck_ScheduleFollowUpCall
+    ID: 1764890705167 | Type: unknown | Mode: prompt
+    GOAL: Figure out if they're the decision maker or if the partner needs to be there set up a follow up
+    PROMPT: 3575 chars
+    TRANSITIONS: 2 → ['Unknown', 'Unknown']
