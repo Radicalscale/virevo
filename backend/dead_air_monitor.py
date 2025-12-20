@@ -81,8 +81,12 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                     tts_session = persistent_tts_manager.get_session(call_control_id) if call_control_id else None
                     generation_in_progress = tts_session and not tts_session.generation_complete
                     
-                    # If playback time has passed AND no pending playbacks in Redis AND generation is complete
-                    if playback_expected_end > 0 and current_time > playback_expected_end and playback_count == 0 and not generation_in_progress:
+                    # 🔥 FIX: Also check if webhook is executing (e.g., waiting for booking confirmation)
+                    # This prevents false "are you still there" triggers during webhook wait periods
+                    executing_webhook = getattr(session, 'executing_webhook', False)
+                    
+                    # If playback time has passed AND no pending playbacks in Redis AND generation is complete AND not executing webhook
+                    if playback_expected_end > 0 and current_time > playback_expected_end and playback_count == 0 and not generation_in_progress and not executing_webhook:
                         time_since_end = current_time - playback_expected_end
                         logger.info(f"⏱️ Playback expected end time passed ({time_since_end:.1f}s ago), marking agent as done speaking")
                         session.mark_agent_speaking_end()

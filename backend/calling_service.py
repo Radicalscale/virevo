@@ -3130,186 +3130,232 @@ Return ONLY a JSON object with the extracted values. If a value cannot be determ
             
             logger.info(f"📤 Request body: {json.dumps(request_body, indent=2)[:500]}...")
             
-            # Make HTTP request
-            async with httpx.AsyncClient(timeout=webhook_timeout) as client:
-                if webhook_method == "GET":
-                    response = await client.get(webhook_url, headers=webhook_headers)
-                else:  # POST
-                    response = await client.post(
-                        webhook_url,
-                        json=request_body,
-                        headers=webhook_headers
-                    )
-                
-                logger.info(f"✅ Webhook response: {response.status_code}")
-                
-                if response.status_code == 200:
-                    # Try to parse JSON response
-                    try:
-                        response_text = response.text
-                        logger.info(f"📥 Response text: {response_text[:200]}...")
+            # Retry configuration
+            max_retries = node_data.get("webhook_max_retries", 1)  # Default: 1 retry (2 total attempts)
+            retry_timeout = node_data.get("webhook_retry_timeout", 30)  # 30s for retry attempts
+            
+            # Retry loop - only retries on timeout, not on other errors
+            response = None
+            last_error = None
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    # Use configured timeout for first attempt, longer timeout for retries
+                    current_timeout = webhook_timeout if attempt == 0 else retry_timeout
+                    
+                    if attempt > 0:
+                        logger.warning(f"🔄 Webhook retry attempt {attempt + 1}/{max_retries + 1} with {current_timeout}s timeout...")
+                    
+                    async with httpx.AsyncClient(timeout=current_timeout) as client:
+                        if webhook_method == "GET":
+                            response = await client.get(webhook_url, headers=webhook_headers)
+                        else:  # POST
+                            response = await client.post(
+                                webhook_url,
+                                json=request_body,
+                                headers=webhook_headers
+                            )
                         
-                        if response_text.strip():
-                            # Try strict JSON parsing first
-                            try:
-                                response_data = response.json()
-                            except json.JSONDecodeError:
-                                # If that fails, try with json.loads which is more lenient
-                                logger.warning("⚠️ Standard JSON parsing failed, trying lenient parsing...")
-                                response_data = json.loads(response_text, strict=False)
+                        logger.info(f"✅ Webhook response: {response.status_code}")
+                        
+                        # Success - break out of retry loop
+                        if response.status_code == 200:
+                            break
+                        else:
+                            # Non-200 response - don't retry, just handle the error
+                            logger.error(f"Webhook failed with status {response.status_code}: {response.text}")
+                            return {
+                                "success": False,
+                                "message": f"Webhook failed with status {response.status_code}"
+                            }
                             
-                            logger.info(f"📥 Response data: {json.dumps(response_data, indent=2)[:300]}...")
-                        else:
-                            # Empty response - treat as success
-                            logger.warning("⚠️ Webhook returned empty response, treating as success")
-                            response_data = {"success": True, "message": "Webhook completed"}
-                    except (json.JSONDecodeError, Exception) as e:
-                        logger.error(f"❌ Failed to parse webhook response as JSON: {e}")
-                        logger.error(f"Response text: {response.text[:500]}")
-                        # Try to extract JSON from text using regex
-                        import re
-                        json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
-                        if json_match:
-                            try:
-                                logger.info("🔍 Found JSON pattern in response, attempting to parse...")
-                                response_data = json.loads(json_match.group(0), strict=False)
-                            except:
-                                # Return the raw text as response
-                                response_data = {
-                                    "success": True,
-                                    "message": "Webhook completed",
-                                    "raw_response": response.text
-                                }
-                        else:
+                except httpx.TimeoutException as e:
+                    last_error = e
+                    if attempt < max_retries:
+                        logger.warning(f"⏳ Webhook timeout after {current_timeout}s (attempt {attempt + 1}/{max_retries + 1}), will retry...")
+                        # NOTE: No dialogue is spoken on retry - the filler statement was already spoken before the first attempt
+                        continue
+                    else:
+                        logger.error(f"❌ Webhook failed after {max_retries + 1} attempts (all timed out)")
+                        return {"success": False, "message": f"Webhook timeout after {max_retries + 1} attempts"}
+                        
+                except Exception as e:
+                    # For non-timeout errors, don't retry
+                    logger.error(f"Error executing webhook: {e}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    return {"success": False, "message": f"Webhook error: {str(e)}"}
+            
+            # If we get here without a response, all retries timed out
+            if response is None:
+                logger.error(f"❌ Webhook failed - no response after {max_retries + 1} attempts")
+                return {"success": False, "message": "Webhook timeout after retries"}
+                
+            # Process successful response
+            if response.status_code == 200:
+                # Try to parse JSON response
+                try:
+                    response_text = response.text
+                    logger.info(f"📥 Response text: {response_text[:200]}...")
+                    
+                    if response_text.strip():
+                        # Try strict JSON parsing first
+                        try:
+                            response_data = response.json()
+                        except json.JSONDecodeError:
+                            # If that fails, try with json.loads which is more lenient
+                            logger.warning("⚠️ Standard JSON parsing failed, trying lenient parsing...")
+                            response_data = json.loads(response_text, strict=False)
+                        
+                        logger.info(f"📥 Response data: {json.dumps(response_data, indent=2)[:300]}...")
+                    else:
+                        # Empty response - treat as success
+                        logger.warning("⚠️ Webhook returned empty response, treating as success")
+                        response_data = {"success": True, "message": "Webhook completed"}
+                except (json.JSONDecodeError, Exception) as e:
+                    logger.error(f"❌ Failed to parse webhook response as JSON: {e}")
+                    logger.error(f"Response text: {response.text[:500]}")
+                    # Try to extract JSON from text using regex
+                    import re
+                    json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                    if json_match:
+                        try:
+                            logger.info("🔍 Found JSON pattern in response, attempting to parse...")
+                            response_data = json.loads(json_match.group(0), strict=False)
+                        except:
                             # Return the raw text as response
                             response_data = {
                                 "success": True,
                                 "message": "Webhook completed",
                                 "raw_response": response.text
                             }
+                    else:
+                        # Return the raw text as response
+                        response_data = {
+                            "success": True,
+                            "message": "Webhook completed",
+                            "raw_response": response.text
+                        }
+                
+                # Store response in session variables
+                self.session_variables[response_variable] = response_data
+                logger.info(f"💾 Stored webhook response in variable: {response_variable}")
+                
+                # Extract individual fields from response and update session variables
+                # This allows subsequent nodes to access updated values
+                if isinstance(response_data, dict):
+                    logger.info(f"🔄 Extracting fields from webhook response to update session variables...")
+                    logger.info(f"Response data keys: {list(response_data.keys())}")
+                    updated_vars = []
                     
-                    # Store response in session variables
-                    self.session_variables[response_variable] = response_data
-                    logger.info(f"💾 Stored webhook response in variable: {response_variable}")
+                    # Try to intelligently extract data from common n8n/automation response formats
+                    actual_data = response_data
                     
-                    # Extract individual fields from response and update session variables
-                    # This allows subsequent nodes to access updated values
-                    if isinstance(response_data, dict):
-                        logger.info(f"🔄 Extracting fields from webhook response to update session variables...")
-                        logger.info(f"Response data keys: {list(response_data.keys())}")
-                        updated_vars = []
+                    # Check if we have a raw_response string that might contain JSON
+                    if "raw_response" in response_data and isinstance(response_data.get("raw_response"), str):
+                        logger.info("📦 Detected raw_response string - attempting to parse as JSON...")
+                        logger.info(f"raw_response type: {type(response_data['raw_response'])}")
+                        logger.info(f"raw_response preview: {str(response_data['raw_response'])[:100]}...")
+                        raw_str = response_data["raw_response"]
                         
-                        # Try to intelligently extract data from common n8n/automation response formats
-                        actual_data = response_data
-                        
-                        # Check if we have a raw_response string that might contain JSON
-                        if "raw_response" in response_data and isinstance(response_data.get("raw_response"), str):
-                            logger.info("📦 Detected raw_response string - attempting to parse as JSON...")
-                            logger.info(f"raw_response type: {type(response_data['raw_response'])}")
-                            logger.info(f"raw_response preview: {str(response_data['raw_response'])[:100]}...")
-                            raw_str = response_data["raw_response"]
-                            
-                            # Check if this contains tool_calls_results with markdown JSON
-                            # Many n8n webhooks return JSON embedded in markdown code blocks
-                            import re
-                            if "tool_calls_results" in raw_str and "```json" in raw_str:
-                                logger.info("📦 Detected tool_calls_results with markdown JSON - extracting...")
-                                try:
-                                    # Extract JSON directly from markdown code block (simplest and most reliable)
-                                    json_match = re.search(r'```json\s*(\{.*?\})\s*```', raw_str, re.DOTALL)
-                                    if json_match:
-                                        json_str = json_match.group(1)
-                                        actual_data = json.loads(json_str)
-                                        logger.info(f"✅ Extracted JSON from markdown: {json.dumps(actual_data, indent=2)[:200]}...")
-                                    else:
-                                        logger.warning("⚠️ Could not find JSON in markdown code block")
-                                except Exception as e:
-                                    logger.warning(f"⚠️ Could not extract from markdown: {e}")
-                            elif "tool_calls_results" in raw_str:
-                                # tool_calls_results exists but no markdown, try standard extraction
-                                logger.info("📦 Detected tool_calls_results without markdown - trying standard extraction...")
-                                try:
-                                    temp_data = json.loads(raw_str, strict=False)
-                                    result_str = temp_data.get("tool_calls_results", [{}])[0].get("result", "")
-                                    if result_str.strip().startswith('{'):
-                                        actual_data = json.loads(result_str.strip())
-                                        logger.info(f"✅ Parsed result as JSON: {json.dumps(actual_data, indent=2)[:200]}...")
-                                except Exception as e:
-                                    logger.warning(f"⚠️ Could not extract from tool_calls_results: {e}")
-                            else:
-                                # No tool_calls_results, try standard JSON parsing
-                                try:
-                                    actual_data = json.loads(raw_str, strict=False)
-                                    logger.info(f"✅ Parsed raw_response as JSON: {list(actual_data.keys())}")
-                                except Exception as e:
-                                    logger.warning(f"⚠️ Could not parse raw_response as JSON: {e}")
-                                    # Try regex extraction
-                                    json_match = re.search(r'\{.*\}', raw_str, re.DOTALL)
-                                    if json_match:
-                                        try:
-                                            actual_data = json.loads(json_match.group(0), strict=False)
-                                            logger.info(f"✅ Extracted and parsed JSON from raw_response: {list(actual_data.keys())}")
-                                        except Exception as e2:
-                                            logger.warning(f"⚠️ Regex extraction also failed: {e2}, using original data")
-                        
-                        # Check for n8n tool_call_response format (if not already handled above)
-                        elif "tool_calls_results" in actual_data:
-                            logger.info("📦 Detected n8n tool_calls_results format - extracting nested data...")
+                        # Check if this contains tool_calls_results with markdown JSON
+                        # Many n8n webhooks return JSON embedded in markdown code blocks
+                        import re
+                        if "tool_calls_results" in raw_str and "```json" in raw_str:
+                            logger.info("📦 Detected tool_calls_results with markdown JSON - extracting...")
                             try:
-                                # Get the result from tool_calls_results array
-                                result_str = actual_data.get("tool_calls_results", [{}])[0].get("result", "")
-                                
-                                # Try to extract JSON from the result string
-                                import re
-                                json_match = re.search(r'```json\s*(\{.*?\})\s*```', result_str, re.DOTALL)
+                                # Extract JSON directly from markdown code block (simplest and most reliable)
+                                json_match = re.search(r'```json\s*(\{.*?\})\s*```', raw_str, re.DOTALL)
                                 if json_match:
                                     json_str = json_match.group(1)
                                     actual_data = json.loads(json_str)
-                                    logger.info(f"✅ Extracted JSON from tool_calls_results: {json.dumps(actual_data, indent=2)[:200]}...")
-                                elif result_str.strip().startswith('{'):
-                                    # Try parsing as direct JSON
-                                    actual_data = json.loads(result_str)
+                                    logger.info(f"✅ Extracted JSON from markdown: {json.dumps(actual_data, indent=2)[:200]}...")
+                                else:
+                                    logger.warning("⚠️ Could not find JSON in markdown code block")
+                            except Exception as e:
+                                logger.warning(f"⚠️ Could not extract from markdown: {e}")
+                        elif "tool_calls_results" in raw_str:
+                            # tool_calls_results exists but no markdown, try standard extraction
+                            logger.info("📦 Detected tool_calls_results without markdown - trying standard extraction...")
+                            try:
+                                temp_data = json.loads(raw_str, strict=False)
+                                result_str = temp_data.get("tool_calls_results", [{}])[0].get("result", "")
+                                if result_str.strip().startswith('{'):
+                                    actual_data = json.loads(result_str.strip())
                                     logger.info(f"✅ Parsed result as JSON: {json.dumps(actual_data, indent=2)[:200]}...")
                             except Exception as e:
-                                logger.warning(f"⚠️ Could not extract nested JSON: {e}, using top-level data")
-                                actual_data = response_data
-                        
-                        # Check for common wrapper formats
-                        if "data" in actual_data and isinstance(actual_data.get("data"), dict):
-                            logger.info("📦 Detected 'data' wrapper - extracting nested data...")
-                            actual_data = actual_data["data"]
-                        elif "result" in actual_data and isinstance(actual_data.get("result"), dict):
-                            logger.info("📦 Detected 'result' wrapper - extracting nested data...")
-                            actual_data = actual_data["result"]
-                        
-                        # Now extract fields from actual_data
-                        for field_name, field_value in actual_data.items():
-                            # Skip meta fields that shouldn't be individual variables
-                            if field_name not in ["success", "message", "error", "status", "response_type", "tool_calls_results", "raw_response"]:
-                                self.session_variables[field_name] = field_value
-                                updated_vars.append(f"{field_name}={field_value}")
-                                logger.info(f"  ✓ Updated session variable: {field_name} = {field_value}")
-                        
-                        if updated_vars:
-                            logger.info(f"✅ Updated {len(updated_vars)} session variables from webhook response")
+                                logger.warning(f"⚠️ Could not extract from tool_calls_results: {e}")
                         else:
-                            logger.info("ℹ️ No individual fields to extract from webhook response")
+                            # No tool_calls_results, try standard JSON parsing
+                            try:
+                                actual_data = json.loads(raw_str, strict=False)
+                                logger.info(f"✅ Parsed raw_response as JSON: {list(actual_data.keys())}")
+                            except Exception as e:
+                                logger.warning(f"⚠️ Could not parse raw_response as JSON: {e}")
+                                # Try regex extraction
+                                json_match = re.search(r'\{.*\}', raw_str, re.DOTALL)
+                                if json_match:
+                                    try:
+                                        actual_data = json.loads(json_match.group(0), strict=False)
+                                        logger.info(f"✅ Extracted and parsed JSON from raw_response: {list(actual_data.keys())}")
+                                    except Exception as e2:
+                                        logger.warning(f"⚠️ Regex extraction also failed: {e2}, using original data")
                     
-                    return {
-                        "success": True,
-                        "message": "Webhook executed successfully",
-                        "data": response_data
-                    }
-                else:
-                    logger.error(f"Webhook failed with status {response.status_code}: {response.text}")
-                    return {
-                        "success": False,
-                        "message": f"Webhook failed with status {response.status_code}"
-                    }
+                    # Check for n8n tool_call_response format (if not already handled above)
+                    elif "tool_calls_results" in actual_data:
+                        logger.info("📦 Detected n8n tool_calls_results format - extracting nested data...")
+                        try:
+                            # Get the result from tool_calls_results array
+                            result_str = actual_data.get("tool_calls_results", [{}])[0].get("result", "")
+                            
+                            # Try to extract JSON from the result string
+                            import re
+                            json_match = re.search(r'```json\s*(\{.*?\})\s*```', result_str, re.DOTALL)
+                            if json_match:
+                                json_str = json_match.group(1)
+                                actual_data = json.loads(json_str)
+                                logger.info(f"✅ Extracted JSON from tool_calls_results: {json.dumps(actual_data, indent=2)[:200]}...")
+                            elif result_str.strip().startswith('{'):
+                                # Try parsing as direct JSON
+                                actual_data = json.loads(result_str)
+                                logger.info(f"✅ Parsed result as JSON: {json.dumps(actual_data, indent=2)[:200]}...")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Could not extract nested JSON: {e}, using top-level data")
+                            actual_data = response_data
                     
-        except httpx.TimeoutException:
-            logger.error(f"Webhook timeout after {webhook_timeout}s")
-            return {"success": False, "message": "Webhook timeout"}
+                    # Check for common wrapper formats
+                    if "data" in actual_data and isinstance(actual_data.get("data"), dict):
+                        logger.info("📦 Detected 'data' wrapper - extracting nested data...")
+                        actual_data = actual_data["data"]
+                    elif "result" in actual_data and isinstance(actual_data.get("result"), dict):
+                        logger.info("📦 Detected 'result' wrapper - extracting nested data...")
+                        actual_data = actual_data["result"]
+                    
+                    # Now extract fields from actual_data
+                    for field_name, field_value in actual_data.items():
+                        # Skip meta fields that shouldn't be individual variables
+                        if field_name not in ["success", "message", "error", "status", "response_type", "tool_calls_results", "raw_response"]:
+                            self.session_variables[field_name] = field_value
+                            updated_vars.append(f"{field_name}={field_value}")
+                            logger.info(f"  ✓ Updated session variable: {field_name} = {field_value}")
+                    
+                    if updated_vars:
+                        logger.info(f"✅ Updated {len(updated_vars)} session variables from webhook response")
+                    else:
+                        logger.info("ℹ️ No individual fields to extract from webhook response")
+                
+                return {
+                    "success": True,
+                    "message": "Webhook executed successfully",
+                    "data": response_data
+                }
+            else:
+                logger.error(f"Webhook failed with status {response.status_code}: {response.text}")
+                return {
+                    "success": False,
+                    "message": f"Webhook failed with status {response.status_code}"
+                }
+                    
         except Exception as e:
             logger.error(f"Error executing webhook: {e}")
             import traceback
