@@ -54,18 +54,28 @@ const Calls = () => {
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
 
+  // Check if any advanced filter is active
+  const hasAdvancedFilters = durationFilter.enabled || dateFilter.enabled || fromNumberFilter.enabled || toNumberFilter.enabled;
+
   useEffect(() => {
     fetchCalls();
     fetchAnalytics();
-  }, [currentPage]); // Re-fetch when page changes
+  }, [currentPage, hasAdvancedFilters]); // Re-fetch when page changes or advanced filters change
 
   const fetchCalls = async () => {
     try {
       setLoading(true);
-      const params = {
-        limit: limit,
-        offset: (currentPage - 1) * limit
-      };
+      const params = {};
+
+      // Only use server-side pagination when no advanced filters are active
+      if (!hasAdvancedFilters) {
+        params.limit = limit;
+        params.offset = (currentPage - 1) * limit;
+      } else {
+        // Fetch all calls when advanced filters are active for proper client-side filtering
+        params.limit = 10000; // Large number to get all calls
+        params.offset = 0;
+      }
 
       if (filters.agent_id) params.agent_id = filters.agent_id;
       if (filters.direction) params.direction = filters.direction;
@@ -153,33 +163,33 @@ const Calls = () => {
   const applyDurationFilter = () => {
     if (durationFilter.value) {
       setDurationFilter(prev => ({ ...prev, enabled: true }));
+      setCurrentPage(1); // Reset to page 1 when filter is applied
     }
     setShowDurationModal(false);
-    setTimeout(() => fetchCalls(), 100);
   };
 
   const applyDateFilter = () => {
     if (dateFilter.value) {
       setDateFilter(prev => ({ ...prev, enabled: true }));
+      setCurrentPage(1); // Reset to page 1 when filter is applied
     }
     setShowDateModal(false);
-    setTimeout(() => fetchCalls(), 100);
   };
 
   const applyFromNumberFilter = () => {
     if (fromNumberFilter.value) {
       setFromNumberFilter(prev => ({ ...prev, enabled: true }));
+      setCurrentPage(1); // Reset to page 1 when filter is applied
     }
     setShowFromNumberModal(false);
-    setTimeout(() => fetchCalls(), 100);
   };
 
   const applyToNumberFilter = () => {
     if (toNumberFilter.value) {
       setToNumberFilter(prev => ({ ...prev, enabled: true }));
+      setCurrentPage(1); // Reset to page 1 when filter is applied
     }
     setShowToNumberModal(false);
-    setTimeout(() => fetchCalls(), 100);
   };
 
   const getFilteredCalls = () => {
@@ -270,6 +280,29 @@ const Calls = () => {
     }
 
     return filteredCalls;
+  };
+
+  // Get paginated calls - handles both server-side and client-side pagination
+  const getPaginatedCalls = () => {
+    const filtered = getFilteredCalls();
+
+    // When advanced filters are active, do client-side pagination
+    if (hasAdvancedFilters) {
+      const startIndex = (currentPage - 1) * limit;
+      const endIndex = startIndex + limit;
+      return filtered.slice(startIndex, endIndex);
+    }
+
+    // When no advanced filters, data is already paginated by server
+    return filtered;
+  };
+
+  // Get total count for pagination display
+  const getDisplayTotalCount = () => {
+    if (hasAdvancedFilters) {
+      return getFilteredCalls().length;
+    }
+    return totalCalls;
   };
 
   const formatDuration = (seconds) => {
@@ -554,14 +587,14 @@ const Calls = () => {
                       Loading calls...
                     </td>
                   </tr>
-                ) : getFilteredCalls().length === 0 ? (
+                ) : getPaginatedCalls().length === 0 ? (
                   <tr>
                     <td colSpan="7" className="px-6 py-12 text-center text-gray-400">
                       No calls found
                     </td>
                   </tr>
                 ) : (
-                  getFilteredCalls().map((call) => (
+                  getPaginatedCalls().map((call) => (
                     <tr
                       key={call.id}
                       className="hover:bg-gray-800 cursor-pointer"
@@ -620,7 +653,14 @@ const Calls = () => {
         {/* Pagination Controls */}
         <div className="mt-4 flex items-center justify-between bg-gray-900 rounded-lg p-4 border border-gray-800">
           <div className="text-sm text-gray-400">
-            Showing <span className="font-medium text-white">{Math.min((currentPage - 1) * limit + 1, totalCalls)}</span> to <span className="font-medium text-white">{Math.min(currentPage * limit, totalCalls)}</span> of <span className="font-medium text-white">{totalCalls}</span> results
+            {getDisplayTotalCount() > 0 ? (
+              <>
+                Showing <span className="font-medium text-white">{Math.min((currentPage - 1) * limit + 1, getDisplayTotalCount())}</span> to <span className="font-medium text-white">{Math.min(currentPage * limit, getDisplayTotalCount())}</span> of <span className="font-medium text-white">{getDisplayTotalCount()}</span> results
+                {hasAdvancedFilters && <span className="ml-2 text-blue-400">(filtered)</span>}
+              </>
+            ) : (
+              <span>No results</span>
+            )}
           </div>
           <div className="flex gap-2">
             <button
@@ -632,7 +672,7 @@ const Calls = () => {
             </button>
             <button
               onClick={() => setCurrentPage(prev => prev + 1)}
-              disabled={currentPage * limit >= totalCalls}
+              disabled={currentPage * limit >= getDisplayTotalCount()}
               className="px-4 py-2 bg-gray-800 border border-gray-700 rounded text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
