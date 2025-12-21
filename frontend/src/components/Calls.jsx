@@ -26,6 +26,28 @@ const Calls = () => {
     unit: 'mins' // 'secs', 'mins'
   });
   const [showDurationModal, setShowDurationModal] = useState(false);
+
+  const [dateFilter, setDateFilter] = useState({
+    enabled: false,
+    operator: 'on', // 'on', 'before', 'after', 'between'
+    value: '',
+    value2: '' // for 'between'
+  });
+  const [showDateModal, setShowDateModal] = useState(false);
+
+  const [fromNumberFilter, setFromNumberFilter] = useState({
+    enabled: false,
+    operator: 'contains', // 'contains', 'equals', 'starts_with', 'ends_with'
+    value: ''
+  });
+  const [showFromNumberModal, setShowFromNumberModal] = useState(false);
+
+  const [toNumberFilter, setToNumberFilter] = useState({
+    enabled: false,
+    operator: 'contains', // 'contains', 'equals', 'starts_with', 'ends_with'
+    value: ''
+  });
+  const [showToNumberModal, setShowToNumberModal] = useState(false);
   const [analytics, setAnalytics] = useState(null);
   const [selectedCallId, setSelectedCallId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -106,6 +128,22 @@ const Calls = () => {
       value2: '',
       unit: 'mins'
     });
+    setDateFilter({
+      enabled: false,
+      operator: 'on',
+      value: '',
+      value2: ''
+    });
+    setFromNumberFilter({
+      enabled: false,
+      operator: 'contains',
+      value: ''
+    });
+    setToNumberFilter({
+      enabled: false,
+      operator: 'contains',
+      value: ''
+    });
     setTimeout(() => {
       fetchCalls();
       fetchAnalytics();
@@ -120,30 +158,118 @@ const Calls = () => {
     setTimeout(() => fetchCalls(), 100);
   };
 
+  const applyDateFilter = () => {
+    if (dateFilter.value) {
+      setDateFilter(prev => ({ ...prev, enabled: true }));
+    }
+    setShowDateModal(false);
+    setTimeout(() => fetchCalls(), 100);
+  };
+
+  const applyFromNumberFilter = () => {
+    if (fromNumberFilter.value) {
+      setFromNumberFilter(prev => ({ ...prev, enabled: true }));
+    }
+    setShowFromNumberModal(false);
+    setTimeout(() => fetchCalls(), 100);
+  };
+
+  const applyToNumberFilter = () => {
+    if (toNumberFilter.value) {
+      setToNumberFilter(prev => ({ ...prev, enabled: true }));
+    }
+    setShowToNumberModal(false);
+    setTimeout(() => fetchCalls(), 100);
+  };
+
   const getFilteredCalls = () => {
-    if (!durationFilter.enabled || !durationFilter.value) {
-      return calls;
+    let filteredCalls = calls;
+
+    // Apply duration filter
+    if (durationFilter.enabled && durationFilter.value) {
+      const multiplier = durationFilter.unit === 'mins' ? 60 : 1;
+      const targetDuration = parseFloat(durationFilter.value) * multiplier;
+      const targetDuration2 = durationFilter.value2 ? parseFloat(durationFilter.value2) * multiplier : 0;
+
+      filteredCalls = filteredCalls.filter(call => {
+        const callDuration = call.duration || 0;
+        switch (durationFilter.operator) {
+          case 'greater_than':
+            return callDuration > targetDuration;
+          case 'less_than':
+            return callDuration < targetDuration;
+          case 'between':
+            return callDuration >= targetDuration && callDuration <= targetDuration2;
+          default:
+            return true;
+        }
+      });
     }
 
-    // Convert duration to seconds
-    const multiplier = durationFilter.unit === 'mins' ? 60 : 1;
-    const targetDuration = parseFloat(durationFilter.value) * multiplier;
-    const targetDuration2 = durationFilter.value2 ? parseFloat(durationFilter.value2) * multiplier : 0;
+    // Apply date filter
+    if (dateFilter.enabled && dateFilter.value) {
+      filteredCalls = filteredCalls.filter(call => {
+        if (!call.start_time) return false;
+        const callDate = new Date(call.start_time).toISOString().split('T')[0];
+        const filterDate = dateFilter.value;
+        const filterDate2 = dateFilter.value2;
 
-    return calls.filter(call => {
-      const callDuration = call.duration || 0;
+        switch (dateFilter.operator) {
+          case 'on':
+            return callDate === filterDate;
+          case 'before':
+            return callDate < filterDate;
+          case 'after':
+            return callDate > filterDate;
+          case 'between':
+            return callDate >= filterDate && callDate <= filterDate2;
+          default:
+            return true;
+        }
+      });
+    }
 
-      switch (durationFilter.operator) {
-        case 'greater_than':
-          return callDuration > targetDuration;
-        case 'less_than':
-          return callDuration < targetDuration;
-        case 'between':
-          return callDuration >= targetDuration && callDuration <= targetDuration2;
-        default:
-          return true;
-      }
-    });
+    // Apply from number filter
+    if (fromNumberFilter.enabled && fromNumberFilter.value) {
+      const searchValue = fromNumberFilter.value.toLowerCase();
+      filteredCalls = filteredCalls.filter(call => {
+        const fromNumber = (call.from_number || '').toLowerCase();
+        switch (fromNumberFilter.operator) {
+          case 'contains':
+            return fromNumber.includes(searchValue);
+          case 'equals':
+            return fromNumber === searchValue;
+          case 'starts_with':
+            return fromNumber.startsWith(searchValue);
+          case 'ends_with':
+            return fromNumber.endsWith(searchValue);
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply to number filter
+    if (toNumberFilter.enabled && toNumberFilter.value) {
+      const searchValue = toNumberFilter.value.toLowerCase();
+      filteredCalls = filteredCalls.filter(call => {
+        const toNumber = (call.to_number || '').toLowerCase();
+        switch (toNumberFilter.operator) {
+          case 'contains':
+            return toNumber.includes(searchValue);
+          case 'equals':
+            return toNumber === searchValue;
+          case 'starts_with':
+            return toNumber.startsWith(searchValue);
+          case 'ends_with':
+            return toNumber.endsWith(searchValue);
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filteredCalls;
   };
 
   const formatDuration = (seconds) => {
@@ -293,8 +419,9 @@ const Calls = () => {
             </div>
           </div>
 
-          {/* Duration Filter Button */}
-          <div className="mt-4 flex items-center gap-2">
+          {/* Advanced Filter Buttons */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {/* Duration Filter Button */}
             <button
               onClick={() => setShowDurationModal(true)}
               className={`flex items-center gap-2 px-4 py-2 rounded border ${durationFilter.enabled
@@ -303,24 +430,89 @@ const Calls = () => {
                 }`}
             >
               <Filter className="w-4 h-4" />
-              Filter by Duration
+              Duration
               {durationFilter.enabled && (
-                <span className="ml-2 px-2 py-0.5 bg-blue-500 rounded text-xs">
+                <span className="ml-1 px-2 py-0.5 bg-blue-500 rounded text-xs">
                   {durationFilter.operator === 'greater_than' && `> ${durationFilter.value} ${durationFilter.unit}`}
                   {durationFilter.operator === 'less_than' && `< ${durationFilter.value} ${durationFilter.unit}`}
                   {durationFilter.operator === 'between' && `${durationFilter.value}-${durationFilter.value2} ${durationFilter.unit}`}
                 </span>
               )}
             </button>
-            {durationFilter.enabled && (
+
+            {/* Date Filter Button */}
+            <button
+              onClick={() => setShowDateModal(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded border ${dateFilter.enabled
+                ? 'bg-green-600 border-green-500 text-white'
+                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+                }`}
+            >
+              <Calendar className="w-4 h-4" />
+              Date
+              {dateFilter.enabled && (
+                <span className="ml-1 px-2 py-0.5 bg-green-500 rounded text-xs">
+                  {dateFilter.operator === 'on' && `on ${dateFilter.value}`}
+                  {dateFilter.operator === 'before' && `before ${dateFilter.value}`}
+                  {dateFilter.operator === 'after' && `after ${dateFilter.value}`}
+                  {dateFilter.operator === 'between' && `${dateFilter.value} - ${dateFilter.value2}`}
+                </span>
+              )}
+            </button>
+
+            {/* From Number Filter Button */}
+            <button
+              onClick={() => setShowFromNumberModal(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded border ${fromNumberFilter.enabled
+                ? 'bg-purple-600 border-purple-500 text-white'
+                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+                }`}
+            >
+              <Phone className="w-4 h-4" />
+              From Number
+              {fromNumberFilter.enabled && (
+                <span className="ml-1 px-2 py-0.5 bg-purple-500 rounded text-xs">
+                  {fromNumberFilter.operator === 'contains' && `contains "${fromNumberFilter.value}"`}
+                  {fromNumberFilter.operator === 'equals' && `= "${fromNumberFilter.value}"`}
+                  {fromNumberFilter.operator === 'starts_with' && `starts "${fromNumberFilter.value}"`}
+                  {fromNumberFilter.operator === 'ends_with' && `ends "${fromNumberFilter.value}"`}
+                </span>
+              )}
+            </button>
+
+            {/* To Number Filter Button */}
+            <button
+              onClick={() => setShowToNumberModal(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded border ${toNumberFilter.enabled
+                ? 'bg-orange-600 border-orange-500 text-white'
+                : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+                }`}
+            >
+              <Phone className="w-4 h-4" />
+              To Number
+              {toNumberFilter.enabled && (
+                <span className="ml-1 px-2 py-0.5 bg-orange-500 rounded text-xs">
+                  {toNumberFilter.operator === 'contains' && `contains "${toNumberFilter.value}"`}
+                  {toNumberFilter.operator === 'equals' && `= "${toNumberFilter.value}"`}
+                  {toNumberFilter.operator === 'starts_with' && `starts "${toNumberFilter.value}"`}
+                  {toNumberFilter.operator === 'ends_with' && `ends "${toNumberFilter.value}"`}
+                </span>
+              )}
+            </button>
+
+            {/* Clear individual filters */}
+            {(durationFilter.enabled || dateFilter.enabled || fromNumberFilter.enabled || toNumberFilter.enabled) && (
               <button
                 onClick={() => {
                   setDurationFilter({ enabled: false, operator: 'greater_than', value: '', value2: '', unit: 'mins' });
+                  setDateFilter({ enabled: false, operator: 'on', value: '', value2: '' });
+                  setFromNumberFilter({ enabled: false, operator: 'contains', value: '' });
+                  setToNumberFilter({ enabled: false, operator: 'contains', value: '' });
                   setTimeout(() => fetchCalls(), 100);
                 }}
-                className="text-sm text-gray-400 hover:text-white"
+                className="text-sm text-gray-400 hover:text-white ml-2"
               >
-                Clear Duration Filter
+                Clear All Advanced Filters
               </button>
             )}
           </div>
@@ -529,6 +721,186 @@ const Calls = () => {
                 onClick={applyDurationFilter}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
                 disabled={!durationFilter.value}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Filter Modal */}
+      {showDateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Filter by Date</h3>
+
+            <div className="space-y-4">
+              {/* Operator Selection */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Condition</label>
+                <select
+                  value={dateFilter.operator}
+                  onChange={(e) => setDateFilter(prev => ({ ...prev, operator: e.target.value }))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                >
+                  <option value="on">is on</option>
+                  <option value="before">is before</option>
+                  <option value="after">is after</option>
+                  <option value="between">is between</option>
+                </select>
+              </div>
+
+              {/* Date Input */}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-400 mb-2">
+                    {dateFilter.operator === 'between' ? 'Start Date' : 'Date'}
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFilter.value}
+                    onChange={(e) => setDateFilter(prev => ({ ...prev, value: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                  />
+                </div>
+
+                {dateFilter.operator === 'between' && (
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-400 mb-2">End Date</label>
+                    <input
+                      type="date"
+                      value={dateFilter.value2}
+                      onChange={(e) => setDateFilter(prev => ({ ...prev, value2: e.target.value }))}
+                      className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowDateModal(false)}
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyDateFilter}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                disabled={!dateFilter.value}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* From Number Filter Modal */}
+      {showFromNumberModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Filter by From Number</h3>
+
+            <div className="space-y-4">
+              {/* Operator Selection */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Condition</label>
+                <select
+                  value={fromNumberFilter.operator}
+                  onChange={(e) => setFromNumberFilter(prev => ({ ...prev, operator: e.target.value }))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                >
+                  <option value="contains">contains</option>
+                  <option value="equals">equals</option>
+                  <option value="starts_with">starts with</option>
+                  <option value="ends_with">ends with</option>
+                </select>
+              </div>
+
+              {/* Phone Number Input */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Phone Number</label>
+                <input
+                  type="text"
+                  value={fromNumberFilter.value}
+                  onChange={(e) => setFromNumberFilter(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="e.g., +1234567890"
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowFromNumberModal(false)}
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyFromNumberFilter}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                disabled={!fromNumberFilter.value}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* To Number Filter Modal */}
+      {showToNumberModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Filter by To Number</h3>
+
+            <div className="space-y-4">
+              {/* Operator Selection */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Condition</label>
+                <select
+                  value={toNumberFilter.operator}
+                  onChange={(e) => setToNumberFilter(prev => ({ ...prev, operator: e.target.value }))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                >
+                  <option value="contains">contains</option>
+                  <option value="equals">equals</option>
+                  <option value="starts_with">starts with</option>
+                  <option value="ends_with">ends with</option>
+                </select>
+              </div>
+
+              {/* Phone Number Input */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Phone Number</label>
+                <input
+                  type="text"
+                  value={toNumberFilter.value}
+                  onChange={(e) => setToNumberFilter(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="e.g., +1234567890"
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowToNumberModal(false)}
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applyToNumberFilter}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded"
+                disabled={!toNumberFilter.value}
               >
                 Save
               </button>
