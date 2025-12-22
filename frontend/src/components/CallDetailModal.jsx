@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  X, Download, Phone, Clock, User, TrendingUp, AlertCircle, 
+import {
+  X, Download, Phone, Clock, User, TrendingUp, AlertCircle,
   Copy, Trash2, CheckCircle, Headphones, MessageCircle, PhoneOff,
   Timer, ChevronDown, ChevronUp, Volume2, Play, Pause
 } from 'lucide-react';
@@ -45,7 +45,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
       setLoading(true);
       const response = await analyticsAPI.callDetail(callId);
       const data = response.data;
-      
+
       // If call has a recording_id, use our backend endpoint to serve it
       // Add cache-busting timestamp
       if (data.recording_id) {
@@ -57,7 +57,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
         const separator = url.includes('?') ? '&' : '?';
         data.recording_url = `${url}${separator}_t=${Date.now()}`;
       }
-      
+
       setCallData(data);
     } catch (error) {
       console.error('Error fetching call details:', error);
@@ -89,7 +89,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio || !callData?.recording_url) return;
-    
+
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
@@ -105,12 +105,12 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
     e.stopPropagation();
     const audio = audioRef.current;
     if (!audio || !callData?.recording_url || !duration || isNaN(duration)) return;
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = Math.max(0, Math.min(1, x / rect.width));
     const newTime = percentage * duration;
-    
+
     audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
@@ -118,11 +118,11 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
   const seekToTime = (seconds) => {
     const audio = audioRef.current;
     if (!audio || !callData?.recording_url || !duration || isNaN(duration)) return;
-    
+
     const newTime = Math.max(0, Math.min(duration, seconds));
     audio.currentTime = newTime;
     setCurrentTime(newTime);
-    
+
     if (!isPlaying) {
       audio.play().catch(err => {
         console.warn('Audio play failed:', err);
@@ -150,6 +150,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
+      timeZone: 'America/New_York',
       month: '2-digit',
       day: '2-digit',
       year: 'numeric',
@@ -204,12 +205,12 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
 
   const downloadLogs = () => {
     if (!callData?.logs) return;
-    
+
     // Build comprehensive log output
     let logOutput = '='.repeat(80) + '\n';
     logOutput += 'DETAILED CALL LOG REPORT\n';
     logOutput += '='.repeat(80) + '\n\n';
-    
+
     // Call metadata
     logOutput += '📞 CALL INFORMATION\n';
     logOutput += '-'.repeat(80) + '\n';
@@ -218,7 +219,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
     logOutput += `Sentiment: ${callData.sentiment || 'N/A'}\n`;
     logOutput += `Date: ${new Date(callData.created_at).toLocaleString()}\n`;
     logOutput += '\n';
-    
+
     // Latency logs
     logOutput += '⏱️  LATENCY LOGS\n';
     logOutput += '-'.repeat(80) + '\n';
@@ -226,14 +227,14 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
       .map(log => `[${log.timestamp}] ${log.level?.toUpperCase() || 'INFO'}: ${log.message}`)
       .join('\n');
     logOutput += logsText + '\n\n';
-    
+
     // Full call_log structure (if available)
     if (callData.call_log && Object.keys(callData.call_log).length > 0) {
       logOutput += '🔍 DETAILED CALL LOG (JSON)\n';
       logOutput += '-'.repeat(80) + '\n';
       logOutput += JSON.stringify(callData.call_log, null, 2) + '\n\n';
     }
-    
+
     // Transcript (if available)
     if (callData.transcript && callData.transcript.length > 0) {
       logOutput += '💬 CONVERSATION TRANSCRIPT\n';
@@ -243,7 +244,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
       });
       logOutput += '\n';
     }
-    
+
     logOutput += '='.repeat(80) + '\n';
     logOutput += 'END OF REPORT\n';
     logOutput += '='.repeat(80) + '\n';
@@ -275,7 +276,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                 </span>
               )}
             </div>
-            
+
             {/* Agent & Version Info */}
             {callData?.agent_name && (
               <div className="flex items-center gap-2 text-sm text-gray-300 mb-1">
@@ -311,7 +312,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
               </button>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
@@ -365,7 +366,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
               {(recordingUrl || callData?.recording_url) && (
                 <div className="bg-gray-800 rounded-lg p-6 mb-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Call Recording</h3>
-                  
+
                   <audio
                     key={recordingUrl}
                     ref={audioRef}
@@ -373,7 +374,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                     preload="metadata"
                     style={{ display: 'none' }}
                   />
-                  
+
                   {/* Custom Audio Controls */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -383,7 +384,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                       >
                         {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                       </button>
-                      
+
                       <div className="flex-1">
                         <div
                           className="bg-gray-700 h-3 rounded-full cursor-pointer relative group"
@@ -395,7 +396,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                             style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
                           />
                           {/* Scrubber handle for better UX */}
-                          <div 
+                          <div
                             className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                             style={{ left: `calc(${(currentTime / duration) * 100 || 0}% - 8px)` }}
                           />
@@ -419,8 +420,8 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                         />
                       </div>
 
-                      <a 
-                        href={recordingUrl || callData?.recording_url} 
+                      <a
+                        href={recordingUrl || callData?.recording_url}
                         download
                         className="text-blue-400 hover:text-blue-300 p-2"
                       >
@@ -509,35 +510,32 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                 <div className="flex gap-6">
                   <button
                     onClick={() => setActiveTab('transcript')}
-                    className={`pb-3 border-b-2 transition-colors ${
-                      activeTab === 'transcript'
+                    className={`pb-3 border-b-2 transition-colors ${activeTab === 'transcript'
                         ? 'border-blue-500 text-white'
                         : 'border-transparent text-gray-400 hover:text-gray-300'
-                    }`}
+                      }`}
                   >
                     Transcription
                   </button>
                   <button
                     onClick={() => setActiveTab('data')}
-                    className={`pb-3 border-b-2 transition-colors ${
-                      activeTab === 'data'
+                    className={`pb-3 border-b-2 transition-colors ${activeTab === 'data'
                         ? 'border-blue-500 text-white'
                         : 'border-transparent text-gray-400 hover:text-gray-300'
-                    }`}
+                      }`}
                   >
                     Data
                   </button>
                   <button
                     onClick={() => setActiveTab('logs')}
-                    className={`pb-3 border-b-2 transition-colors ${
-                      activeTab === 'logs'
+                    className={`pb-3 border-b-2 transition-colors ${activeTab === 'logs'
                         ? 'border-blue-500 text-white'
                         : 'border-transparent text-gray-400 hover:text-gray-300'
-                    }`}
+                      }`}
                   >
                     Detail Logs
                   </button>
-                  
+
                   {/* Download button for current tab */}
                   <button
                     onClick={activeTab === 'transcript' ? downloadTranscript : downloadLogs}
@@ -557,20 +555,18 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                       const isAssistant = message.role === 'assistant' || message.speaker === 'agent';
                       const timestamp = formatTimestamp(message.timestamp);
                       const timestampSeconds = timestamp.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
-                      
+
                       return (
                         <div key={index}>
                           <div
-                            className={`flex gap-3 ${
-                              isAssistant ? 'flex-row' : 'flex-row-reverse'
-                            }`}
+                            className={`flex gap-3 ${isAssistant ? 'flex-row' : 'flex-row-reverse'
+                              }`}
                           >
                             <div
-                              className={`flex-1 rounded-lg p-4 ${
-                                isAssistant
+                              className={`flex-1 rounded-lg p-4 ${isAssistant
                                   ? 'bg-gray-800 text-gray-100'
                                   : 'bg-blue-600 text-white'
-                              }`}
+                                }`}
                             >
                               <div className="flex items-center gap-2 mb-2">
                                 <User className="w-4 h-4" />
@@ -603,7 +599,7 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                                 )}
                                 <span>Node Transition</span>
                               </button>
-                              
+
                               {expandedNodes[index] && (
                                 <div className="mt-2 ml-6 p-3 bg-gray-800 rounded text-sm text-gray-300">
                                   <div>previous node: {message.node_transition.previous_node}</div>
@@ -683,11 +679,10 @@ const CallDetailModal = ({ callId, isOpen, onClose }) => {
                         {callData.logs.map((log, index) => (
                           <div
                             key={index}
-                            className={`py-1 ${
-                              log.level === 'error' ? 'text-red-400' : 
-                              log.level === 'warning' ? 'text-yellow-400' : 
-                              'text-gray-300'
-                            }`}
+                            className={`py-1 ${log.level === 'error' ? 'text-red-400' :
+                                log.level === 'warning' ? 'text-yellow-400' :
+                                  'text-gray-300'
+                              }`}
                           >
                             <span className="text-gray-500">[{log.timestamp}]</span>{' '}
                             <span className={log.level === 'error' ? 'text-red-400' : 'text-gray-400'}>
