@@ -1459,10 +1459,22 @@ class CallSession:
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
                         return response_text
                     else:
-                        # No rephrase - skip speaking entirely, wait for user's next input
-                        logger.info(f"⏭️ Staying on same script node without dynamic_rephrase - NOT re-speaking content")
-                        # Don't add to history - we didn't say anything
-                        return ""
+                        # FIX: Prevent "Dead Air" when user input doesn't trigger transition
+                        # Instead of returning empty string (silence), generate a contextual acknowledgment
+                        logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
+                        
+                        # Create a prompt that acknowledges the user but keeps them on track
+                        prevention_prompt = (
+                            f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
+                            f"However, they did not answer the question or trigger a transition. "
+                            f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
+                            f"and then gently nudge them to answer the script's question or move forward. "
+                            f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
+                        )
+                        
+                        logger.info(f"🤖 Generating sticky-prevention response...")
+                        response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
+                        return response_text
                 
                 # Generate and stream the response
                 response_text = ""

@@ -1,95 +1,186 @@
-
 import os
 import sys
-import telnyx
 import json
+import asyncio
+import base64
 from datetime import datetime
 
-# Load environment variables (ensure TELNYX_API_KEY is set in your env)
-TELNYX_API_KEY = os.environ.get('TELNYX_API_KEY')
+# Add backend directory to sys.path to import modules
+backend_dir = os.path.join(os.getcwd(), 'backend')
+sys.path.append(backend_dir)
 
-if not TELNYX_API_KEY:
-    print("❌ Error: TELNYX_API_KEY environment variable is not set.")
+try:
+    import telnyx
+    from dotenv import load_dotenv
+    from motor.motor_asyncio import AsyncIOMotorClient
+    # Try importing key_encryption
+    try:
+        from key_encryption import decrypt_api_key
+    except ImportError:
+        decrypt_api_key = None
+        
+except ImportError as e:
+    print(f"❌ Error: Missing dependencies: {e}")
     sys.exit(1)
 
-telnyx.api_key = TELNYX_API_KEY
+# Load environment variables
+load_dotenv(os.path.join(backend_dir, '.env'))
 
-def json_converter(obj):
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    return str(obj)
+# JSON converter for datetime objects
+def json_converter(o):
+    if isinstance(o, datetime):
+        return o.isoformat()
+    return str(o)
 
-def fetch_call_debug_info(call_control_id):
+async def get_details_from_db(call_control_id):
     """
-    Retrieves status and debug info for a specific Telnyx call.
+    Retrieve:
+    1. The API Key (decrypted)
+    2. The full Call Log record (for debugging)
     """
-    print(f"🔍 Fetching debug info for Call ID: {call_control_id}...")
+    mongo_url = os.environ.get('MONGO_URL')
+    db_name = os.environ.get('DB_NAME')
     
+    # documentation fallbacks
+    if not mongo_url:
+        mongo_url = "mongodb+srv://radicalscale_db_user:BqTnIhsbVjhh01Bq@andramada.rznsqrc.mongodb.net/?appName=Andramada"
+        print("⚠️  Using fallback MONGO_URL")
+    if not db_name:
+        db_name = "test_database"
+        
+    try:
+        client = AsyncIOMotorClient(mongo_url)
+        db = client[db_name]
+        
+        # 1. FIND THE RECORD
+        print(f"🔍 Searching DB for call: {call_control_id}")
+        
+        # Try call_logs first (Webhooks)
+        record = await db.call_logs.find_one({"call_id": call_control_id})
+        collection_source = "call_logs"
+        
+        if not record:
+            # Try calls (Internal)
+            record = await db.calls.find_one({"id": call_control_id})
+            collection_source = "calls"
+            
+        if not record:
+            print("❌ Call not found in DB.")
+            return None, None
+            
+        print(f"✅ Found record in '{collection_source}'")
+        
+        # 2. GET USER ID to fetch Key
+        user_id = record.get('user_id')
+        agent_id = record.get('agent_id')
+        
+        if not user_id and agent_id:
+             agent = await db.agents.find_one({"id": agent_id})
+             if agent:
+                 user_id = agent.get('user_id')
+        
+        if not user_id:
+            print("❌ Could not determine User ID from record.")
+            record['_id'] = str(record['_id'])
+            return None, record
+
+        # 3. GET API KEY
+        key_doc = await db.api_keys.find_one({
+            "user_id": user_id,
+            "service_name": "telnyx",
+            "is_active": True
+        })
+        
+        api_key = None
+        if key_doc and key_doc.get("api_key"):
+            encrypted = key_doc.get("api_key")
+            if decrypt_api_key:
+                try:
+                    # Look for encryption key in likely env vars if not set
+                    if not os.environ.get('ENCRYPTION_KEY'):
+                         # Fallback for dev - typically not safe but we are debugging
+                         pass
+                    api_key = decrypt_api_key(encrypted)
+                except Exception:
+                    api_key = encrypted # Fallback to raw if decryption fails (might be unencrypted)
+            else:
+                api_key = encrypted
+
+        # Prepare record for JSON output
+        record['_id'] = str(record['_id'])
+        
+        return api_key, record
+             
+    except Exception as e:
+        print(f"❌ Database Error: {e}")
+        return None, None
+
+async def fetch_call_debug_info(call_control_id):
     debug_data = {
-        "call_id": call_control_id,
-        "timestamp": datetime.now().isoformat(),
-        "call_details": None,
+        "call_control_id": call_control_id,
+        "timestamp": datetime.utcnow().isoformat(),
+        "db_record": None,
+        "telnyx_api_record": None,
         "recordings": [],
         "errors": []
     }
 
-    # 1. Try to retrieve Call Information
-    # Note: Telnyx Call Control API generally requires an active call for 'retrieve',
-    # OR we might be able to find it in CDRs/Reports if it's historic.
-    # We'll try the standard retrieve first.
+    # 1. Get DB Record & Key
+    api_key, db_record = await get_details_from_db(call_control_id)
+    debug_data["db_record"] = db_record
+    
+    # Override with env key if present
+    env_key = os.environ.get('TELNYX_API_KEY')
+    if env_key:
+        api_key = env_key
+        
+    if not api_key:
+        print("❌ Connect failed: No API Key found.")
+        # Print what we have
+        print(json.dumps(debug_data, indent=2, default=json_converter))
+        return
+
+    # 2. Fetch Telnyx Data
     try:
-        # Check standard call retrieve (often only works for active calls)
+        client = telnyx.Telnyx(api_key=api_key)
+        
+        print("📡 Fetching Telnyx API Data...")
         try:
-            call = telnyx.Call.retrieve(call_control_id)
-            debug_data["call_details"] = call
-            print("✅ Found active/cached call details.")
-        except telnyx.error.ResourceNotFoundError:
-            print("⚠️  Call not found in active sessions (expected for finished calls).")
-            # If not active, we might try to look up CDRs if we had the UUID, 
-            # but usually Call Control ID is ephemeral. 
-            # Let's try to verify if it exists as a minimal check.
-            debug_data["call_details"] = {"status": "not_active_or_not_found"}
+            call = client.calls.retrieve(call_control_id)
+            debug_data["telnyx_api_record"] = call
+        except Exception as e:
+            debug_data["errors"].append(f"Call API Fetch Error: {e}")
             
+        print("📼 Fetching Recordings...")
+        try:
+            recs = client.recordings.list(filter={"call_control_id": call_control_id})
+            debug_data["recordings"] = [r for r in recs.data]
+        except Exception as e:
+             debug_data["errors"].append(f"Recording API Fetch Error: {e}")
+             
     except Exception as e:
-        debug_data["errors"].append(f"Call Retrieve Error: {str(e)}")
+        debug_data["errors"].append(f"Telnyx Client Error: {e}")
 
-    # 2. List Recordings associated with this call (if mapped)
-    # This is often the best artifact for "did this happen?"
-    try:
-        # Note: Filtering recordings by specific call control ID filter might vary 
-        # depending on API capabilities. We'll list recent and filter client-side if needed,
-        # or use specific filters if available.
-        # For this script, we'll try a precise filter if the SDK supports it.
-        # Telnyx 'list' often accepts filters.
-        print("🔍 Searching for recordings...")
-        recordings = telnyx.Recording.list(filter={"call_control_id": call_control_id})
-        
-        for rec in recordings.data:
-            debug_data["recordings"].append({
-                "id": rec.id,
-                "created_at": rec.created_at,
-                "status": rec.status,
-                "download_urls": rec.download_urls,
-                "duration": getattr(rec, "duration", None)
-            })
-        print(f"✅ Found {len(debug_data['recordings'])} recordings.")
-        
-    except Exception as e:
-        # debug_data["errors"].append(f"Recording Fetch Error: {str(e)}")
-        # Silence this for now as it can be noisy if filter is invalid
-        print(f"⚠️  Recording fetch warning: {e}")
-
-    # Output detailed JSON
-    print("\n" + "="*40)
+    # Output
+    print("\n" + "="*30)
     print("DEBUG REPORT")
-    print("="*40)
-    print(json.dumps(debug_data, indent=2, default=json_converter))
-    print("="*40)
+    print("="*30)
+    
+    def robust_converter(o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        try:
+            return o.to_dict()
+        except:
+            return str(o)
+            
+    print(json.dumps(debug_data, indent=2, default=robust_converter))
+    print("="*30)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python3 fetch_call_debug.py <call_control_id>")
         sys.exit(1)
-        
-    target_call_id = sys.argv[1]
-    fetch_call_debug_info(target_call_id)
+    
+    call_id = sys.argv[1]
+    asyncio.run(fetch_call_debug_info(call_id))
