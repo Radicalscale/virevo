@@ -1,0 +1,160 @@
+⚠️  Using fallback MONGO_URL
+🔍 Searching DB for call: v3:1vy0XJVy6fi5koDDKgUzUYIAJFwXKCP0z376MuHSWkEeGkmzdOOFCQ
+✅ Found record in 'call_logs'
+📡 Fetching Telnyx API Data...
+📼 Fetching Recordings...
+
+==============================
+DEBUG REPORT
+==============================
+{
+  "call_control_id": "v3:1vy0XJVy6fi5koDDKgUzUYIAJFwXKCP0z376MuHSWkEeGkmzdOOFCQ",
+  "timestamp": "2025-12-24T15:42:04.902166",
+  "db_record": {
+    "_id": "694c098b2ebd671473973947",
+    "id": "8ab7cc62-f52c-4f84-93a9-fc84784d2ca6",
+    "call_id": "v3:1vy0XJVy6fi5koDDKgUzUYIAJFwXKCP0z376MuHSWkEeGkmzdOOFCQ",
+    "agent_id": "bbeda238-e8d9-4d8c-b93b-1b7694581adb",
+    "user_id": "dcafa642-6136-4096-b77d-a4cb99a62651",
+    "phone_number_id": null,
+    "direction": "outbound",
+    "from_number": "+14048000152",
+    "to_number": "+17708336397",
+    "status": "completed",
+    "end_reason": "hangup",
+    "duration": 12,
+    "cost": 0.002,
+    "start_time": "2025-12-24T15:40:59.333000",
+    "end_time": "2025-12-24T15:41:14.755000",
+    "answered_at": "2025-12-24T15:41:02.032000",
+    "sentiment": "unknown",
+    "transcript": [
+      {
+        "role": "user",
+        "text": "Hello?",
+        "timestamp": "2025-12-24T15:41:05.376939"
+      },
+      {
+        "role": "assistant",
+        "text": "Kendrick?",
+        "timestamp": "2025-12-24T15:41:06.130033"
+      },
+      {
+        "role": "assistant",
+        "text": "This is Jake... I was just, um, wondering if you could possibly help me out for a moment?",
+        "timestamp": "2025-12-24T15:41:06.242746"
+      }
+    ],
+    "summary": "",
+    "latency_avg": 0.0,
+    "latency_p50": 0.0,
+    "latency_p90": 0.0,
+    "latency_p99": 0.0,
+    "user_sentiment_score": 0.0,
+    "recording_url": "https://s3.amazonaws.com/telephony-recorder-prod/227803fb-1717-407d-9bd5-fd04aa27c656/2025-12-24/f194e1f4-e0de-11f0-8d0e-02420aef941f-1766590862816886.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIASDC5E2MJDPKMH7UW%2F20251224%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251224T154114Z&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=81edff50c79618ab4db1238aeb506b22d8bad2a5f783d0d7f2eaa86870d3f0a5",
+    "recording_id": "088e6f26-5dcd-4e65-a4cf-a63e6154807c",
+    "recording_duration": 0,
+    "custom_variables": {},
+    "metadata": {},
+    "error_message": null,
+    "created_at": "2025-12-24T15:40:59.333000",
+    "updated_at": "2025-12-24T15:41:15.252000",
+    "logs": [
+      {
+        "timestamp": "2025-12-24T15:40:59.333806",
+        "level": "info",
+        "type": "call_start",
+        "message": "Call initiated - Direction: outbound, From: +14048000152, To: +17708336397",
+        "details": {
+          "direction": "outbound",
+          "from_number": "+14048000152",
+          "to_number": "+17708336397",
+          "agent_id": "bbeda238-e8d9-4d8c-b93b-1b7694581adb"
+        }
+      },
+      {
+        "timestamp": "2025-12-24T15:41:06.130045",
+        "level": "info",
+        "type": "turn_complete",
+        "turn_number": 0,
+        "node_id": "2",
+        "node_label": "Greeting",
+        "user_text": "Hello?",
+        "agent_text": "Kendrick?",
+        "latency": {
+          "e2e_ms": 751,
+          "llm_ms": 655,
+          "stt_ms": 9,
+          "tts_ms": 655,
+          "total_pause_ms": 752,
+          "ttfs_ms": 760,
+          "dead_air_ms": 1260,
+          "transition_ms": 0,
+          "kb_ms": 0
+        },
+        "message": "E2E latency for this turn: 751ms (LLM: 655ms) | User: 'Hello?' -> Agent: 'Kendrick?'"
+      },
+      {
+        "timestamp": "2025-12-24T15:41:06.226243",
+        "level": "metrics",
+        "type": "latency_breakdown",
+        "node_id": "2",
+        "node_label": "Greeting",
+        "latency": {
+          "total_ms": 752,
+          "stt_ms": 9,
+          "llm_ms": 751,
+          "tts_ms": 655,
+          "ttfs_ms": 760,
+          "dead_air_ms": 1260,
+          "transition_ms": 0,
+          "kb_ms": 0
+        },
+        "message": "LATENCY BREAKDOWN - Node: Greeting | DEAD_AIR: 1260ms | STT: 9ms | LLM: 751ms | TTS: 655ms | Transition: 0ms | KB: 0ms"
+      },
+      {
+        "timestamp": "2025-12-24T15:41:14.850070",
+        "level": "info",
+        "type": "call_end",
+        "message": "Call ended - Duration: 12s, Status: completed, Reason: hangup",
+        "details": {
+          "duration_seconds": 12,
+          "status": "completed",
+          "end_reason": "hangup",
+          "cost": 0.002,
+          "error_message": null
+        }
+      }
+    ]
+  },
+  "telnyx_api_record": null,
+  "recordings": [
+    {
+      "id": "088e6f26-5dcd-4e65-a4cf-a63e6154807c",
+      "call_control_id": "v3:1vy0XJVy6fi5koDDKgUzUYIAJFwXKCP0z376MuHSWkEeGkmzdOOFCQ",
+      "call_leg_id": "f194e1f4-e0de-11f0-8d0e-02420aef941f",
+      "call_session_id": "f191576e-e0de-11f0-95f4-02420aef941f",
+      "channels": "dual",
+      "conference_id": null,
+      "created_at": "2025-12-24T15:41:14",
+      "download_urls": {
+        "mp3": "https://s3.amazonaws.com/telephony-recorder-prod/227803fb-1717-407d-9bd5-fd04aa27c656/2025-12-24/f194e1f4-e0de-11f0-8d0e-02420aef941f-1766590862816886.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIASDC5E2MJDPKMH7UW%2F20251224%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251224T154205Z&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=54b3c5f86a73794bb47f80ad977f9ef2fecc82e37c78445e806723582ffafde1"
+      },
+      "duration_millis": 9794,
+      "record_type": "recording",
+      "recording_ended_at": "2025-12-24T15:41:13.496849Z",
+      "recording_started_at": "2025-12-24T15:41:03.702956Z",
+      "source": "call",
+      "status": "completed",
+      "updated_at": "2025-12-24T15:41:14",
+      "connection_id": "2777245537294877821",
+      "to": "+17708336397",
+      "from": "+14048000152",
+      "initiated_by": "StartCallRecordingAPI"
+    }
+  ],
+  "errors": [
+    "Call API Fetch Error: 'CallsResource' object has no attribute 'retrieve'"
+  ]
+}
+==============================

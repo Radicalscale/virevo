@@ -76,7 +76,9 @@ class RedisService:
                 "last_agent_text": call_data.get("last_agent_text", ""),
                 "processing_speech": call_data.get("processing_speech", False),
                 "chunk_count": call_data.get("chunk_count", 0),
-                "recent_agent_texts": call_data.get("recent_agent_texts", [])
+                "recent_agent_texts": call_data.get("recent_agent_texts", []),
+                "user_has_spoken": call_data.get("user_has_spoken", False),  # CRITICAL: For Double Speaking protection
+                "silence_greeting_triggered": call_data.get("silence_greeting_triggered", False)
             }
             
             key = f"call:{call_control_id}"
