@@ -1510,9 +1510,10 @@ class CallSession:
                     if extract_variables and len(extract_variables) > 0:
                         has_mandatory = any(var.get("mandatory", False) for var in extract_variables)
                         
-                        if not has_mandatory:
-                            # Only non-mandatory variables - extract in background
-                            logger.info(f"🔍 Extracting {len(extract_variables)} variables AFTER response (non-blocking)")
+                        # Extract in background if NO mandatory variables OR if we explicitly skipped the precheck
+                        # This ensures that if we skipped precheck, we still attempt to extract the values for future use
+                        if not has_mandatory or should_skip_precheck:
+                            logger.info(f"🔍 Extracting {len(extract_variables)} variables AFTER response (non-blocking) [has_mandatory={has_mandatory}, skipped_precheck={should_skip_precheck}]")
                             import asyncio
                             asyncio.create_task(self._extract_variables_background(extract_variables, user_message))
                             logger.info(f"🚀 Variable extraction started in background")

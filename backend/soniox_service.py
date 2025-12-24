@@ -190,7 +190,9 @@ def clean_transcript(text: str) -> str:
         current = words[i]
         
         # Check if this is a short fragment that should be merged with next word
+        # FIX: Do not merge if current token contains digits (prevents "10" + "to" -> "10to")
         if (len(current) <= 2 and 
+            not any(c.isdigit() for c in current) and
             current.lower() not in standalone and 
             i + 1 < len(words)):
             next_word = words[i + 1]
