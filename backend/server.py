@@ -3762,6 +3762,17 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         # Dead air prevention: Mark user as speaking when we get any transcript
         if text.strip() and not session.user_speaking:
             session.mark_user_speaking_start()
+            
+            # 🔥 FIX: Mark globally that user has spoken to prevent race condition with greeting
+            # This is critical for preventing "Double Speaking" (Agent Greeting + Agent Reply overlap)
+            if call_control_id in active_telnyx_calls:
+                active_telnyx_calls[call_control_id]["user_has_spoken"] = True
+            
+            # Also update Redis for cross-worker visibility
+            try:
+                redis_svc.set_call_data(call_control_id, {"user_has_spoken": True})
+            except Exception as e:
+                logger.warning(f"Failed to update user_has_spoken in Redis: {e}")
         
         # DEBUG: Log ALL partials to see if they're coming through
         logger.info(f"🔍 PARTIAL TRANSCRIPT: '{text}' | Generating: {agent_generating_response}")
@@ -8019,6 +8030,24 @@ async def telnyx_webhook(payload: dict):
                 call_data["flow_type"] = "voice_realtime"
                 call_data["awaiting_speech"] = True
                 call_data["last_agent_text"] = first_text
+
+                # 🔥 FIX: Check if user has ALREADY spoken (race condition protection)
+                # If user spoke during AMD wait/setup, we should NOT speak the greeting
+                # because the WebSocket handler is already generating a response to them.
+                current_call_data = redis_service.get_call_data(call_control_id) or {}
+                mem_call_data = active_telnyx_calls.get(call_control_id, {})
+                
+                user_spoken_redis = current_call_data.get("user_has_spoken", False)
+                user_spoken_mem = mem_call_data.get("user_has_spoken", False)
+                
+                if user_spoken_redis or user_spoken_mem:
+                    logger.warning(f"🛑 SKIPPING GREETING: User already spoke! (Redis: {user_spoken_redis}, Mem: {user_spoken_mem})")
+                    first_text = ""  # Clear greeting so we don't speak it
+                    
+                    # Update transcript to show we skipped it (optional, but good for debugging)
+                    # We don't remove the DB entry since it "technically" was the plan, 
+                    # but we could append a note if needed.
+
             
             # Now speak greeting if there is one
             try:
