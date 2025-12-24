@@ -1,72 +1,43 @@
 
-import re
+import sys
+import os
+
+# Add current directory to path so we can import backend
+sys.path.append(os.getcwd())
+
+from backend.soniox_service import clean_transcript
+
+print("--- Testing Real clean_transcript from backend.soniox_service ---")
 
 inputs = [
-    "10 0to 20 0,1 50 to 20 0grand.",
-    "10 0 to 20 0",
-    "1 50 to 20 0 grand",
-    "10 to 20 grand"
+    ("10 0to 20 0,1 50 to 20 0grand.", "10 0to 20 0,1 50 to 20 0grand."), # Should not merge 10+to (remains split if not mergeable)
+    ("10 0 to 20 0", "100 to 200"),   # 10 + 0 -> 100
+    ("1 50 to 20 0 grand", "150 to 200 grand"), # 1+50 -> 150
+    ("10 to 20 grand", "10 to 20 grand"), # 10 (digits) + to (no digits) -> NO MERGE
+    ("I will be there at 10 to 5", "I will be there at 10 to 5"), # NO MERGE "10to"
+    ("about 1 0 0 0 dol lar s", "about 1000 dollars"), # 1+0+0+0 -> 1000
+    ("one", "one")
 ]
 
-def clean_transcript(text: str) -> str:
-    # Original (simplified for test)
-    if not text: return text
-    text = re.sub(r'\s+', ' ', text).strip()
-    standalone = {'a', 'i', 'the', 'and', 'for', 'are', 'but', 'not', 'you', 'to', 'of'} # Simplified set
+failures = 0
+for inp, expected in inputs:
+    cleaned = clean_transcript(inp)
+    print(f"Input:    '{inp}'")
+    print(f"Output:   '{cleaned}'")
     
-    words = text.split()
-    merged_words = []
-    i = 0
-    while i < len(words):
-        current = words[i]
-        # Original logic:
-        if (len(current) <= 2 and 
-            current.lower() not in standalone and 
-            i + 1 < len(words)):
-            next_word = words[i + 1]
-            if (not any(c in current.lower() for c in 'aeiou') or
-                len(current) == 1 and current.lower() not in {'a', 'i'}):
-                merged_words.append(current + next_word)
-                i += 2
-                continue
-        merged_words.append(current)
-        i += 1
-    return ' '.join(merged_words)
-
-def clean_transcript_v2(text: str) -> str:
-    # Fix with has_digits check
-    if not text: return text
-    text = re.sub(r'\s+', ' ', text).strip()
-    standalone = {'a', 'i', 'the', 'and', 'for', 'are', 'but', 'not', 'you', 'to', 'of'} # Simplified set
-
-    words = text.split()
-    merged_words = []
-    i = 0
-    while i < len(words):
-        current = words[i]
-        
-        # FIX: Check for digits
-        has_digits = any(c.isdigit() for c in current)
-        
-        if (len(current) <= 2 and 
-            not has_digits and   # <--- FIX
-            current.lower() not in standalone and 
-            i + 1 < len(words)):
-            next_word = words[i + 1]
-            if (not any(c in current.lower() for c in 'aeiou') or
-                len(current) == 1 and current.lower() not in {'a', 'i'}):
-                merged_words.append(current + next_word)
-                i += 2
-                continue
-        merged_words.append(current)
-        i += 1
-    return ' '.join(merged_words)
-
-print("--- Testing clean_transcript (Original) ---")
-for inp in inputs:
-    print(f"Input:  '{inp}'")
-    print(f"Output: '{clean_transcript(inp)}'")
-print("\n--- Testing clean_transcript_v2 (Fix) ---")
-for inp in inputs:
-    print(f"Input:  '{inp}'")
-    print(f"Output: '{clean_transcript_v2(inp)}'")
+    # Simple heuristic checks
+    if inp == "about 1 0 0 0 dol lar s":
+        if "1000" in cleaned:
+             print("✅ Numeric merge PASSED (1000)")
+        else:
+             print("❌ Numeric merge FAILED (Expected 1000)")
+             failures += 1
+             
+    if inp == "I will be there at 10 to 5":
+        if "10 to" in cleaned:
+            print("✅ Numeric separation PASSED (10 to)")
+        else:
+            print(f"❌ Numeric separation FAILED (Got '{cleaned}')")
+            failures += 1
+            
+print(f"\nTotal Failures: {failures}")

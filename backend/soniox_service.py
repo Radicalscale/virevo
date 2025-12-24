@@ -184,29 +184,51 @@ def clean_transcript(text: str) -> str:
     # Fourth pass: Aggressive subword merging for short fragments
     # Pattern: 1-2 letter fragment + space + another fragment (when not standalone words)
     words = text.split()
-    merged_words = []
     i = 0
-    while i < len(words):
+    while i < len(words) - 1:
         current = words[i]
         
         # Check if this is a short fragment that should be merged with next word
-        # FIX: Do not merge if current token contains digits (prevents "10" + "to" -> "10to")
-        if (len(current) <= 2 and 
-            not any(c.isdigit() for c in current) and
+        # FIX: Refined digit handling
+        # 1. If current has digits, ONLY merge if next also has digits (e.g. "1" + "0" -> "10")
+        # 2. Identify if "10" + "to" -> "10to" (prevent this)
+        current_has_digits = any(c.isdigit() for c in current)
+        
+        should_merge_digits = False
+        if current_has_digits:
+            next_word_has_digits = any(c.isdigit() for c in words[i+1])
+            if next_word_has_digits:
+                should_merge_digits = True
+                
+        # Condition to process the merge:
+        # 1. Length check (<= 2 chars) OR merging digits (allow long numbers)
+        # 2. Standalone word check
+        # 3. Digit logic:
+        #    - If current has NO digits, proceed with normal vowel/length checks
+        #    - If current HAS digits, only proceed if we explicitly allowed it (should_merge_digits)
+        if ((len(current) <= 2 or should_merge_digits) and 
             current.lower() not in standalone and 
-            i + 1 < len(words)):
+            (not current_has_digits or should_merge_digits)):
+            
             next_word = words[i + 1]
             # Merge if current is consonant-only or matches subword pattern
-            if (not any(c in current.lower() for c in 'aeiou') or
+            # OR if we are merging digits (which often lack vowels)
+            if (should_merge_digits or
+                not any(c in current.lower() for c in 'aeiou') or
                 len(current) == 1 and current.lower() not in {'a', 'i'}):
-                merged_words.append(current + next_word)
-                i += 2
+                
+                # MERGE HAPPENS HERE
+                words[i] = current + next_word
+                del words[i+1]
+                # CRITICAL: Do NOT increment i. We want to check if the NEW merged word
+                # can be merged with the *next* word (e.g. "1"+"0"->"10", then "10"+"0"->"100")
                 continue
         
-        merged_words.append(current)
+        # Only increment if no merge happened
         i += 1
     
-    text = ' '.join(merged_words)
+    # Reconstruct text
+    text = ' '.join(words)
     
     # Final cleanup
     text = re.sub(r'\s+', ' ', text).strip()

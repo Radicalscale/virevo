@@ -8378,8 +8378,10 @@ async def telnyx_webhook(payload: dict):
                                 telnyx_service = get_telnyx_service()
                                 agent_config = session.agent_config if session else None
                                 try:
-                                    await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
-                                    logger.info(f"🔊 Spoke response successfully")
+                                    # 🔥 OPTIMIZATION: Update recent_agent_texts BEFORE speaking
+                                    # This ensures the echo filter is active immediately, preventing race conditions
+                                    # where the agent hears its own audio start before the list is updated.
+                                    
                                     # Update recent agent texts for echo filtering (keep last 3)
                                     # Get current data from Redis or fallback
                                     call_data = redis_service.get_call_data(call_control_id) or active_telnyx_calls.get(call_control_id, {})
@@ -8399,6 +8401,9 @@ async def telnyx_webhook(payload: dict):
                                         call_states[call_control_id]["recent_agent_texts"] = recent_texts
                                     else:
                                         logger.warning(f"⚠️ call_states entry missing for {call_control_id}, skipping recent_agent_texts update")
+
+                                    await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
+                                    logger.info(f"🔊 Spoke response successfully")
                                 except Exception as speak_error:
                                     logger.error(f"❌ Error speaking: {speak_error}")
                                 
