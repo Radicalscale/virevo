@@ -613,8 +613,45 @@ class CallSession:
                     redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
                     logger.info("✅ BARGE-IN: Reset silence_greeting_triggered flag")
                     
+                    # 4. FIX: Return the greeting script directly
+                    # The user spoke before/during our greeting - we should just deliver the greeting
+                    # and THEN wait for their response. NOT treat their barge-in as a transition.
+                    flow_nodes = self.agent_config.get("call_flow", [])
+                    if flow_nodes and self.current_node_id:
+                        for node in flow_nodes:
+                            if node.get("id") == self.current_node_id:
+                                node_data = node.get("data", {})
+                                content = node_data.get("content", "")
+                                
+                                # Replace variables in the greeting
+                                content = self._replace_variables(content)
+                                
+                                if content:
+                                    logger.info(f"✅ BARGE-IN: Returning greeting script: '{content}'")
+                                    
+                                    # Add user's message to history (they did speak)
+                                    self.conversation_history.append({
+                                        "role": "user",
+                                        "content": user_text
+                                    })
+                                    
+                                    # Stream the greeting
+                                    if stream_callback:
+                                        await stream_callback(content)
+                                    
+                                    # Add greeting to history
+                                    self.conversation_history.append({
+                                        "role": "assistant",
+                                        "content": content,
+                                        "_node_id": self.current_node_id
+                                    })
+                                    
+                                    return content
+                                break
+                    
             except Exception as e:
                 logger.error(f"⚠️ Error in Barge-In Interceptor: {e}")
+
             
             # ═══════════════════════════════════════════════════════════════════
             # WEBHOOK EXECUTION GUARD: Wait for any executing webhook to complete
