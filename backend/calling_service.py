@@ -590,6 +590,37 @@ class CallSession:
                 else:
                     logger.info(f"✅ WEBHOOK GUARD: Webhook completed after {wait_time:.1f}s, proceeding with user input")
             
+            # ═══════════════════════════════════════════════════════════════════
+            # RACE CONDITION FIX: Check if user spoke immediately after silence greeting
+            # If so, cancel the greeting audio and remove it from history
+            # ═══════════════════════════════════════════════════════════════════
+            try:
+                if getattr(self, 'silence_greeting_triggered', False):
+                    silence_time = getattr(self, 'silence_greeting_time', 0)
+                    time_since_silence = time.time() - silence_time
+                    
+                    # 2.0s window: covers generation time + network latency
+                    if time_since_silence < 2.0:
+                        logger.warning(f"🚨 RACE CONDITION: User spoke '{user_text}' during silence greeting (delta={time_since_silence:.2f}s). CANCELLING.")
+                        
+                        # 1. Stop Audio immediately
+                        if hasattr(self, 'telnyx_svc') and self.telnyx_svc:
+                            try:
+                                logger.info(f"🛑 Stopping audio for call {self.call_id}")
+                                await self.telnyx_svc.stop_audio(self.call_id)
+                            except Exception as e:
+                                logger.warning(f"⚠️ Failed to stop audio: {e}")
+                        
+                        # 2. Remove the greeting from history if present
+                        if self.conversation_history and self.conversation_history[-1]['role'] == 'assistant':
+                            removed = self.conversation_history.pop()
+                            logger.info(f"🧹 Removed interrupted greeting from history: {removed.get('content')}")
+                        
+                        # 3. Reset state so we don't trigger this again
+                        self.silence_greeting_triggered = False
+            except Exception as e:
+                logger.error(f"Error handling silence race condition: {e}")
+            
             # Update {{now}} variable with current date/time in EST
             import pytz
             est = pytz.timezone('America/New_York')

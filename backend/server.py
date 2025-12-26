@@ -3771,7 +3771,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             # Also update Redis for cross-worker visibility
             # Use update_call_data to merge instead of overwrite (prevents data loss)
             try:
-                redis_svc.update_call_data(call_control_id, {"user_has_spoken": True})
+                redis_service.update_call_data(call_control_id, {"user_has_spoken": True})
             except Exception as e:
                 logger.warning(f"Failed to update user_has_spoken in Redis: {e}")
         
@@ -5229,6 +5229,7 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                     user_id=user_id,
                     db=db
                 )
+                session.telnyx_svc = get_telnyx_service()  # Attach service for self-cancellation logic
                 
                 # Update custom variables
                 custom_variables = call_data_fresh.get("custom_variables", {})
@@ -5276,6 +5277,10 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             
                             # Use update_call_data to prevent wiping session state
                             redis_service.update_call_data(call_control_id, {"silence_greeting_triggered": True})
+                            
+                            # Attach to session for immediate barge-in checking in process_user_input
+                            session.silence_greeting_triggered = True
+                            session.silence_greeting_time = time.time()
                             
                             logger.info(f"⏱️ [WebSocket Worker] Silence timeout reached - generating greeting!")
                             
@@ -7791,6 +7796,7 @@ async def telnyx_webhook(payload: dict):
                     user_id=agent.get("user_id"), 
                     db=db
                 )
+                session.telnyx_svc = telnyx_service  # Attach service for self-cancellation logic
                 logger.info(f"🔧 Calling create_call_session() - COMPLETE")
                 
                 logger.info(f"✅ Session object created: {type(session).__name__}")
