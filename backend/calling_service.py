@@ -621,10 +621,12 @@ class CallSession:
                         for node in flow_nodes:
                             if node.get("id") == self.current_node_id:
                                 node_data = node.get("data", {})
-                                content = node_data.get("content", "")
+                                # Get script content (conversation nodes use 'script', others use 'content')
+                                content = node_data.get("script", "") or node_data.get("content", "")
                                 
-                                # Replace variables in the greeting
-                                content = self._replace_variables(content)
+                                # Replace variables in the greeting (inline, like the rest of the code)
+                                for var_name, var_value in self.session_variables.items():
+                                    content = content.replace(f"{{{{{var_name}}}}}", str(var_value))
                                 
                                 if content:
                                     logger.info(f"✅ BARGE-IN: Returning greeting script: '{content}'")
@@ -648,6 +650,7 @@ class CallSession:
                                     
                                     return content
                                 break
+
                     
             except Exception as e:
                 logger.error(f"⚠️ Error in Barge-In Interceptor: {e}")
