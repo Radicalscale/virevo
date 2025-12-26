@@ -574,6 +574,49 @@ class CallSession:
             logger.info(f"⏱️ [{timestamp_str}] 📥 process_user_input() ENTRY - text: '{user_text[:50]}...'")
             
             # ═══════════════════════════════════════════════════════════════════
+            # 🚨 BARGE-IN INTERCEPTOR 🚨
+            # Check if we generated a silence greeting that the user is now interrupting
+            # ═══════════════════════════════════════════════════════════════════
+            try:
+                from redis_service import redis_service
+                call_data = redis_service.get_call_data(self.call_id)
+                
+                if call_data and call_data.get("silence_greeting_triggered"):
+                    logger.warning(f"🚨 BARGE-IN DETECTED for call {self.call_id}: User spoke while Silence Greeting was triggering")
+                    
+                    # 1. Stop Audio Immediately (best-effort - may fail if audio already finished)
+                    try:
+                        from telnyx_service import TelnyxService
+                        # TelnyxService will use env vars for api_key and connection_id
+                        # This is safe because we're just stopping playback, not initiating calls
+                        ts = TelnyxService()
+                        await ts.stop_audio_playback(self.call_id)
+                        logger.info("✅ BARGE-IN: Audio playback STOPPED")
+                    except Exception as e:
+                        # This is expected if audio already finished or never started
+                        logger.warning(f"⚠️ BARGE-IN: Could not stop audio (may have finished): {e}")
+
+                    # 2. Clean History (Remove the silence greeting)
+                    # SAFETY: Only remove if last message is the silence greeting (short, question-like)
+                    if self.conversation_history and len(self.conversation_history) >= 1:
+                        last_msg = self.conversation_history[-1]
+                        if last_msg.get("role") == "assistant":
+                            last_content = last_msg.get("content", "")
+                            # Only remove if it looks like a silence greeting (short, ends with ?)
+                            if len(last_content) < 50 and "?" in last_content:
+                                removed = self.conversation_history.pop()
+                                logger.info(f"✅ BARGE-IN: Removed silence greeting from history: '{removed.get('content')}'")
+                            else:
+                                logger.info(f"⚠️ BARGE-IN: Last message doesn't look like silence greeting, keeping history")
+                    
+                    # 3. Clear the flag so we don't trigger this again
+                    redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
+                    logger.info("✅ BARGE-IN: Reset silence_greeting_triggered flag")
+                    
+            except Exception as e:
+                logger.error(f"⚠️ Error in Barge-In Interceptor: {e}")
+            
+            # ═══════════════════════════════════════════════════════════════════
             # WEBHOOK EXECUTION GUARD: Wait for any executing webhook to complete
             # This prevents race conditions where user speaks during webhook chain
             # and causes stale current_node_id to be used for transition evaluation
@@ -589,37 +632,6 @@ class CallSession:
                     logger.warning(f"⚠️ WEBHOOK GUARD: Timed out after {wait_time:.1f}s, proceeding anyway")
                 else:
                     logger.info(f"✅ WEBHOOK GUARD: Webhook completed after {wait_time:.1f}s, proceeding with user input")
-            
-            # ═══════════════════════════════════════════════════════════════════
-            # RACE CONDITION FIX: Check if user spoke immediately after silence greeting
-            # If so, cancel the greeting audio and remove it from history
-            # ═══════════════════════════════════════════════════════════════════
-            try:
-                if getattr(self, 'silence_greeting_triggered', False):
-                    silence_time = getattr(self, 'silence_greeting_time', 0)
-                    time_since_silence = time.time() - silence_time
-                    
-                    # 2.0s window: covers generation time + network latency
-                    if time_since_silence < 2.0:
-                        logger.warning(f"🚨 RACE CONDITION: User spoke '{user_text}' during silence greeting (delta={time_since_silence:.2f}s). CANCELLING.")
-                        
-                        # 1. Stop Audio immediately
-                        if hasattr(self, 'telnyx_svc') and self.telnyx_svc:
-                            try:
-                                logger.info(f"🛑 Stopping audio for call {self.call_id}")
-                                await self.telnyx_svc.stop_audio(self.call_id)
-                            except Exception as e:
-                                logger.warning(f"⚠️ Failed to stop audio: {e}")
-                        
-                        # 2. Remove the greeting from history if present
-                        if self.conversation_history and self.conversation_history[-1]['role'] == 'assistant':
-                            removed = self.conversation_history.pop()
-                            logger.info(f"🧹 Removed interrupted greeting from history: {removed.get('content')}")
-                        
-                        # 3. Reset state so we don't trigger this again
-                        self.silence_greeting_triggered = False
-            except Exception as e:
-                logger.error(f"Error handling silence race condition: {e}")
             
             # Update {{now}} variable with current date/time in EST
             import pytz

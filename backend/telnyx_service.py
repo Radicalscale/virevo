@@ -958,6 +958,23 @@ class TelnyxService:
             logger.error(f"❌ Error stopping audio streaming: {e}")
             return {"success": False, "error": str(e)}
 
+    async def stop_audio_playback(
+        self,
+        call_control_id: str
+    ) -> Dict[str, Any]:
+        """Stop audio playback (MP3/WAV via REST)"""
+        try:
+            logger.info(f"🛑 Stopping audio playback on call: {call_control_id}")
+            
+            self.client.calls.actions.playback_stop(
+                call_control_id=call_control_id
+            )
+            
+            return {"success": True}
+        except Exception as e:
+            logger.error(f"❌ Error stopping audio playback: {e}")
+            return {"success": False, "error": str(e)}
+
     def verify_webhook(self, payload: Dict[str, Any], signature: str) -> bool:
         """Verify webhook signature from Telnyx"""
         # TODO: Implement webhook signature verification
