@@ -576,12 +576,18 @@ class CallSession:
             # ═══════════════════════════════════════════════════════════════════
             # 🚨 BARGE-IN INTERCEPTOR 🚨
             # Check if we generated a silence greeting that the user is now interrupting
+            # IMPORTANT: Only trigger barge-in if user_text is NOT the silence marker ("...")
+            # The silence marker indicates this IS the silence greeting being generated,
+            # not a user interruption.
             # ═══════════════════════════════════════════════════════════════════
             try:
                 from redis_service import redis_service
                 call_data = redis_service.get_call_data(self.call_id)
                 
-                if call_data and call_data.get("silence_greeting_triggered"):
+                # CRITICAL FIX: Skip barge-in if this IS the silence greeting being generated
+                is_silence_timeout = user_text.strip() in ["...", "…"]
+                
+                if call_data and call_data.get("silence_greeting_triggered") and not is_silence_timeout:
                     logger.warning(f"🚨 BARGE-IN DETECTED for call {self.call_id}: User spoke while Silence Greeting was triggering")
                     
                     # 1. Stop Audio Immediately (best-effort - may fail if audio already finished)

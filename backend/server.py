@@ -4310,8 +4310,8 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                     accumulated_transcript = ""
                     return
                 
-                response_text = response.get("text", "")
-                response_latency = response.get("latency", 0)
+                response_text = response.get("text", "") if isinstance(response, dict) else (response or "")
+                response_latency = response.get("latency", 0) if isinstance(response, dict) else 0
                 llm_latency_ms = int((time.time() - llm_start_time) * 1000)
                 
                 logger.info(f"✅ LLM finished in {llm_latency_ms}ms, TTS tasks already running in background")
@@ -5281,7 +5281,14 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             
                             # Generate and speak greeting
                             greeting_response = await session.process_user_input("")
-                            greeting_text = greeting_response.get("text", "Hello?")
+                            
+                            # Handle both string and dict return types
+                            if isinstance(greeting_response, str):
+                                greeting_text = greeting_response
+                            elif greeting_response:
+                                greeting_text = greeting_response.get("text", "Hello?")
+                            else:
+                                greeting_text = "Hello?"
                             
                             logger.info(f"💬 [WebSocket Worker] AI speaks after silence: {greeting_text}")
                             
