@@ -8360,6 +8360,11 @@ async def telnyx_webhook(payload: dict):
                     if session:
                         try:
                             response = await session.process_user_input(transcript_text)
+                            
+                            if not response:
+                                logger.info("🤖 AI response suppressed (likely barge-in or empty)")
+                                return {"status": "ok"}
+                                
                             response_text = response.get("text", "I'm sorry, I didn't understand.")
                             
                             logger.info(f"🤖 AI response: {response_text}")

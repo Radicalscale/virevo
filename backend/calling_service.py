@@ -625,14 +625,24 @@ class CallSession:
                     if not target_node_id and flow_nodes:
                         logger.warning("⚠️ BARGE-IN: current_node_id is missing, attempting to find Start Node...")
                         # 1. Find node with type 'start'
-                        start_node = next((n for n in flow_nodes if n.get("type") == "start"), None)
+                        start_node = next((n for n in flow_nodes if n.get("type", "").lower() == "start"), None)
+                        
                         if start_node:
                             # 2. Find the edge connecting start to the next node
-                            edges = self.agent_config.get("call_flow_edges", [])
+                            # Check both keys just in case
+                            edges = self.agent_config.get("call_flow_edges", []) or self.agent_config.get("edges", [])
                             start_edge = next((e for e in edges if e.get("source") == start_node.get("id")), None)
+                            
                             if start_edge:
                                 target_node_id = start_edge.get("target")
                                 logger.info(f"✅ BARGE-IN: Found start node target: {target_node_id}")
+                        
+                        # 3. Hail Mary: If still no target, look for a node with a greeting-like label
+                        if not target_node_id:
+                            greeting_node = next((n for n in flow_nodes if n.get("data", {}).get("label", "").lower() in ["greeting", "intro", "introduction", "start"]), None)
+                            if greeting_node:
+                                target_node_id = greeting_node.get("id")
+                                logger.info(f"✅ BARGE-IN: Found greeting node via label: {target_node_id}")
                     
                     content_to_return = None
                     
