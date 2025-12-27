@@ -1,0 +1,799 @@
+2025-12-27T09:23:40.000000000Z [inf]  Starting Container
+2025-12-27T09:23:41.093454778Z [inf]  =========================================
+2025-12-27T09:23:41.093460186Z [inf]  🚀 START.SH SCRIPT IS EXECUTING
+2025-12-27T09:23:41.093467657Z [inf]  =========================================
+2025-12-27T09:23:41.093473607Z [inf]  📍 Working directory: /app/backend
+2025-12-27T09:23:41.093479009Z [inf]  🔍 Python path: /app/backend
+2025-12-27T09:23:41.093484726Z [inf]  🌐 Starting Gunicorn on 0.0.0.0:8080...
+2025-12-27T09:23:41.093490780Z [inf]  =========================================
+2025-12-27T09:23:42.918148884Z [err]  [2025-12-27 09:23:42 +0000] [1] [INFO] Starting gunicorn 22.0.0
+2025-12-27T09:23:42.918153698Z [err]  [2025-12-27 09:23:42 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+2025-12-27T09:23:42.918158327Z [err]  [2025-12-27 09:23:42 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-12-27T09:23:42.918162736Z [err]  [2025-12-27 09:23:42 +0000] [3] [INFO] Booting worker with pid: 3
+2025-12-27T09:23:43.098816071Z [err]  [2025-12-27 09:23:42 +0000] [4] [INFO] Booting worker with pid: 4
+2025-12-27T09:23:43.098819980Z [err]  [2025-12-27 09:23:43 +0000] [5] [INFO] Booting worker with pid: 5
+2025-12-27T09:23:43.153471303Z [err]  [2025-12-27 09:23:43 +0000] [6] [INFO] Booting worker with pid: 6
+2025-12-27T09:24:03.088707078Z [err]  2025-12-27 09:23:57,461 - server - INFO - ℹ️  RAG service disabled (set ENABLE_RAG=true to enable semantic search)
+2025-12-27T09:24:03.088718636Z [err]  2025-12-27 09:23:57,461 - server - INFO - 🔥 Pre-warming connection libraries...
+2025-12-27T09:24:03.088727006Z [err]  2025-12-27 09:23:57,468 - server - INFO - ✅ CORS configured for origins: ['https://app.li-ai.org', 'https://li-ai.org']
+2025-12-27T09:24:03.088734970Z [err]  2025-12-27 09:23:57,484 - server - INFO - ✅ Connection libraries pre-warmed (websockets, httpx, ElevenLabs, Soniox)
+2025-12-27T09:24:03.088746110Z [err]  2025-12-27 09:23:57,318 - server - INFO - ℹ️  RAG service disabled (set ENABLE_RAG=true to enable semantic search)
+2025-12-27T09:24:03.088746714Z [err]  2025-12-27 09:23:57,486 - server - INFO - ℹ️  RAG service disabled (set ENABLE_RAG=true to enable semantic search)
+2025-12-27T09:24:03.088755750Z [err]  2025-12-27 09:23:57,486 - server - INFO - 🔥 Pre-warming connection libraries...
+2025-12-27T09:24:03.088757738Z [err]  2025-12-27 09:23:57,318 - server - INFO - 🔥 Pre-warming connection libraries...
+2025-12-27T09:24:03.088764469Z [err]  2025-12-27 09:23:57,509 - server - INFO - ✅ Connection libraries pre-warmed (websockets, httpx, ElevenLabs, Soniox)
+2025-12-27T09:24:03.088770194Z [err]  2025-12-27 09:23:57,323 - server - INFO - ℹ️  RAG service disabled (set ENABLE_RAG=true to enable semantic search)
+2025-12-27T09:24:03.088779389Z [err]  2025-12-27 09:23:57,323 - server - INFO - 🔥 Pre-warming connection libraries...
+2025-12-27T09:24:03.088787796Z [err]  2025-12-27 09:23:57,342 - server - INFO - ✅ Connection libraries pre-warmed (websockets, httpx, ElevenLabs, Soniox)
+2025-12-27T09:24:03.088796523Z [err]  2025-12-27 09:23:57,345 - server - INFO - ✅ Connection libraries pre-warmed (websockets, httpx, ElevenLabs, Soniox)
+2025-12-27T09:24:03.088805282Z [err]  2025-12-27 09:23:57,461 - server - INFO - ✅ CORS configured for origins: ['https://app.li-ai.org', 'https://li-ai.org']
+2025-12-27T09:24:03.089541688Z [err]  2025-12-27 09:23:57,732 - server - INFO - ✅ QC test router loaded
+2025-12-27T09:24:03.089545913Z [err]  2025-12-27 09:23:57,561 - server - INFO - ✅ QC enhanced router loaded
+2025-12-27T09:24:03.089553990Z [err]  2025-12-27 09:23:57,733 - server - INFO - ✅ QC test router loaded
+2025-12-27T09:24:03.089556550Z [err]  2025-12-27 09:23:57,562 - server - INFO - ✅ QC enhanced router loaded
+2025-12-27T09:24:03.089563881Z [err]  2025-12-27 09:23:57,585 - server - INFO - ✅ CORS configured for origins: ['https://app.li-ai.org', 'https://li-ai.org']
+2025-12-27T09:24:03.089572506Z [err]  2025-12-27 09:23:57,599 - server - INFO - ✅ QC agent router loaded
+2025-12-27T09:24:03.089579077Z [err]  2025-12-27 09:23:57,602 - server - INFO - ✅ QC agent router loaded
+2025-12-27T09:24:03.089586356Z [err]  2025-12-27 09:23:57,616 - server - INFO - ✅ CORS configured for origins: ['https://app.li-ai.org', 'https://li-ai.org']
+2025-12-27T09:24:03.089593548Z [err]  2025-12-27 09:23:57,621 - server - INFO - ✅ QC learning router loaded
+2025-12-27T09:24:03.089601600Z [err]  2025-12-27 09:23:57,623 - server - INFO - ✅ QC learning router loaded
+2025-12-27T09:24:03.089608861Z [err]  2025-12-27 09:23:57,631 - server - INFO - ✅ QC enhanced router loaded
+2025-12-27T09:24:03.089616009Z [err]  2025-12-27 09:23:57,664 - server - INFO - ✅ QC agent router loaded
+2025-12-27T09:24:03.089623556Z [err]  2025-12-27 09:23:57,668 - server - INFO - ✅ QC enhanced router loaded
+2025-12-27T09:24:03.089630416Z [err]  2025-12-27 09:23:57,680 - server - INFO - ✅ QC learning router loaded
+2025-12-27T09:24:03.089636568Z [err]  2025-12-27 09:23:57,703 - server - INFO - ✅ QC agent router loaded
+2025-12-27T09:24:03.089642963Z [err]  2025-12-27 09:23:57,719 - server - INFO - ✅ QC learning router loaded
+2025-12-27T09:24:03.089650063Z [err]  2025-12-27 09:23:57,721 - server - INFO - ✅ CRM router loaded
+2025-12-27T09:24:03.089657484Z [err]  2025-12-27 09:23:57,725 - server - INFO - ✅ CRM router loaded
+2025-12-27T09:24:03.090018627Z [err]  2025-12-27 09:23:57,749 - server - INFO - ✅ Agent test router loaded
+2025-12-27T09:24:03.090027013Z [err]  2025-12-27 09:23:57,750 - server - INFO - ✅ Agent test router loaded
+2025-12-27T09:24:03.090033880Z [err]  2025-12-27 09:23:57,760 - server - INFO - ✅ Director Studio router loaded
+2025-12-27T09:24:03.090040003Z [err]  2025-12-27 09:23:57,760 - server - INFO - ✅ QC agents orchestrator loaded
+2025-12-27T09:24:03.090046263Z [err]  2025-12-27 09:23:57,761 - server - INFO - ✅ Director Studio router loaded
+2025-12-27T09:24:03.090052986Z [err]  2025-12-27 09:23:57,761 - server - INFO - ✅ QC agents orchestrator loaded
+2025-12-27T09:24:03.090059255Z [err]  2025-12-27 09:23:57,773 - server - INFO - ✅ CRM router loaded
+2025-12-27T09:24:03.090067555Z [err]  [2025-12-27 09:23:57 +0000] [5] [INFO] Started server process [5]
+2025-12-27T09:24:03.090073602Z [err]  [2025-12-27 09:23:57 +0000] [5] [INFO] Waiting for application startup.
+2025-12-27T09:24:03.090080106Z [err]  [2025-12-27 09:23:57 +0000] [3] [INFO] Started server process [3]
+2025-12-27T09:24:03.090085620Z [err]  [2025-12-27 09:23:57 +0000] [3] [INFO] Waiting for application startup.
+2025-12-27T09:24:03.090090592Z [err]  2025-12-27 09:23:57,777 - server - INFO - ✅ QC test router loaded
+2025-12-27T09:24:03.090096185Z [err]  2025-12-27 09:23:57,783 - server - INFO - 🎵 Pre-generating comfort noise file on startup (5 minutes for seamless loops)...
+2025-12-27T09:24:03.090101506Z [err]  2025-12-27 09:23:57,783 - server - INFO - 🎵 Pre-generating comfort noise file on startup (5 minutes for seamless loops)...
+2025-12-27T09:24:03.090107311Z [err]  2025-12-27 09:23:57,790 - server - INFO - ✅ Agent test router loaded
+2025-12-27T09:24:03.090112666Z [err]  2025-12-27 09:23:57,796 - server - INFO - ✅ Director Studio router loaded
+2025-12-27T09:24:03.090118221Z [err]  2025-12-27 09:23:57,796 - server - INFO - ✅ QC agents orchestrator loaded
+2025-12-27T09:24:03.090745476Z [err]  [2025-12-27 09:23:57 +0000] [4] [INFO] Started server process [4]
+2025-12-27T09:24:03.090755116Z [err]  [2025-12-27 09:23:57 +0000] [4] [INFO] Waiting for application startup.
+2025-12-27T09:24:03.090761973Z [err]  2025-12-27 09:23:57,814 - server - INFO - 🎵 Pre-generating comfort noise file on startup (5 minutes for seamless loops)...
+2025-12-27T09:24:03.090768760Z [err]  2025-12-27 09:23:57,820 - server - INFO - ✅ CRM router loaded
+2025-12-27T09:24:03.090775116Z [err]  2025-12-27 09:23:57,824 - server - INFO - ✅ QC test router loaded
+2025-12-27T09:24:03.090781432Z [err]  2025-12-27 09:23:57,836 - server - INFO - ✅ Agent test router loaded
+2025-12-27T09:24:03.090787682Z [err]  2025-12-27 09:23:57,842 - server - INFO - ✅ Director Studio router loaded
+2025-12-27T09:24:03.090794139Z [err]  2025-12-27 09:23:57,842 - server - INFO - ✅ QC agents orchestrator loaded
+2025-12-27T09:24:03.090800423Z [err]  [2025-12-27 09:23:57 +0000] [6] [INFO] Started server process [6]
+2025-12-27T09:24:03.090806268Z [err]  [2025-12-27 09:23:57 +0000] [6] [INFO] Waiting for application startup.
+2025-12-27T09:24:03.090810208Z [err]  2025-12-27 09:23:57,860 - server - INFO - 🎵 Pre-generating comfort noise file on startup (5 minutes for seamless loops)...
+2025-12-27T09:24:05.844515511Z [err]  2025-12-27 09:24:05,827 - comfort_noise - INFO - Generated continuous comfort noise: /tmp/comfort_noise_continuous.mp3 (300s, white=-83dB, hum=-93dB)
+2025-12-27T09:24:05.844522281Z [err]  2025-12-27 09:24:05,827 - server - INFO - ✅ Comfort noise MP3 ready for immediate use
+2025-12-27T09:24:05.844527011Z [err]  2025-12-27 09:24:05,827 - server - INFO - 🎵 Pre-warming mulaw comfort noise for WebSocket streaming...
+2025-12-27T09:24:05.844530878Z [err]  2025-12-27 09:24:05,827 - comfort_noise - INFO - 🎵 Loading mulaw comfort noise for WebSocket mixing...
+2025-12-27T09:24:05.844569644Z [err]  2025-12-27 09:24:05,827 - comfort_noise - INFO - Generated continuous comfort noise: /tmp/comfort_noise_continuous.mp3 (300s, white=-83dB, hum=-93dB)
+2025-12-27T09:24:05.844579311Z [err]  2025-12-27 09:24:05,831 - server - INFO - ✅ Comfort noise MP3 ready for immediate use
+2025-12-27T09:24:05.844586229Z [err]  2025-12-27 09:24:05,831 - server - INFO - 🎵 Pre-warming mulaw comfort noise for WebSocket streaming...
+2025-12-27T09:24:05.844593250Z [err]  2025-12-27 09:24:05,831 - comfort_noise - INFO - 🎵 Loading mulaw comfort noise for WebSocket mixing...
+2025-12-27T09:24:05.844600385Z [err]  2025-12-27 09:24:05,838 - comfort_noise - INFO - Generated continuous comfort noise: /tmp/comfort_noise_continuous.mp3 (300s, white=-83dB, hum=-93dB)
+2025-12-27T09:24:05.844606241Z [err]  2025-12-27 09:24:05,838 - server - INFO - ✅ Comfort noise MP3 ready for immediate use
+2025-12-27T09:24:05.844611118Z [err]  2025-12-27 09:24:05,838 - server - INFO - 🎵 Pre-warming mulaw comfort noise for WebSocket streaming...
+2025-12-27T09:24:05.844615691Z [err]  2025-12-27 09:24:05,838 - comfort_noise - INFO - 🎵 Loading mulaw comfort noise for WebSocket mixing...
+2025-12-27T09:24:05.844877822Z [err]  2025-12-27 09:24:05,844 - comfort_noise - INFO - Generated continuous comfort noise: /tmp/comfort_noise_continuous.mp3 (300s, white=-83dB, hum=-93dB)
+2025-12-27T09:24:05.850003770Z [err]  2025-12-27 09:24:05,847 - server - INFO - ✅ Comfort noise MP3 ready for immediate use
+2025-12-27T09:24:05.850012441Z [err]  2025-12-27 09:24:05,847 - server - INFO - 🎵 Pre-warming mulaw comfort noise for WebSocket streaming...
+2025-12-27T09:24:05.850019953Z [err]  2025-12-27 09:24:05,847 - comfort_noise - INFO - 🎵 Loading mulaw comfort noise for WebSocket mixing...
+2025-12-27T09:24:06.538893313Z [err]  2025-12-27 09:24:06,520 - comfort_noise - INFO - ✅ Generated comfort noise sample: 30s (white=-83dB, hum=-93dB)
+2025-12-27T09:24:06.538897085Z [err]  2025-12-27 09:24:06,528 - comfort_noise - INFO - ✅ Generated comfort noise sample: 30s (white=-83dB, hum=-93dB)
+2025-12-27T09:24:06.538901524Z [err]  2025-12-27 09:24:06,532 - comfort_noise - INFO - ✅ Generated comfort noise sample: 30s (white=-83dB, hum=-93dB)
+2025-12-27T09:24:06.591703158Z [err]  2025-12-27 09:24:06,582 - comfort_noise - INFO - ✅ Generated comfort noise sample: 30s (white=-83dB, hum=-93dB)
+2025-12-27T09:24:06.613976452Z [err]  2025-12-27 09:24:06,612 - comfort_noise - INFO - ✅ Generated mulaw comfort noise: 240000 bytes
+2025-12-27T09:24:06.613986041Z [err]  2025-12-27 09:24:06,613 - server - INFO - ✅ Mulaw comfort noise ready (240000 bytes)
+2025-12-27T09:24:06.614022935Z [err]  2025-12-27 09:24:06,609 - comfort_noise - INFO - ✅ Generated mulaw comfort noise: 240000 bytes
+2025-12-27T09:24:06.614030100Z [err]  2025-12-27 09:24:06,609 - server - INFO - ✅ Mulaw comfort noise ready (240000 bytes)
+2025-12-27T09:24:06.614036623Z [err]  [2025-12-27 09:24:06 +0000] [6] [INFO] Application startup complete.
+2025-12-27T09:24:06.614044438Z [err]  2025-12-27 09:24:06,609 - comfort_noise - INFO - ✅ Generated mulaw comfort noise: 240000 bytes
+2025-12-27T09:24:06.614052347Z [err]  2025-12-27 09:24:06,609 - server - INFO - ✅ Mulaw comfort noise ready (240000 bytes)
+2025-12-27T09:24:06.614058907Z [err]  [2025-12-27 09:24:06 +0000] [4] [INFO] Application startup complete.
+2025-12-27T09:24:06.614352474Z [err]  [2025-12-27 09:24:06 +0000] [3] [INFO] Application startup complete.
+2025-12-27T09:24:06.669691919Z [err]  2025-12-27 09:24:06,664 - comfort_noise - INFO - ✅ Generated mulaw comfort noise: 240000 bytes
+2025-12-27T09:24:06.669697273Z [err]  2025-12-27 09:24:06,664 - server - INFO - ✅ Mulaw comfort noise ready (240000 bytes)
+2025-12-27T09:24:06.669702110Z [err]  [2025-12-27 09:24:06 +0000] [5] [INFO] Application startup complete.
+2025-12-27T09:58:23.883164243Z [inf]  100.64.0.2:44504 - "POST /api/auth/logout HTTP/1.1" 401
+2025-12-27T09:58:23.883172365Z [inf]  100.64.0.3:31328 - "OPTIONS /api/auth/login HTTP/1.1" 200
+2025-12-27T09:58:23.883180993Z [inf]  100.64.0.2:44504 - "POST /api/auth/login HTTP/1.1" 200
+2025-12-27T09:58:23.883189443Z [inf]  100.64.0.2:44504 - "GET /api/agents HTTP/1.1" 200
+2025-12-27T09:58:23.883197149Z [inf]  100.64.0.4:52604 - "GET /api/agents HTTP/1.1" 200
+2025-12-27T09:58:43.839836381Z [inf]  100.64.0.5:24714 - "OPTIONS /api/telnyx/call/outbound HTTP/1.1" 200
+2025-12-27T09:58:43.839842523Z [err]  2025-12-27 09:58:37,148 - server - INFO - 🌐 Created WebSocket stream URL: wss://api.li-ai.org/api/telnyx/audio-stream
+2025-12-27T09:58:43.839848298Z [err]  2025-12-27 09:58:37,238 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:43.839853585Z [err]  2025-12-27 09:58:37,325 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:43.839859243Z [err]  2025-12-27 09:58:37,348 - telnyx_service - INFO - Telnyx service initialized with connection: 2777245537294877821
+2025-12-27T09:58:43.839864617Z [err]  2025-12-27 09:58:37,348 - telnyx_service - INFO - 📞 Initiating outbound call from +14048000152 to +17708336397
+2025-12-27T09:58:43.839871942Z [err]  2025-12-27 09:58:37,348 - telnyx_service - INFO - 🤖 Enabling AMD (premium mode)
+2025-12-27T09:58:43.839877385Z [err]  2025-12-27 09:58:37,348 - telnyx_service - INFO - 🌐 Adding streaming parameters: wss://api.li-ai.org/api/telnyx/audio-stream
+2025-12-27T09:58:43.839883830Z [err]  2025-12-27 09:58:38,221 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls "HTTP/1.1 200 OK"
+2025-12-27T09:58:43.839889419Z [err]  2025-12-27 09:58:38,223 - telnyx_service - INFO - ✅ Call initiated: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:43.839894654Z [err]  2025-12-27 09:58:38,325 - server - INFO - 📝 Created call log: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:43.839900045Z [err]  2025-12-27 09:58:38,325 - server - INFO - 🔍 DEBUG Call Initiated Webhook (UI Trigger): url='https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b', active=True, should_fire=True
+2025-12-27T09:58:43.839905969Z [err]  2025-12-27 09:58:38,325 - server - INFO - 🔍 DEBUG Agent Settings Webhook Context: {'temperature': 0.2, 'max_tokens': 500, 'tts_speed': 1, 'llm_provider': 'grok', 'tts_provider': 'elevenlabs', 'stt_provider': 'soniox', 'enable_comfort_noise': True, 'dead_air_settings': {'silence_timeout_normal': 7, 'silence_timeout_hold_on': 25, 'max_checkins_before_disconnect': 2, 'max_call_duration': 1500, 'checkin_message': 'Are you still there?'}, 'voicemail_detection': {'enabled': True, 'use_telnyx_amd': True, 'telnyx_amd_mode': 'premium', 'use_llm_detection': True, 'disconnect_on_detection': True}, 'deepgram_settings': {'endpointing': 500, 'vad_turnoff': 250, 'utterance_end_ms': 1000, 'interim_results': True, 'smart_format': True}, 'elevenlabs_settings': {'voice_id': 'J5iaaqzR5zn6HFG4jV3b', 'model': 'eleven_turbo_v2_5', 'stability': 0.6, 'similarity_boost': 0.65, 'style': 0.2, 'speed': 1.1, 'use_speaker_boost': True, 'enable_normalization': True, 'enable_ssml_parsing': True}, 'hume_settings': {'voice_name': 'e7af7ed6-3381-48aa-ab97-49485007470b', 'description': 'warm and friendly', 'speed': 1}, 'sesame_settings': {'speaker_id': 0, 'output_format': 'wav'}, 'melo_settings': {'voice': 'EN-US', 'speed': 1.2, 'clone_wav': None}, 'dia_settings': {'voice': 'S1', 'speed': 1, 'response_format': 'wav'}, 'kokoro_settings': {'voice': 'af_bella', 'speed': 1, 'response_format': 'mp3'}, 'chattts_settings': {'voice': 'female_1', 'speed': 1, 'temperature': 0.3, 'response_format': 'wav'}, 'assemblyai_settings': {'sample_rate': 8000, 'word_boost': [], 'enable_extra_session_information': True, 'disable_partial_transcripts': False, 'threshold': 0, 'end_of_turn_confidence_threshold': 0.8, 'min_end_of_turn_silence_when_confident': 500, 'max_turn_silence': 2000}, 'soniox_settings': {'model': 'stt-rt-v3', 'sample_rate': 8000, 'audio_format': 'mulaw', 'num_channels': 1, 'enable_endpoint_detection': True, 'enable_speaker_diarization': False, 'language_hints': ['en'], 'context': ''}, 'post_call_webhook_url': 'https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b', 'post_call_webhook_active': True, 'call_started_webhook_url': 'https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b', 'call_started_webhook_active': True}
+2025-12-27T09:58:43.840821629Z [err]  2025-12-27 09:58:38,554 - server - INFO -    Path: /api/telnyx/audio-stream
+2025-12-27T09:58:43.840828699Z [err]  2025-12-27 09:58:38,554 - server - INFO - 🔌 Incoming Telnyx WebSocket connection
+2025-12-27T09:58:43.840835234Z [err]  2025-12-27 09:58:38,325 - server - INFO - 🔍 DEBUG Call Initiated Webhook: url='https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b', active=True, should_fire=True
+2025-12-27T09:58:43.840836791Z [inf]  100.64.0.6:54256 - "POST /api/telnyx/call/outbound HTTP/1.1" 200
+2025-12-27T09:58:43.840840549Z [err]  2025-12-27 09:58:38,325 - server - INFO - 📤 Sending call-initiated webhook to: https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b
+2025-12-27T09:58:43.840845256Z [err]  2025-12-27 09:58:38,353 - redis_service - INFO - 📦 Stored call data in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (TTL: 3600s)
+2025-12-27T09:58:43.840849049Z [err]  2025-12-27 09:58:38,554 - server - INFO - 🔌🔌🔌 WEBSOCKET CONNECTION ATTEMPT
+2025-12-27T09:58:43.840850666Z [err]  2025-12-27 09:58:38,353 - server - INFO - 📦 Call data stored in Redis and memory
+2025-12-27T09:58:43.840856462Z [err]  2025-12-27 09:58:38,353 - server - INFO - 📞 Outbound call initiated: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:43.840857088Z [err]  2025-12-27 09:58:38,554 - server - INFO -    Client: Address(host='100.64.0.7', port=14258)
+2025-12-27T09:58:43.840862947Z [err]  2025-12-27 09:58:38,554 - server - INFO -    Headers: {'host': 'api.li-ai.org', 'user-agent': 'telnyx-websocket', 'connection': 'Upgrade', 'sec-websocket-key': 'PuBp8JXfLzzU7WgXkZUCew==', 'sec-websocket-version': '13', 'upgrade': 'websocket', 'x-forwarded-for': '192.76.120.151', 'x-forwarded-host': 'api.li-ai.org', 'x-forwarded-proto': 'https', 'x-railway-edge': 'railway/us-west2', 'x-railway-request-id': 'QZ57sscHTti39P5R-_9nXA', 'x-real-ip': '192.76.120.151', 'x-request-start': '1766829518321', 'accept-encoding': 'gzip'}
+2025-12-27T09:58:43.841721066Z [err]  [2025-12-27 09:58:38 +0000] [3] [INFO] ('100.64.0.7', 14258) - "WebSocket /api/telnyx/audio-stream" [accepted]
+2025-12-27T09:58:43.841726676Z [err]  2025-12-27 09:58:38,554 - server - INFO - ✅ WebSocket accepted, waiting for Telnyx events
+2025-12-27T09:58:43.841732072Z [err]  [2025-12-27 09:58:38 +0000] [3] [INFO] connection open
+2025-12-27T09:58:43.841737546Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📬 Received Telnyx event: connected
+2025-12-27T09:58:43.841743546Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:43.841748784Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📞 Telnyx connected event received, waiting for 'start'...
+2025-12-27T09:58:43.841754266Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.initiated', 'id': 'fdc72f89-d9c9-4dd2-88ff-48839a1a88a3', 'occurred_at': '2025-12-27T09:58:38.029221Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'direction': 'outgoing', 'from': '+14048000152', 'state': 'bridging', 'to': '+17708336397'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:43.841764289Z [err]  2025-12-27 09:58:38,713 - server - INFO - 🎯 Event type: call.initiated, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:43.841769978Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📨 ================================================
+2025-12-27T09:58:43.841775140Z [err]  2025-12-27 09:58:38,713 - server - INFO - 📞 Call initiated - Direction: outgoing, From: +14048000152, To: +17708336397
+2025-12-27T09:58:43.841780402Z [inf]  100.64.0.8:27844 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:43.842501138Z [err]  2025-12-27 09:58:38,800 - httpx - INFO - HTTP Request: POST https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b "HTTP/1.1 200 OK"
+2025-12-27T09:58:43.842506551Z [err]  2025-12-27 09:58:38,800 - server - INFO - ✅ Call-initiated webhook sent successfully (status=200)
+2025-12-27T09:58:44.034975790Z [err]  2025-12-27 09:58:44,030 - server - INFO - 📬 Received Telnyx event: start
+2025-12-27T09:58:44.034981044Z [err]  2025-12-27 09:58:44,030 - server - INFO - 🎬 Stream started for call: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.074709216Z [err]  2025-12-27 09:58:44,058 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.074714132Z [err]  2025-12-27 09:58:44,059 - server - INFO - ✅ Call data found after 0s wait
+2025-12-27T09:58:44.074718076Z [err]  2025-12-27 09:58:44,059 - server - INFO - ⏳ Session not found locally, waiting briefly for webhook...
+2025-12-27T09:58:44.360723455Z [err]  2025-12-27 09:58:44,358 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:44.360732093Z [err]  2025-12-27 09:58:44,358 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.answered', 'id': '0fdcc615-a138-4bf9-89f6-7044eafff4b5', 'occurred_at': '2025-12-27T09:58:43.809222Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'codec': 'PCMU', 'connection_id': '2777245537294877821', 'from': '+14048000152', 'sampling_rate': 8000, 'start_time': '2025-12-27T09:58:38.029221Z', 'to': '+17708336397'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:44.360737818Z [err]  2025-12-27 09:58:44,358 - server - INFO - 🎯 Event type: call.answered, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.360742477Z [err]  2025-12-27 09:58:44,358 - server - INFO - 📨 ================================================
+2025-12-27T09:58:44.360747035Z [err]  2025-12-27 09:58:44,358 - server - INFO - ✅ Call answered: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.372142617Z [err]  2025-12-27 09:58:44,368 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.372150662Z [err]  2025-12-27 09:58:44,369 - server - INFO - ✅ Found call in Redis (multi-worker state sharing working)
+2025-12-27T09:58:44.372155626Z [err]  2025-12-27 09:58:44,370 - server - INFO - 📞 Phone numbers added to session: from=+14048000152, to=+17708336397
+2025-12-27T09:58:44.491661958Z [err]  2025-12-27 09:58:44,473 - server - INFO - ✅ Call log updated
+2025-12-27T09:58:44.491669704Z [err]  2025-12-27 09:58:44,473 - server - INFO - 🔍 DEBUG Webhook: url='https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b', active=True, should_fire=True
+2025-12-27T09:58:44.491677573Z [err]  2025-12-27 09:58:44,473 - server - INFO - 📤 Sending call-started webhook to: https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b
+2025-12-27T09:58:44.491683691Z [err]  2025-12-27 09:58:44,473 - server - INFO - 🔧 Getting Telnyx API keys for user: dcafa642-6136-4096-b77d-a4cb99a62651
+2025-12-27T09:58:44.655984573Z [err]  2025-12-27 09:58:44,568 - calling_service - INFO - 🔍 Checking KB for agent bbeda238-e8d9-4d8c-b93b-1b7694581adb...
+2025-12-27T09:58:44.655994544Z [err]  2025-12-27 09:58:44,569 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:44.656030134Z [err]  2025-12-27 09:58:44,559 - server - INFO - ⚠️ Session still not found after wait, will create in worker
+2025-12-27T09:58:44.656034216Z [err]  2025-12-27 09:58:44,559 - server - WARNING - ⚠️ Session not found after waiting, creating in WebSocket worker...
+2025-12-27T09:58:44.656039713Z [err]  2025-12-27 09:58:44,567 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.656044731Z [err]  2025-12-27 09:58:44,568 - server - INFO - 📝 Creating session with agent_id=bbeda238-e8d9-4d8c-b93b-1b7694581adb, user_id=dcafa642-6136-4096-b77d-a4cb99a62651
+2025-12-27T09:58:44.675951054Z [err]  2025-12-27 09:58:44,668 - calling_service - INFO - 🔍 KB count query completed: 4 items
+2025-12-27T09:58:44.675956397Z [err]  2025-12-27 09:58:44,668 - calling_service - INFO - 📚 Agent bbeda238-e8d9-4d8c-b93b-1b7694581adb has 4 KB items - Smart routing enabled (RAG on demand)
+2025-12-27T09:58:44.687026953Z [err]  2025-12-27 09:58:44,681 - calling_service - INFO - 📋 Built cached system prompt: 5065 chars (global) + 1402 chars (technical)
+2025-12-27T09:58:44.687032801Z [err]  2025-12-27 09:58:44,681 - calling_service - INFO - 📚 KB available - will use smart routing (simple chat: NO KB, factual: WITH KB)
+2025-12-27T09:58:44.687038110Z [err]  2025-12-27 09:58:44,682 - calling_service - INFO - 🔥 Pre-warming LLM client (grok)...
+2025-12-27T09:58:44.787540610Z [err]  2025-12-27 09:58:44,768 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:44.787549561Z [err]  2025-12-27 09:58:44,776 - calling_service - INFO - ✅ LLM client pre-warmed in 94ms
+2025-12-27T09:58:44.787559245Z [err]  2025-12-27 09:58:44,776 - server - INFO - ✅ Session created in WebSocket worker
+2025-12-27T09:58:44.787563858Z [err]  2025-12-27 09:58:44,776 - server - INFO - ⏱️ [WebSocket Worker] Scheduling silence timeout: 2000ms
+2025-12-27T09:58:44.787567886Z [err]  2025-12-27 09:58:44,776 - server - INFO - ⏱️ [WebSocket Worker] Silence timeout task scheduled!
+2025-12-27T09:58:44.787571987Z [err]  2025-12-27 09:58:44,776 - server - INFO - 📞 Call data loaded, starting SONIOX connection...
+2025-12-27T09:58:44.787575934Z [err]  2025-12-27 09:58:44,778 - server - INFO - ✅ Initialized call_states for v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g with session reference
+2025-12-27T09:58:44.787579909Z [err]  2025-12-27 09:58:44,779 - server - INFO - ⏱️ [WebSocket Worker] Silence timeout task started, waiting 2000ms...
+2025-12-27T09:58:44.826722237Z [err]  2025-12-27 09:58:44,809 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:44.826726497Z [err]  2025-12-27 09:58:44,809 - server - INFO - 📨 Full payload: {'data': {'event_type': 'streaming.started', 'id': '623e0e2e-8c9e-4c0a-9d54-b19b76605715', 'occurred_at': '2025-12-27T09:58:44.269208Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'stream_id': '5e0f0419-0fa8-4733-b3ea-369b3bcc1fc0', 'stream_params': {'stream_track': 'inbound', 'stream_url': 'wss://api.li-ai.org/api/telnyx/audio-stream'}, 'stream_type': 'websocket'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:44.826731004Z [err]  2025-12-27 09:58:44,809 - server - INFO - 🎯 Event type: streaming.started, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:44.826735113Z [err]  2025-12-27 09:58:44,809 - server - INFO - 📨 ================================================
+2025-12-27T09:58:44.826744793Z [inf]  100.64.0.10:58280 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:44.869641555Z [err]  2025-12-27 09:58:44,867 - server - INFO - 🔑 Using user's Soniox API key (first 10 chars): b999f22d7b...
+2025-12-27T09:58:44.992096053Z [err]  2025-12-27 09:58:44,988 - httpx - INFO - HTTP Request: POST https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b "HTTP/1.1 200 OK"
+2025-12-27T09:58:44.992105156Z [err]  2025-12-27 09:58:44,989 - server - INFO - ✅ Call-started webhook sent successfully (status=200)
+2025-12-27T09:58:45.126459777Z [err]  2025-12-27 09:58:45,123 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:45.126466694Z [err]  2025-12-27 09:58:45,123 - server - INFO - 🔧 Creating Telnyx service with user's keys...
+2025-12-27T09:58:45.158319873Z [err]  2025-12-27 09:58:45,156 - telnyx_service - INFO - Telnyx service initialized with connection: 2777245537294877821
+2025-12-27T09:58:45.372882551Z [err]  2025-12-27 09:58:45,370 - soniox_service - INFO - ✅ Connected to Soniox Real-Time STT
+2025-12-27T09:58:45.372886750Z [err]  2025-12-27 09:58:45,370 - soniox_service - INFO - ⚙️  Config: model=stt-rt-v3, format=mulaw, rate=8000Hz, channels=1
+2025-12-27T09:58:45.372891498Z [err]  2025-12-27 09:58:45,370 - soniox_service - INFO - ⚙️  Endpoint detection: True, Speaker diarization: False
+2025-12-27T09:58:45.393472000Z [err]  2025-12-27 09:58:45,391 - telnyx_service - INFO - Telnyx service initialized with connection: 2777245537294877821
+2025-12-27T09:58:45.393478674Z [err]  2025-12-27 09:58:45,392 - dead_air_monitor - INFO - 🔇 Dead air monitoring started for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:45.398378970Z [err]  2025-12-27 09:58:45,397 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:45.398388201Z [err]  2025-12-27 09:58:45,397 - server - INFO - ✅ Started forwarding audio (8kHz mulaw → Soniox, NO BUFFERING)
+2025-12-27T09:58:45.465053855Z [err]  2025-12-27 09:58:45,461 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/playback_start "HTTP/1.1 200 OK"
+2025-12-27T09:58:45.465061009Z [err]  2025-12-27 09:58:45,462 - telnyx_service - INFO - ✅ Playing audio from URL, playback_id: Nr8MOnNEEQ (loop=True, overlay=True)
+2025-12-27T09:58:45.465067164Z [err]  2025-12-27 09:58:45,462 - server - INFO - 🎵 Comfort noise started as continuous background overlay (playback_id: Nr8MOnNEEQ)
+2025-12-27T09:58:45.465072745Z [err]  2025-12-27 09:58:45,462 - telnyx_service - INFO - 🎙️ Starting recording: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:45.849584638Z [err]  2025-12-27 09:58:45,846 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:45.849590543Z [err]  2025-12-27 09:58:45,846 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.playback.started', 'id': '918e25db-cdc7-4c56-9f19-2db7ace416f5', 'occurred_at': '2025-12-27T09:58:45.629207Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'media_name': None, 'media_url': 'api.li-ai.org/api/tts-audio/comfort_noise_continuous.mp3', 'overlay': True, 'playback_id': 'Nr8MOnNEEQ', 'start_time': '2025-12-27T09:58:45.629207Z'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:45.849594973Z [err]  2025-12-27 09:58:45,846 - server - INFO - 🎯 Event type: call.playback.started, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:45.849600062Z [err]  2025-12-27 09:58:45,846 - server - INFO - 📨 ================================================
+2025-12-27T09:58:45.849605443Z [inf]  100.64.0.10:58280 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:47.055217593Z [err]  2025-12-27 09:58:47,033 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/record_start "HTTP/1.1 200 OK"
+2025-12-27T09:58:47.055225433Z [err]  2025-12-27 09:58:47,034 - server - INFO - 🎙️ Call recording started for v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.055231758Z [err]  2025-12-27 09:58:47,035 - server - INFO - 🔧 Creating call session for v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g...
+2025-12-27T09:58:47.055235891Z [err]  2025-12-27 09:58:47,035 - server - INFO - 🔍 Agent ID: bbeda238-e8d9-4d8c-b93b-1b7694581adb, User ID: dcafa642-6136-4096-b77d-a4cb99a62651
+2025-12-27T09:58:47.055239860Z [err]  2025-12-27 09:58:47,035 - server - INFO - 🔧 Calling create_call_session() - START
+2025-12-27T09:58:47.055243403Z [err]  2025-12-27 09:58:47,035 - calling_service - INFO - 🔍 Checking KB for agent bbeda238-e8d9-4d8c-b93b-1b7694581adb...
+2025-12-27T09:58:47.055248356Z [err]  2025-12-27 09:58:47,040 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:47.066167196Z [err]  2025-12-27 09:58:47,063 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.071706293Z [err]  2025-12-27 09:58:47,071 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.107520189Z [err]  2025-12-27 09:58:47,103 - redis_service - INFO - 📦 Stored call data in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (TTL: 3600s)
+2025-12-27T09:58:47.107531956Z [err]  2025-12-27 09:58:47,103 - server - INFO - ⏱️ [WebSocket Worker] Silence timeout reached - generating greeting!
+2025-12-27T09:58:47.107538100Z [err]  2025-12-27 09:58:47,103 - calling_service - INFO - ⏱️ [09:58:47.103] 📥 process_user_input() ENTRY - text: '...'
+2025-12-27T09:58:47.117821278Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{track_keywords}} with  in content
+2025-12-27T09:58:47.117832459Z [err]  2025-12-27 09:58:47,114 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.117834364Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{expected_commitment}} with not_specified in content
+2025-12-27T09:58:47.117842889Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ⏱️ [09:58:47.115] ⏩ About to call _process_call_flow_streaming()
+2025-12-27T09:58:47.117850090Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ⏱️ [09:58:47.115] 🔀 Agent type: call_flow, calling flow processor...
+2025-12-27T09:58:47.117866242Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ⏱️ [09:58:47.115] 🔀 _process_call_flow_streaming() ENTRY
+2025-12-27T09:58:47.117872559Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - Flow processing - History length: 1, Is first: True
+2025-12-27T09:58:47.117879208Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ⏱️ [09:58:47.115] ✅ Node selected, about to process content...
+2025-12-27T09:58:47.117885835Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{now}} with Saturday, December 27, 2025 at 4:58 AM EST in content
+2025-12-27T09:58:47.117892442Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{customer_name}} with Kendrick in content
+2025-12-27T09:58:47.117899520Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{callerName}} with  in content
+2025-12-27T09:58:47.117906181Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{lead_id}} with None in content
+2025-12-27T09:58:47.117912640Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{qc_tracking_enabled}} with False in content
+2025-12-27T09:58:47.118414349Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{to_number}} with +17708336397 in content
+2025-12-27T09:58:47.118423545Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{phone_number}} with +17708336397 in content
+2025-12-27T09:58:47.118431239Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔧 Replaced {{email}} with None in content
+2025-12-27T09:58:47.118438628Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ✅ Using explicit SCRIPT mode (length: 9 chars) - will return text instantly
+2025-12-27T09:58:47.118446343Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - Using flow node: Greeting (type: conversation, mode: script)
+2025-12-27T09:58:47.118453525Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+2025-12-27T09:58:47.118460293Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - ⏱️ [09:58:47.115] 📄 About to process content (mode=script, length=9)
+2025-12-27T09:58:47.118467608Z [err]  2025-12-27 09:58:47,115 - calling_service - INFO - 🔊 Silence tracking reset for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (user responded)
+2025-12-27T09:58:47.118474967Z [err]  2025-12-27 09:58:47,116 - calling_service - INFO - ✅ User responded to regular message, resetting counter
+2025-12-27T09:58:47.118481987Z [err]  2025-12-27 09:58:47,116 - calling_service - INFO - 💾 Storing node ID 2 in conversation history
+2025-12-27T09:58:47.118488828Z [err]  2025-12-27 09:58:47,116 - calling_service - INFO - LLM response (0.01s): Kendrick?
+2025-12-27T09:58:47.118496152Z [err]  2025-12-27 09:58:47,116 - calling_service - INFO - Total latency: 0.01s
+2025-12-27T09:58:47.118503037Z [err]  2025-12-27 09:58:47,116 - server - INFO - 💬 [WebSocket Worker] AI speaks after silence: Kendrick?
+2025-12-27T09:58:47.123082718Z [err]  2025-12-27 09:58:47,122 - calling_service - INFO - 🔍 KB count query completed: 4 items
+2025-12-27T09:58:47.123093098Z [err]  2025-12-27 09:58:47,122 - calling_service - INFO - 📚 Agent bbeda238-e8d9-4d8c-b93b-1b7694581adb has 4 KB items - Smart routing enabled (RAG on demand)
+2025-12-27T09:58:47.123098592Z [err]  2025-12-27 09:58:47,122 - calling_service - INFO - 📋 Built cached system prompt: 5065 chars (global) + 1402 chars (technical)
+2025-12-27T09:58:47.123103071Z [err]  2025-12-27 09:58:47,122 - calling_service - INFO - 📚 KB available - will use smart routing (simple chat: NO KB, factual: WITH KB)
+2025-12-27T09:58:47.123107359Z [err]  2025-12-27 09:58:47,122 - calling_service - INFO - 🔥 Pre-warming LLM client (grok)...
+2025-12-27T09:58:47.218730024Z [err]  2025-12-27 09:58:47,216 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.218738163Z [err]  2025-12-27 09:58:47,217 - telnyx_service - INFO - 🔊 Speaking text on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: Kendrick?...
+2025-12-27T09:58:47.218743990Z [err]  2025-12-27 09:58:47,217 - telnyx_service - INFO - 🔍 Agent config provided: True
+2025-12-27T09:58:47.218751486Z [err]  2025-12-27 09:58:47,217 - telnyx_service - INFO - 🔍 TTS provider from settings: elevenlabs
+2025-12-27T09:58:47.218757532Z [err]  2025-12-27 09:58:47,217 - telnyx_service - INFO - 🔍 WebSocket TTS: False
+2025-12-27T09:58:47.218763077Z [err]  2025-12-27 09:58:47,217 - telnyx_service - INFO - 🎙️ Attempting elevenlabs TTS (REST)
+2025-12-27T09:58:47.218768594Z [err]  2025-12-27 09:58:47,217 - server - INFO - ⏱️ [09:58:47.217] 🔊 TTS REQUEST START: provider=elevenlabs, user=dcafa642, comfort_noise=True
+2025-12-27T09:58:47.218778110Z [err]  2025-12-27 09:58:47,217 - server - INFO - ⚡ Using Turbo v2.5 (high quality)
+2025-12-27T09:58:47.218783550Z [err]  2025-12-27 09:58:47,217 - server - INFO - 🎙️ ElevenLabs streaming TTS: voice=J5iaaqzR5zn6HFG4jV3b, model=eleven_turbo_v2_5, speed=1.1, normalization=on, ssml=True
+2025-12-27T09:58:47.218789265Z [err]  2025-12-27 09:58:47,217 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:47.229878704Z [err]  2025-12-27 09:58:47,224 - calling_service - INFO - ✅ LLM client pre-warmed in 102ms
+2025-12-27T09:58:47.229884532Z [err]  2025-12-27 09:58:47,225 - server - INFO - 🔧 Calling create_call_session() - COMPLETE
+2025-12-27T09:58:47.229888926Z [err]  2025-12-27 09:58:47,225 - server - INFO - ✅ Session object created: CallSession
+2025-12-27T09:58:47.241146325Z [err]  2025-12-27 09:58:47,239 - redis_service - INFO - 📦 Stored call data in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (TTL: 3600s)
+2025-12-27T09:58:47.241153760Z [err]  2025-12-27 09:58:47,239 - server - INFO - ✅ Serializable call_data synced to Redis (agent_id, user_id)
+2025-12-27T09:58:47.241159650Z [err]  2025-12-27 09:58:47,239 - server - INFO - ✅ Session stored in worker memory (not Redis)
+2025-12-27T09:58:47.246254394Z [err]  2025-12-27 09:58:47,244 - redis_service - INFO - ✅ Marked session ready in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.246262997Z [err]  2025-12-27 09:58:47,244 - server - INFO - 🤖 AI session created for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.246268027Z [err]  2025-12-27 09:58:47,244 - server - INFO - 📦 Custom variables injected: {'lead_id': None, 'qc_tracking_enabled': False, 'track_keywords': '', 'expected_commitment': 'not_specified', 'customer_name': 'Kendrick', 'to_number': '+17708336397', 'phone_number': '+17708336397', 'email': None, 'from_number': '+14048000152'}
+2025-12-27T09:58:47.246272591Z [err]  2025-12-27 09:58:47,244 - server - INFO - ⏭️ Skipping persistent TTS creation in webhook - will create on-demand with telnyx_ws
+2025-12-27T09:58:47.246277177Z [err]  2025-12-27 09:58:47,244 - server - INFO - 👤 Who speaks first: user, aiSpeaksAfterSilence: True, timeout: 2000ms
+2025-12-27T09:58:47.246282393Z [err]  2025-12-27 09:58:47,244 - server - INFO - 👂 User speaks first - waiting for user input...
+2025-12-27T09:58:47.246286897Z [err]  2025-12-27 09:58:47,244 - server - INFO - 🛡️ Voicemail timeout protection started (15000ms)
+2025-12-27T09:58:47.246290949Z [err]  2025-12-27 09:58:47,244 - server - INFO - ⏱️ AI will speak after 2000ms of silence (scheduled in WebSocket worker)
+2025-12-27T09:58:47.246295033Z [err]  2025-12-27 09:58:47,244 - server - INFO - 🎤 Voice flow - streaming started via dial command
+2025-12-27T09:58:47.256341501Z [err]  2025-12-27 09:58:47,252 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.256348412Z [err]  2025-12-27 09:58:47,253 - server - INFO - 🤐 No greeting - waiting for user to speak first
+2025-12-27T09:58:47.256355027Z [err]  2025-12-27 09:58:47,253 - server - INFO - 🎤 Voice flow - WebSocket streaming already initiated
+2025-12-27T09:58:47.256360471Z [inf]  100.64.0.9:51548 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:47.307580539Z [err]  2025-12-27 09:58:47,305 - server - INFO - 🔌 Attempting ElevenLabs connection (attempt 1/2)
+2025-12-27T09:58:47.307585738Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Timeout: 10.0s
+2025-12-27T09:58:47.307596822Z [err]  2025-12-27 09:58:47,304 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:47.307605649Z [err]  2025-12-27 09:58:47,305 - server - INFO - 📦 ElevenLabs Request Payload:
+2025-12-27T09:58:47.307612267Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Text length: 9 chars
+2025-12-27T09:58:47.307618283Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Text content: 'Kendrick?'
+2025-12-27T09:58:47.307626573Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Text bytes: b'Kendrick?'
+2025-12-27T09:58:47.307632576Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Model: eleven_turbo_v2_5
+2025-12-27T09:58:47.307638112Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Voice ID: J5iaaqzR5zn6HFG4jV3b
+2025-12-27T09:58:47.307643879Z [err]  2025-12-27 09:58:47,305 - server - INFO -    URL: https://api.elevenlabs.io/v1/text-to-speech/J5iaaqzR5zn6HFG4jV3b/stream
+2025-12-27T09:58:47.307649819Z [err]  2025-12-27 09:58:47,305 - server - INFO -    Full data: {'text': 'Kendrick?', 'model_id': 'eleven_turbo_v2_5', 'voice_settings': {'stability': 0.6, 'similarity_boost': 0.65, 'use_speaker_boost': True, 'speed': 1.1, 'style': 0.2}, 'apply_text_normalization': 'on', 'enable_ssml_parsing': True, 'optimize_streaming_latency': 4}
+2025-12-27T09:58:47.318769975Z [err]  2025-12-27 09:58:47,312 - server - INFO -    ✓ HTTP client created (0.007s)
+2025-12-27T09:58:47.318781174Z [err]  2025-12-27 09:58:47,312 - server - INFO -    → Sending POST request to ElevenLabs (optimize_latency=0)...
+2025-12-27T09:58:47.679373897Z [err]  2025-12-27 09:58:47,546 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:47.690013190Z [err]  2025-12-27 09:58:47,688 - httpx - INFO - HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/J5iaaqzR5zn6HFG4jV3b/stream "HTTP/1.1 200 OK"
+2025-12-27T09:58:47.690023853Z [err]  2025-12-27 09:58:47,688 - server - INFO -    ✓ Connection established (0.383s) [TARGET: <200ms]
+2025-12-27T09:58:47.690031259Z [err]  2025-12-27 09:58:47,688 - server - INFO -    ✓ Response status: 200
+2025-12-27T09:58:47.690038443Z [err]  2025-12-27 09:58:47,688 - server - INFO -    → Streaming audio chunks...
+2025-12-27T09:58:47.705573315Z [err]  2025-12-27 09:58:47,701 - telnyx_service - INFO - 🔗 Using audio URL: api.li-ai.org/api/tts-audio/tts_4837cb141ab1223ca76c9b05a8448cb6.mp3
+2025-12-27T09:58:47.705580487Z [err]  2025-12-27 09:58:47,701 - telnyx_service - INFO - ⏱️  TTS generation time: 0.48s
+2025-12-27T09:58:47.705580490Z [err]  2025-12-27 09:58:47,699 - server - INFO -    ✓ FIRST CHUNK received (0.394s, 922 bytes) [TARGET: <300ms]
+2025-12-27T09:58:47.705587331Z [err]  2025-12-27 09:58:47,701 - server - INFO -       - Audio generation only: 11ms
+2025-12-27T09:58:47.705590934Z [err]  2025-12-27 09:58:47,701 - server - INFO -    ✓ ALL CHUNKS received: 55 chunks (0.396s)
+2025-12-27T09:58:47.705596545Z [err]  2025-12-27 09:58:47,701 - server - INFO - ⏱️ [09:58:47.701] 🔊 TTS COMPLETE: 483ms, audio_size=13419 bytes
+2025-12-27T09:58:47.705599985Z [err]  2025-12-27 09:58:47,701 - server - INFO -    ✓ Total audio size: 13419 bytes
+2025-12-27T09:58:47.705606100Z [err]  2025-12-27 09:58:47,701 - server - INFO - 💾 TTS CACHED: elevenlabs:Kendrick?... (13419 bytes)
+2025-12-27T09:58:47.705608817Z [err]  2025-12-27 09:58:47,701 - telnyx_service - INFO - ✅ Generated 13419 bytes, saved to /tmp/tts_4837cb141ab1223ca76c9b05a8448cb6.mp3
+2025-12-27T09:58:47.705610525Z [err]  2025-12-27 09:58:47,701 - server - INFO -    📊 TTS API TIMING BREAKDOWN:
+2025-12-27T09:58:47.705616900Z [err]  2025-12-27 09:58:47,701 - server - INFO -       - Connection: 383ms
+2025-12-27T09:58:47.705623800Z [err]  2025-12-27 09:58:47,701 - server - INFO -       - First chunk: 394ms
+2025-12-27T09:58:47.705630400Z [err]  2025-12-27 09:58:47,701 - server - INFO -       - All chunks: 396ms
+2025-12-27T09:58:47.992585332Z [err]  2025-12-27 09:58:47,988 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/playback_start "HTTP/1.1 200 OK"
+2025-12-27T09:58:47.992595123Z [err]  2025-12-27 09:58:47,988 - telnyx_service - INFO - ⏱️  Playback API call time: 0.29s
+2025-12-27T09:58:47.992601328Z [err]  2025-12-27 09:58:47,988 - telnyx_service - INFO - ⏱️  Total TTS latency: 0.77s
+2025-12-27T09:58:47.992606018Z [err]  2025-12-27 09:58:47,988 - telnyx_service - INFO - ✅ Playing elevenlabs audio via Telnyx playback
+2025-12-27T09:58:47.992610166Z [err]  2025-12-27 09:58:47,988 - telnyx_service - INFO - 🎬 Playback ID: fJdNXCRn-Q
+2025-12-27T09:58:47.992615061Z [err]  2025-12-27 09:58:47,989 - server - INFO - 🔊 [WebSocket Worker] Silence greeting spoken via Telnyx TTS
+2025-12-27T09:58:47.992618985Z [err]  2025-12-27 09:58:47,989 - calling_service - INFO - ⏱️ SILENCE TIMER STARTED at 1766829527.9890995 for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:47.992622783Z [err]  2025-12-27 09:58:47,989 - server - INFO - ⏱️ [WebSocket Worker] Silence tracking started for dead air monitoring
+2025-12-27T09:58:48.081520090Z [err]  2025-12-27 09:58:48,050 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:48.692354591Z [err]  2025-12-27 09:58:48,556 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:48.702583685Z [err]  2025-12-27 09:58:48,698 - server - INFO - 🔤 RAW TOKENS: ["H"?]
+2025-12-27T09:58:48.703367935Z [err]  2025-12-27 09:58:48,702 - calling_service - INFO - ⏱️ SILENCE TIMER RESET (user started speaking) for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:48.703375768Z [err]  2025-12-27 09:58:48,702 - calling_service - INFO - 🔊 Silence timer reset for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (user started speaking)
+2025-12-27T09:58:48.703381723Z [err]  2025-12-27 09:58:48,702 - calling_service - INFO - 👤 User started speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:48.703387680Z [err]  2025-12-27 09:58:48,702 - server - WARNING - Failed to update user_has_spoken in Redis: cannot access local variable 'redis_svc' where it is not associated with a value
+2025-12-27T09:58:48.703395033Z [err]  2025-12-27 09:58:48,702 - server - INFO - 🔍 PARTIAL TRANSCRIPT: 'H' | Generating: False
+2025-12-27T09:58:48.959753440Z [err]  2025-12-27 09:58:48,955 - server - INFO - 🔤 RAW TOKENS: ["H"?, "ello"?]
+2025-12-27T09:58:48.959760126Z [err]  2025-12-27 09:58:48,956 - server - INFO - 🔍 PARTIAL TRANSCRIPT: 'Hello' | Generating: False
+2025-12-27T09:58:49.072523025Z [err]  2025-12-27 09:58:49,064 - server - INFO - 🔍 FILTER CHECK: words=1, is_filler=False, is_garbled=False, tts_speaking=False, time_until_done=0.0s, generating=False, playbacks=0, is_active=False
+2025-12-27T09:58:49.072567193Z [err]  2025-12-27 09:58:49,064 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.072575194Z [err]  2025-12-27 09:58:49,064 - server - INFO - 🚀 Spawned tracked background task for endpoint processing
+2025-12-27T09:58:49.072582780Z [err]  2025-12-27 09:58:49,064 - server - INFO - ⏱️ [09:58:49.064] 📝 FINAL TRANSCRIPT RECEIVED: 'Hello?'
+2025-12-27T09:58:49.072590169Z [err]  2025-12-27 09:58:49,064 - server - INFO - ⏱️ [09:58:49.064] STT endpoint detection latency: 14ms
+2025-12-27T09:58:49.072597805Z [err]  2025-12-27 09:58:49,064 - server - INFO - ⏱️ [09:58:49.064] 🎤 USER STOPPED SPEAKING - Beginning processing pipeline
+2025-12-27T09:58:49.072635345Z [err]  2025-12-27 09:58:49,060 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.072641558Z [err]  2025-12-27 09:58:49,063 - server - INFO - 🔤 RAW TOKENS: ["H"✓, "ello"✓, "?"✓, "<end>"✓]
+2025-12-27T09:58:49.072648091Z [err]  2025-12-27 09:58:49,063 - server - INFO - 🎯 Endpoint detected: <end> token received
+2025-12-27T09:58:49.072654922Z [err]  2025-12-27 09:58:49,063 - server - INFO - 🧹 Cleaned transcript: 'H ello ?' -> 'Hello?'
+2025-12-27T09:58:49.072661807Z [err]  2025-12-27 09:58:49,063 - server - INFO - 📥 FINAL TOKENS: 'Hello?' (3 tokens)
+2025-12-27T09:58:49.072668089Z [err]  2025-12-27 09:58:49,063 - server - INFO - 🎤 Soniox final transcript: 'Hello?'
+2025-12-27T09:58:49.072674634Z [err]  2025-12-27 09:58:49,064 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.072909863Z [err]  2025-12-27 09:58:49,069 - redis_service - INFO - 📦 Stored call data in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (TTL: 3600s)
+2025-12-27T09:58:49.072917016Z [err]  2025-12-27 09:58:49,069 - server - INFO - 👤 User has spoken - aiSpeaksAfterSilence timer cancelled if pending
+2025-12-27T09:58:49.072924584Z [err]  2025-12-27 09:58:49,069 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.072930880Z [err]  2025-12-27 09:58:49,069 - server - INFO - ✅ Agent SILENT - User said 1 word(s): 'Hello?' - Processing...
+2025-12-27T09:58:49.083259508Z [err]  2025-12-27 09:58:49,080 - calling_service - INFO - 🤖 Agent started speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.083259930Z [err]  2025-12-27 09:58:49,079 - server - INFO - 🎤 Endpoint detected by Soniox - processing transcript: Hello?
+2025-12-27T09:58:49.083267368Z [err]  2025-12-27 09:58:49,079 - calling_service - INFO - 👤 User stopped speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.083274652Z [err]  2025-12-27 09:58:49,080 - server - INFO - ⏱️ [TIMING] STT_START: User last audio packet received
+2025-12-27T09:58:49.083280922Z [err]  2025-12-27 09:58:49,080 - server - INFO - ⏱️ [TIMING] STT_END: Endpoint detected at T+10ms
+2025-12-27T09:58:49.083287095Z [err]  2025-12-27 09:58:49,080 - server - INFO - ⏱️ [TIMING] STT_LATENCY: 10ms (Soniox model: stt-rt-v3)
+2025-12-27T09:58:49.083293350Z [err]  2025-12-27 09:58:49,080 - server - INFO - ⏱️  USER STOPPED SPEAKING at T=0ms
+2025-12-27T09:58:49.083299590Z [err]  2025-12-27 09:58:49,080 - server - INFO - 🎙️ Agent generating response - interruption detection active
+2025-12-27T09:58:49.185575494Z [err]  2025-12-27 09:58:49,172 - server - INFO - 📝 Saved user transcript to database
+2025-12-27T09:58:49.185583897Z [err]  2025-12-27 09:58:49,173 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.185591050Z [err]  2025-12-27 09:58:49,173 - calling_service - INFO - ⏱️ [09:58:49.173] 📥 process_user_input() ENTRY - text: 'Hello?...'
+2025-12-27T09:58:49.185597983Z [err]  2025-12-27 09:58:49,177 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.185604694Z [err]  2025-12-27 09:58:49,177 - calling_service - WARNING - 🚨 BARGE-IN DETECTED for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: User spoke while Silence Greeting was triggering
+2025-12-27T09:58:49.206213576Z [err]  2025-12-27 09:58:49,198 - telnyx_service - INFO - Telnyx service initialized with connection: 2777245537294877821
+2025-12-27T09:58:49.206218171Z [err]  2025-12-27 09:58:49,199 - telnyx_service - INFO - 🛑 Stopping audio playback on call: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.206222663Z [err]  2025-12-27 09:58:49,199 - telnyx_service - ERROR - ❌ Error stopping audio playback: 'ActionsResource' object has no attribute 'playback_stop'
+2025-12-27T09:58:49.206228106Z [err]  2025-12-27 09:58:49,199 - calling_service - INFO - ✅ BARGE-IN: Audio playback STOPPED
+2025-12-27T09:58:49.206233028Z [err]  2025-12-27 09:58:49,199 - calling_service - INFO - ✅ BARGE-IN: Preserving silence greeting in history to maintain context
+2025-12-27T09:58:49.206237420Z [err]  2025-12-27 09:58:49,203 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.210951433Z [err]  2025-12-27 09:58:49,208 - redis_service - INFO - 📦 Stored call data in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (TTL: 3600s)
+2025-12-27T09:58:49.210963367Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - ✅ BARGE-IN: Reset silence_greeting_triggered flag
+2025-12-27T09:58:49.210973025Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - ⏱️ [09:58:49.208] ⏩ About to call _process_call_flow_streaming()
+2025-12-27T09:58:49.210981005Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - ⏱️ [09:58:49.208] 🔀 Agent type: call_flow, calling flow processor...
+2025-12-27T09:58:49.210989026Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - ⏱️ [09:58:49.208] 🔀 _process_call_flow_streaming() ENTRY
+2025-12-27T09:58:49.210997807Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - Flow processing - History length: 3, Is first: False
+2025-12-27T09:58:49.211005301Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - 🔍 Using explicitly set current_node_id: 2
+2025-12-27T09:58:49.211013228Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - ⏱️ [09:58:49.208] 🔀 About to call _follow_transition() for: Hello?...
+2025-12-27T09:58:49.211023913Z [err]  2025-12-27 09:58:49,208 - calling_service - INFO - Evaluating transitions from Greeting for message: Hello?
+2025-12-27T09:58:49.221637190Z [err]  2025-12-27 09:58:49,215 - calling_service - INFO - ⏱️ [09:58:49.215] 🔀 TRANSITION EVALUATION START - Calling LLM for 2 options
+2025-12-27T09:58:49.221642615Z [inf]  100.64.0.7:43384 - "GET /api/tts-audio/tts_4837cb141ab1223ca76c9b05a8448cb6.mp3 HTTP/1.1" 200
+2025-12-27T09:58:49.714485663Z [err]  2025-12-27 09:58:49,570 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.714490412Z [err]  2025-12-27 09:58:49,570 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:49.807636664Z [err]  2025-12-27 09:58:49,805 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-27T09:58:49.812614209Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - ⚠️ No transition matched, but node has GOAL. Staying on current node to continue with goal-based guidance.
+2025-12-27T09:58:49.812623048Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🎯 Goal: Say the customer's name...
+2025-12-27T09:58:49.812627126Z [err]  2025-12-27 09:58:49,810 - calling_service - INFO - ⏱️ [09:58:49.810] 🔀 TRANSITION EVALUATION COMPLETE - took 595ms
+2025-12-27T09:58:49.812630379Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - ⏱️ [TIMING] TRANSITION_EVAL: 602ms
+2025-12-27T09:58:49.812636677Z [err]  2025-12-27 09:58:49,810 - calling_service - INFO - 🤖 AI transition decision: '-1'
+2025-12-27T09:58:49.812638744Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - ⏱️ [09:58:49.811] ✅ Node selected, about to process content...
+2025-12-27T09:58:49.812643672Z [err]  2025-12-27 09:58:49,810 - calling_service - INFO - 📊 Available transitions: ['Confirms name (Yes|Speaking|This is he/she) OR Ask...', 'Wrong number (No John here|Wrong number|etc) - don...']
+2025-12-27T09:58:49.812645964Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{now}} with Saturday, December 27, 2025 at 4:58 AM EST in content
+2025-12-27T09:58:49.812650744Z [err]  2025-12-27 09:58:49,810 - calling_service - INFO - Selected transition index: -1
+2025-12-27T09:58:49.812652718Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{customer_name}} with Kendrick in content
+2025-12-27T09:58:49.812657332Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - No specific condition matched, looking for default transition...
+2025-12-27T09:58:49.812659342Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{callerName}} with  in content
+2025-12-27T09:58:49.812664979Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{lead_id}} with None in content
+2025-12-27T09:58:49.813319314Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{qc_tracking_enabled}} with False in content
+2025-12-27T09:58:49.813326882Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{track_keywords}} with  in content
+2025-12-27T09:58:49.813331416Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{expected_commitment}} with not_specified in content
+2025-12-27T09:58:49.813336086Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{to_number}} with +17708336397 in content
+2025-12-27T09:58:49.813344745Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{phone_number}} with +17708336397 in content
+2025-12-27T09:58:49.813349335Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🔧 Replaced {{email}} with None in content
+2025-12-27T09:58:49.813353325Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - ✅ Using explicit SCRIPT mode (length: 9 chars) - will return text instantly
+2025-12-27T09:58:49.813357513Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - Using flow node: Greeting (type: conversation, mode: script)
+2025-12-27T09:58:49.813362643Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 📚 skip_mandatory_precheck=true - skipping pre-response mandatory check, will check on transition
+2025-12-27T09:58:49.813367180Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - ⏱️ [09:58:49.811] 📄 About to process content (mode=script, length=9)
+2025-12-27T09:58:49.813371320Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🛡️ Preventing Dead Air: User stayed on script node 'Greeting' without transition
+2025-12-27T09:58:49.813375446Z [err]  2025-12-27 09:58:49,811 - calling_service - INFO - 🤖 Generating sticky-prevention response...
+2025-12-27T09:58:49.824267577Z [err]  If user says a name, don't assume it's theirs—wait for explicit correction.
+2025-12-27T09:58:49.824276411Z [err]  
+2025-12-27T09:58:49.824280074Z [err]  2025-12-27 09:58:49,818 - calling_service - INFO - ⚡ PARALLEL MODE: Running KB + analysis simultaneously
+2025-12-27T09:58:49.824283758Z [err]  If user asks to repeat info, rephrase naturally—never exact repeat.
+2025-12-27T09:58:49.824286049Z [err]  2025-12-27 09:58:49,819 - kb_router - INFO - 🚦 KB Router: SKIP (simple chat pattern matched)
+2025-12-27T09:58:49.824290364Z [err]  2025-12-27 09:58:49,819 - calling_service - INFO - ⚡ Skipping KB (reason: simple_chat)
+2025-12-27T09:58:49.824294124Z [err]  2025-12-27 09:58:49,819 - calling_service - INFO - ⚡ Parallel operations completed in 0ms
+2025-12-27T09:58:49.824298339Z [err]  2025-12-27 09:58:49,819 - calling_service - INFO - 🔍 Node 'Greeting': use_parallel_llm=True
+2025-12-27T09:58:49.824301997Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - ⚡ Parallel mode: Using condensed history (3/3 messages)
+2025-12-27T09:58:49.824305713Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - ⏱️ [09:58:49.821] 💬 LLM REQUEST START: 3 conversation turns, 7883 system chars (KB cached)
+2025-12-27T09:58:49.824309301Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝 ═══════════ LLM PROMPT BREAKDOWN ═══════════
+2025-12-27T09:58:49.824312968Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝 [SYSTEM MSG 1 - GLOBAL PROMPT] (6467 chars):
+2025-12-27T09:58:49.824316954Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝   Preview: # Global Prompt: Direct Drive Engine (V4.2 - Acknowledging & Fluid)
+2025-12-27T09:58:49.824321774Z [err]  
+2025-12-27T09:58:49.824325569Z [err]  When user states income, convert/update as [yearly_income] variable for logic splits.
+2025-12-27T09:58:49.824329218Z [err]  
+2025-12-27T09:58:49.825123869Z [err]  
+2025-12-27T09:58:49.825127936Z [err]  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2025-12-27T09:58:49.825130264Z [err]  If asked your state: "Atlanta, GA. Been in Midtown 10 years."
+2025-12-27T09:58:49.825134179Z [err]  PREPROCESSED CONTEXT (to help you prioritize and focus):
+2025-12-27T09:58:49.825135244Z [err]  1. Generate a natural, contextual response
+2025-12-27T09:58:49.825136219Z [err]  
+2025-12-27T09:58:49.825139761Z [err]  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2025-12-27T09:58:49.825142128Z [err]  If asked about call number: "Company number."
+2025-12-27T09:58:49.825143957Z [err]  2. Evaluate transitions per your node instructions
+2025-12-27T09:58:49.825145893Z [err]  
+2025-12-27T09:58:49.825147972Z [err]  
+2025-12-27T09:58:49.825151248Z [err]  USER COMMUNICATION STYLE: C type - adjust your response accordingly
+2025-12-27T09:58:49.825153083Z [err]  User email: {customer_email} (for them: {{customer_email}}).
+2025-12-27T09:58:49.825157219Z [err]  CONVERSATION STATUS: Turn 2, objection handling phase
+2025-12-27T09:58:49.825158224Z [err]  
+2025-12-27T09:58:49.825162243Z [err]  
+2025-12-27T09:58:49.825163412Z [err]  If explaining ends in peri...
+2025-12-27T09:58:49.825168327Z [err]  This context is provided to help you focus. You still need to:
+2025-12-27T09:58:49.825169152Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝 [SYSTEM MSG 2 - DYNAMIC CONTEXT] (1416 chars):
+2025-12-27T09:58:49.825174461Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝   Preview: 
+2025-12-27T09:58:49.825178266Z [err]  
+2025-12-27T09:58:49.825753095Z [err]  2025-12-27 09:58:49,822 - calling_service - INFO - 📝 ═══════════════════════════════════════════
+2025-12-27T09:58:49.825759643Z [err]  
+2025-12-27T09:58:49.825764813Z [err]  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2025-12-27T09:58:49.825768841Z [err]  
+2025-12-27T09:58:49.825772519Z [err]  # CURRENT CONTEXT
+2025-12-27T09:58:49.825776049Z [err]  Customer: Kendrick
+2025-12-27T09:58:49.825779737Z [err]  Variables: {"now": "Saturday, December 27, 2025 at 4:58 AM EST", "customer_name": "Kendrick", "callerName": "", "lead_id": null, "qc_tracking_enabled": false, "track_keywords": "", "expected_commitment"...
+2025-12-27T09:58:49.825784671Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝 [CONVERSATION HISTORY] (3 messages)
+2025-12-27T09:58:49.825788560Z [err]  2025-12-27 09:58:49,821 - calling_service - INFO - 📝   assistant: Kendrick?...
+2025-12-27T09:58:49.825792334Z [err]  2025-12-27 09:58:49,822 - calling_service - INFO - 📝   user: Hello?...
+2025-12-27T09:58:49.995604515Z [err]  2025-12-27 09:58:49,992 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:49.995609481Z [err]  2025-12-27 09:58:49,992 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.machine.premium.detection.ended', 'id': 'b1ed97c9-0c4f-4e91-9f6d-5b99b646f6c8', 'occurred_at': '2025-12-27T09:58:49.629205Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'from': '+14048000152', 'result': 'human_residence', 'to': '+17708336397'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:49.995613641Z [err]  2025-12-27 09:58:49,992 - server - INFO - 🎯 Event type: call.machine.premium.detection.ended, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:49.995617904Z [err]  2025-12-27 09:58:49,992 - server - INFO - 📨 ================================================
+2025-12-27T09:58:49.995622730Z [inf]  100.64.0.8:44278 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:50.110996074Z [err]  2025-12-27 09:58:50,079 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:50.111002240Z [err]  2025-12-27 09:58:50,079 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:50.111007112Z [err]  2025-12-27 09:58:50,080 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=True, user_speaking=False, silence=0.0s, checkin_count=0/2
+2025-12-27T09:58:50.253757630Z [err]  2025-12-27 09:58:50,252 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:50.253765898Z [err]  2025-12-27 09:58:50,252 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.playback.started', 'id': '3024e981-d0bf-4af1-90f1-552efd74bc75', 'occurred_at': '2025-12-27T09:58:49.729206Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'media_name': None, 'media_url': 'api.li-ai.org/api/tts-audio/tts_4837cb141ab1223ca76c9b05a8448cb6.mp3', 'overlay': False, 'playback_id': 'fJdNXCRn-Q'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:50.253772563Z [err]  2025-12-27 09:58:50,252 - server - INFO - 🎯 Event type: call.playback.started, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:50.253778980Z [err]  2025-12-27 09:58:50,252 - server - INFO - 📨 ================================================
+2025-12-27T09:58:50.253785087Z [inf]  100.64.0.11:41778 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:50.392963265Z [err]  2025-12-27 09:58:50,340 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-27T09:58:50.414465580Z [err]  2025-12-27 09:58:50,408 - server - INFO - 📤 Audio flowing: 296 packets sent to Soniox (5s update)
+2025-12-27T09:58:50.731983731Z [err]  2025-12-27 09:58:50,590 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=True, user_speaking=False, silence=0.0s, checkin_count=0/2
+2025-12-27T09:58:50.731992421Z [err]  2025-12-27 09:58:50,694 - calling_service - INFO - ⏱️ [09:58:50.694] 💬 LLM FIRST TOKEN: 872ms (grok grok-4-1-fast-non-reasoning)
+2025-12-27T09:58:50.732028834Z [err]  2025-12-27 09:58:50,590 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:50.732033104Z [err]  2025-12-27 09:58:50,590 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:50.792223503Z [err]  2025-12-27 09:58:50,781 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:50.792231224Z [err]  2025-12-27 09:58:50,781 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.playback.ended', 'id': 'f93268c9-3d4f-4715-86f9-c24d7489b3ed', 'occurred_at': '2025-12-27T09:58:50.569340Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'media_name': None, 'media_url': 'api.li-ai.org/api/tts-audio/tts_4837cb141ab1223ca76c9b05a8448cb6.mp3', 'overlay': False, 'playback_id': 'fJdNXCRn-Q', 'status': 'completed', 'status_detail': ''}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:50.792237437Z [err]  2025-12-27 09:58:50,781 - server - INFO - 🎯 Event type: call.playback.ended, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:50.792241725Z [err]  2025-12-27 09:58:50,781 - server - INFO - 📨 ================================================
+2025-12-27T09:58:50.792246934Z [err]  2025-12-27 09:58:50,790 - redis_service - INFO - ➖ Removed playback fJdNXCRn-Q, 0 remaining for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:50.792251253Z [err]  2025-12-27 09:58:50,790 - server - INFO - 🔊 Redis: Removed playback fJdNXCRn-Q, 0 remaining
+2025-12-27T09:58:50.792255543Z [err]  2025-12-27 09:58:50,790 - server - INFO - 🔊 ALL PLAYBACKS FINISHED (via Redis) - attempting to start silence timer
+2025-12-27T09:58:50.796906657Z [err]  2025-12-27 09:58:50,795 - server - INFO - ✅ Set 'agent_done_speaking' flag in Redis for worker with session to detect
+2025-12-27T09:58:50.796913457Z [inf]  100.64.0.8:44278 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:50.833979125Z [err]  2025-12-27 09:58:50,828 - server - INFO - 📤 Sentence arrived from LLM: [N] Hey Kendrick,...
+2025-12-27T09:58:50.833986025Z [err]  2025-12-27 09:58:50,828 - server - INFO - ⏱️ [TIMING] TTFS (Time To First Sentence): 1748ms
+2025-12-27T09:58:50.833993736Z [err]  2025-12-27 09:58:50,828 - server - INFO - ⚡ Starting REAL-TIME TTS for first sentence
+2025-12-27T09:58:50.834000682Z [err]  2025-12-27 09:58:50,828 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:50.834005962Z [err]  2025-12-27 09:58:50,828 - server - INFO - ⚡ ON-DEMAND: Creating persistent TTS session (multi-worker mode)
+2025-12-27T09:58:50.921046083Z [err]  2025-12-27 09:58:50,915 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:51.003249319Z [err]  2025-12-27 09:58:51,002 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:51.097269850Z [err]  2025-12-27 09:58:51,089 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:58:51.112947874Z [err]  2025-12-27 09:58:51,109 - telnyx_service - INFO - Telnyx service initialized with connection: 2777245537294877821
+2025-12-27T09:58:51.112953965Z [err]  2025-12-27 09:58:51,109 - server - INFO - ✅ ON-DEMAND: Using Telnyx WebSocket from closure for streaming audio
+2025-12-27T09:58:51.112958281Z [err]  2025-12-27 09:58:51,109 - persistent_tts_service - INFO - 🎙️ Extracted voice_settings from agent config: {'stability': 0.6, 'similarity_boost': 0.65, 'style': 0.2, 'use_speaker_boost': True}
+2025-12-27T09:58:51.112962438Z [err]  2025-12-27 09:58:51,109 - persistent_tts_service - INFO - 🔌 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Establishing persistent TTS WebSocket...
+2025-12-27T09:58:51.112969333Z [err]  2025-12-27 09:58:51,109 - persistent_tts_service - INFO - 🎙️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Voice settings: {'stability': 0.6, 'similarity_boost': 0.65, 'style': 0.2, 'use_speaker_boost': True}
+2025-12-27T09:58:51.112973912Z [err]  2025-12-27 09:58:51,109 - elevenlabs_ws_service - INFO - 🔌 Connecting to ElevenLabs WebSocket: voice=J5iaaqzR5zn6HFG4jV3b, model=eleven_turbo_v2_5
+2025-12-27T09:58:51.112978267Z [err]  2025-12-27 09:58:51,109 - elevenlabs_ws_service - INFO - 🎙️ Voice settings: stability=0.6, similarity=0.65, style=0.2
+2025-12-27T09:58:51.123664502Z [err]  2025-12-27 09:58:51,121 - dead_air_monitor - INFO - 🚩 Detected 'agent_done_speaking' flag from webhook - marking agent as done
+2025-12-27T09:58:51.123669890Z [err]  2025-12-27 09:58:51,121 - calling_service - INFO - ⏱️ SILENCE TIMER STARTED at 1766829531.121421 for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:51.123673807Z [err]  2025-12-27 09:58:51,121 - calling_service - INFO - 🤖 Agent stopped speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:51.128514715Z [err]  2025-12-27 09:58:51,125 - persistent_tts_service - WARNING - ⚠️  No persistent TTS session found for call v3:Zc6Rf1J5q93QShn2x... (active sessions: [])
+2025-12-27T09:58:51.246056019Z [err]  2025-12-27 09:58:51,242 - calling_service - INFO - 📤 Streamed sentence: [N] Hey Kendrick,...
+2025-12-27T09:58:51.246063498Z [err]  2025-12-27 09:58:51,242 - elevenlabs_ws_service - INFO - ✅ Connected to ElevenLabs WebSocket
+2025-12-27T09:58:51.246067561Z [err]  2025-12-27 09:58:51,243 - persistent_tts_service - INFO - 🎵 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Playback consumer started
+2025-12-27T09:58:51.246073402Z [err]  2025-12-27 09:58:51,242 - elevenlabs_ws_service - INFO - 📤 Sent BOS message with voice settings
+2025-12-27T09:58:51.246078018Z [err]  2025-12-27 09:58:51,242 - persistent_tts_service - INFO - ✅ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Persistent TTS WebSocket established
+2025-12-27T09:58:51.246082097Z [err]  2025-12-27 09:58:51,242 - persistent_tts_service - INFO - 🎧 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Audio receiver loop started
+2025-12-27T09:58:51.246085902Z [err]  2025-12-27 09:58:51,242 - persistent_tts_service - INFO - 🔊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Comfort noise loop started
+2025-12-27T09:58:51.246090038Z [err]  2025-12-27 09:58:51,242 - persistent_tts_service - INFO - ✅ Created persistent TTS session for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:51.246093657Z [err]  2025-12-27 09:58:51,242 - server - INFO - ✅ ON-DEMAND: Persistent TTS session created successfully!
+2025-12-27T09:58:51.246097332Z [err]  2025-12-27 09:58:51,242 - server - INFO - 🔍 Persistent TTS lookup: call_id=v3:Zc6Rf1J5q93QShn2x..., session=FOUND
+2025-12-27T09:58:51.246101592Z [err]  2025-12-27 09:58:51,242 - server - INFO - 🚀 Streaming sentence #1 via persistent WebSocket
+2025-12-27T09:58:51.246105591Z [err]  2025-12-27 09:58:51,242 - server - INFO - 🎵 TTS task #1 started at +414ms
+2025-12-27T09:58:51.246109458Z [err]  2025-12-27 09:58:51,242 - server - INFO - ⏱️ [TIMING] TTFT_TTS (First TTS Task Started): 2162ms
+2025-12-27T09:58:51.246731507Z [err]  2025-12-27 09:58:51,243 - persistent_tts_service - INFO - 🎧 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Audio Receiver Loop STARTED
+2025-12-27T09:58:51.246740983Z [err]  2025-12-27 09:58:51,243 - persistent_tts_service - INFO - 💓 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Starting TTS keep-alive loop (every 15s)
+2025-12-27T09:58:51.246748253Z [err]  2025-12-27 09:58:51,243 - persistent_tts_service - INFO - 🔊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Starting comfort noise loop
+2025-12-27T09:58:51.246754940Z [err]  2025-12-27 09:58:51,243 - persistent_tts_service - INFO - 🎤 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Streaming sentence #1: [N] Hey Kendrick,...
+2025-12-27T09:58:51.246761259Z [err]  2025-12-27 09:58:51,244 - persistent_tts_service - INFO - 🚀 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Sent sentence #1 (NON-BLOCKING) in 0ms
+2025-12-27T09:58:51.246768252Z [err]  2025-12-27 09:58:51,244 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: pending_sentences=1, audio_queue=0, is_first=True, is_last=False
+2025-12-27T09:58:51.246774830Z [err]  2025-12-27 09:58:51,244 - server - INFO - 📤 Sentence arrived from LLM: it's Jake here from JK....
+2025-12-27T09:58:51.246781053Z [err]  2025-12-27 09:58:51,244 - server - INFO - 🔍 Persistent TTS lookup: call_id=v3:Zc6Rf1J5q93QShn2x..., session=FOUND
+2025-12-27T09:58:51.246787935Z [err]  2025-12-27 09:58:51,244 - server - INFO - 🚀 Streaming sentence #2 via persistent WebSocket
+2025-12-27T09:58:51.246794259Z [err]  2025-12-27 09:58:51,244 - server - INFO - 🎵 TTS task #2 started at +416ms
+2025-12-27T09:58:51.246801167Z [err]  2025-12-27 09:58:51,244 - calling_service - INFO - 📤 Streamed sentence: it's Jake here from JK....
+2025-12-27T09:58:51.246808597Z [err]  2025-12-27 09:58:51,246 - persistent_tts_service - INFO - 🎧 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver processing sentence #1: '[N] Hey Kendrick,...'
+2025-12-27T09:58:51.247615320Z [err]  2025-12-27 09:58:51,246 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: queue_latency=2ms, pending_sentences=0, audio_queue=0, interrupted=False
+2025-12-27T09:58:51.247623190Z [err]  2025-12-27 09:58:51,246 - persistent_tts_service - INFO - 🎤 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Streaming sentence #2: it's Jake here from JK....
+2025-12-27T09:58:51.247630487Z [err]  2025-12-27 09:58:51,246 - persistent_tts_service - INFO - 🚀 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Sent sentence #2 (NON-BLOCKING) in 0ms
+2025-12-27T09:58:51.247636382Z [err]  2025-12-27 09:58:51,246 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: pending_sentences=1, audio_queue=0, is_first=False, is_last=False
+2025-12-27T09:58:51.247642691Z [err]  2025-12-27 09:58:51,246 - server - INFO - 📤 Sentence arrived from LLM: You there?...
+2025-12-27T09:58:51.247649112Z [err]  2025-12-27 09:58:51,246 - server - INFO - 🔍 Persistent TTS lookup: call_id=v3:Zc6Rf1J5q93QShn2x..., session=FOUND
+2025-12-27T09:58:51.247655258Z [err]  2025-12-27 09:58:51,246 - server - INFO - 🚀 Streaming sentence #3 via persistent WebSocket
+2025-12-27T09:58:51.247661597Z [err]  2025-12-27 09:58:51,246 - server - INFO - 🎵 TTS task #3 started at +418ms
+2025-12-27T09:58:51.247667738Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - 📤 Streamed final fragment: You there?...
+2025-12-27T09:58:51.247674335Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - ⏱️ [TIMING] LLM_TOTAL: 1424ms for 52 chars (grok grok-4-1-fast-non-reasoning)
+2025-12-27T09:58:51.247680584Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - ⏱️ SILENCE TIMER RESET (user gave meaningful response) for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:51.247686569Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - 🔊 Silence tracking reset for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (user responded)
+2025-12-27T09:58:51.248486871Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - ✅ User responded to regular message, resetting counter
+2025-12-27T09:58:51.248495381Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - 💾 Storing node ID 2 in conversation history
+2025-12-27T09:58:51.248501187Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - LLM response (2.07s): [N] Hey Kendrick, it's Jake here from JK. You there?
+2025-12-27T09:58:51.248507449Z [err]  2025-12-27 09:58:51,246 - calling_service - INFO - Total latency: 2.07s
+2025-12-27T09:58:51.249691926Z [err]  2025-12-27 09:58:51,247 - server - INFO - ✅ LLM finished in 2167ms, TTS tasks already running in background
+2025-12-27T09:58:51.249700210Z [err]  2025-12-27 09:58:51,248 - server - INFO - 🎵 Streaming 3 TTS chunks as they complete...
+2025-12-27T09:58:51.249706302Z [err]  2025-12-27 09:58:51,248 - server - INFO - 🚀 Persistent TTS: Audio already streaming in background!
+2025-12-27T09:58:51.249712463Z [err]  2025-12-27 09:58:51,248 - server - INFO -    3 sentences queued and playing seamlessly
+2025-12-27T09:58:51.249719026Z [err]  2025-12-27 09:58:51,248 - persistent_tts_service - INFO - 🎤 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Streaming sentence #3: You there?...
+2025-12-27T09:58:51.249725140Z [err]  2025-12-27 09:58:51,248 - persistent_tts_service - INFO - 🚀 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Sent sentence #3 (NON-BLOCKING) in 0ms
+2025-12-27T09:58:51.249731500Z [err]  2025-12-27 09:58:51,248 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: pending_sentences=2, audio_queue=0, is_first=False, is_last=False
+2025-12-27T09:58:51.249737583Z [err]  2025-12-27 09:58:51,248 - server - INFO - ✅ All 3 persistent TTS streams completed
+2025-12-27T09:58:51.249743471Z [err]  2025-12-27 09:58:51,248 - server - INFO - ✅ Agent generation complete (persistent TTS) - response window closed
+2025-12-27T09:58:51.249753780Z [err]  2025-12-27 09:58:51,248 - server - INFO - ⏱️  FIRST AUDIO STARTED: 2168ms from user stop 🚀
+2025-12-27T09:58:51.249757767Z [err]  2025-12-27 09:58:51,248 - calling_service - INFO - 🤖 Agent started speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:51.249762065Z [err]  2025-12-27 09:58:51,248 - server - INFO - ✅ Agent generation complete - response window closed
+2025-12-27T09:58:51.249766322Z [err]  2025-12-27 09:58:51,248 - server - INFO - ⏱️  ═══════════════════════════════════════════════
+2025-12-27T09:58:51.250432343Z [err]  2025-12-27 09:58:51,248 - server - INFO - ⏱️  [TIMING] ==== E2E LATENCY SUMMARY ====
+2025-12-27T09:58:51.250437551Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] STT: 10ms (provider: soniox, model: stt-rt-v3)
+2025-12-27T09:58:51.250441597Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] LLM_TOTAL: 2167ms (provider: grok, model: grok-4-1-fast-non-reasoning)
+2025-12-27T09:58:51.250445241Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] TTS_TOTAL: 420ms (provider: elevenlabs, websocket: False)
+2025-12-27T09:58:51.250449290Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] E2E_TOTAL: 2168ms (user stopped → play_audio_url called)
+2025-12-27T09:58:51.250453113Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] ⚠️ NOTE: E2E_TOTAL does not include:
+2025-12-27T09:58:51.250456567Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING]   - Telnyx processing time (~50-200ms)
+2025-12-27T09:58:51.250460260Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING]   - Network latency to user's phone (~50-150ms)
+2025-12-27T09:58:51.250463872Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING]   - Phone audio buffering (~50-200ms)
+2025-12-27T09:58:51.250482979Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING]   - TOTAL MISSING: ~150-550ms typically
+2025-12-27T09:58:51.250486794Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING]   - REAL USER LATENCY: 2468ms estimated
+2025-12-27T09:58:51.250490497Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] RESPONSE_TEXT: 52 chars, 3 sentences
+2025-12-27T09:58:51.250494017Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] USER_INPUT: 'Hello?...'
+2025-12-27T09:58:51.250497400Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] AI_RESPONSE: '[N] Hey Kendrick, it's Jake here from JK. You there?...'
+2025-12-27T09:58:51.250894411Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  [TIMING] ==========================
+2025-12-27T09:58:51.250899167Z [err]  2025-12-27 09:58:51,249 - server - INFO - ⏱️  ═══════════════════════════════════════════════
+2025-12-27T09:58:51.439202670Z [err]  2025-12-27 09:58:51,435 - server - INFO - 📝 Saved assistant transcript and latency to database (Node: Greeting, Dead Air: 2597ms)
+2025-12-27T09:58:51.439211875Z [err]  2025-12-27 09:58:51,435 - server - INFO - 🔊 Agent finished generating, 0 playbacks active - waiting for webhooks to close window and start silence tracking
+2025-12-27T09:58:51.439218829Z [err]  2025-12-27 09:58:51,435 - server - INFO - 🔍 END CALL CHECK: should_end_call=False, max_checkins=False, max_duration=False
+2025-12-27T09:58:51.500489679Z [err]  2025-12-27 09:58:51,497 - persistent_tts_service - INFO - ⏱️ [TIMING] TTFA (Time To First Audio Playback): 253ms
+2025-12-27T09:58:51.500497604Z [err]  2025-12-27 09:58:51,497 - persistent_tts_service - INFO - 📤 Sending 9643 bytes of audio (61 chunks, 1.2s duration) via WebSocket
+2025-12-27T09:58:51.500502175Z [err]  2025-12-27 09:58:51,497 - persistent_tts_service - INFO - 🎙️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] AGENT IS NOW SPEAKING (is_speaking=True)
+2025-12-27T09:58:51.500506273Z [err]  2025-12-27 09:58:51,497 - persistent_tts_service - INFO - ⏱️ EXTEND playback_expected_end_time: +1.2s (total: 1.2s from now)
+2025-12-27T09:58:51.500511139Z [err]  2025-12-27 09:58:51,498 - persistent_tts_service - INFO - ✅ Sent 61 audio chunks via WebSocket
+2025-12-27T09:58:51.728013880Z [err]  2025-12-27 09:58:51,694 - persistent_tts_service - INFO - 📤 Sending 13747 bytes of audio (86 chunks, 1.7s duration) via WebSocket
+2025-12-27T09:58:51.728021389Z [err]  2025-12-27 09:58:51,695 - persistent_tts_service - INFO - 🎙️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] AGENT IS NOW SPEAKING (is_speaking=True)
+2025-12-27T09:58:51.728028805Z [err]  2025-12-27 09:58:51,695 - persistent_tts_service - INFO - ⏱️ EXTEND playback_expected_end_time: +1.7s (total: 2.7s from now)
+2025-12-27T09:58:51.728035275Z [err]  2025-12-27 09:58:51,696 - persistent_tts_service - INFO - ✅ Sent 86 audio chunks via WebSocket
+2025-12-27T09:58:51.889188927Z [err]  2025-12-27 09:58:51,886 - persistent_tts_service - INFO - 📤 Sending 5572 bytes of audio (35 chunks, 0.7s duration) via WebSocket
+2025-12-27T09:58:51.889197485Z [err]  2025-12-27 09:58:51,886 - persistent_tts_service - INFO - 🎙️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] AGENT IS NOW SPEAKING (is_speaking=True)
+2025-12-27T09:58:51.889203564Z [err]  2025-12-27 09:58:51,886 - persistent_tts_service - INFO - ⏱️ EXTEND playback_expected_end_time: +0.7s (total: 3.2s from now)
+2025-12-27T09:58:51.889209725Z [err]  2025-12-27 09:58:51,886 - persistent_tts_service - INFO - ✅ Sent 35 audio chunks via WebSocket
+2025-12-27T09:58:53.944837953Z [err]  2025-12-27 09:58:53,886 - elevenlabs_ws_service - INFO - ⏱️  [TIMING] ElevenLabs audio stream complete (0.5s timeout reached) - End of Sentence
+2025-12-27T09:58:53.944844925Z [err]  2025-12-27 09:58:53,886 - persistent_tts_service - INFO - ✅ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver finished sentence #1: 3 chunks in 2642ms
+2025-12-27T09:58:53.944851897Z [err]  2025-12-27 09:58:53,886 - persistent_tts_service - INFO - 🎧 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver processing sentence #2: 'it's Jake here from JK....'
+2025-12-27T09:58:53.944858813Z [err]  2025-12-27 09:58:53,886 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: queue_latency=2639ms, pending_sentences=1, audio_queue=0, interrupted=False
+2025-12-27T09:58:55.212496638Z [err]  2025-12-27 09:58:55,203 - dead_air_monitor - INFO - ⏱️ Playback expected end time passed (0.1s ago), marking agent as done speaking
+2025-12-27T09:58:55.212503975Z [err]  2025-12-27 09:58:55,203 - calling_service - INFO - ⏱️ SILENCE TIMER STARTED at 1766829535.2037745 for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:55.212509971Z [err]  2025-12-27 09:58:55,203 - calling_service - INFO - 🤖 Agent stopped speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:55.415507142Z [err]  2025-12-27 09:58:55,409 - server - INFO - 📤 Audio flowing: 544 packets sent to Soniox (5s update)
+2025-12-27T09:58:55.420024068Z [err]  2025-12-27 09:58:55,418 - persistent_tts_service - INFO - 🔇 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] FLOOR RELEASED (is_holding_floor=False)
+2025-12-27T09:58:55.498664225Z [err]  2025-12-27 09:58:55,495 - server - INFO - 🎤 Soniox receiver alive - 12 messages received in last 10s
+2025-12-27T09:58:56.395595433Z [err]  2025-12-27 09:58:56,386 - elevenlabs_ws_service - WARNING - ⚠️  [TIMING] ElevenLabs timeout waiting for first chunk (2.5s) - No audio received!
+2025-12-27T09:58:56.395602804Z [err]  2025-12-27 09:58:56,386 - persistent_tts_service - WARNING - ⚠️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver got 0 chunks for sentence #2! interrupted=False
+2025-12-27T09:58:56.395607738Z [err]  2025-12-27 09:58:56,386 - persistent_tts_service - INFO - 🎧 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver processing sentence #3: 'You there?...'
+2025-12-27T09:58:56.395616453Z [err]  2025-12-27 09:58:56,386 - persistent_tts_service - INFO - 📊 [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] DIAGNOSTIC: queue_latency=5137ms, pending_sentences=0, audio_queue=0, interrupted=False
+2025-12-27T09:58:58.646711564Z [err]  2025-12-27 09:58:58,638 - server - INFO - 📞 Telnyx WebSocket disconnected. Sent 696 total packets
+2025-12-27T09:58:58.646717298Z [err]  [2025-12-27 09:58:58 +0000] [3] [INFO] connection closed
+2025-12-27T09:58:58.835352659Z [inf]  100.64.0.8:48728 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:58.835394740Z [err]  2025-12-27 09:58:58,782 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:58.835402797Z [err]  2025-12-27 09:58:58,782 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.playback.ended', 'id': '8162ce5d-7e79-45a7-8649-db7fed1b8e03', 'occurred_at': '2025-12-27T09:58:58.429216Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'end_time': '2025-12-27T09:58:58.429216Z', 'media_name': None, 'media_url': 'api.li-ai.org/api/tts-audio/comfort_noise_continuous.mp3', 'overlay': True, 'playback_id': 'Nr8MOnNEEQ', 'status': 'call_hangup', 'status_detail': ''}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:58.835409596Z [err]  2025-12-27 09:58:58,782 - server - INFO - 🎯 Event type: call.playback.ended, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:58.835415607Z [err]  2025-12-27 09:58:58,782 - server - INFO - 📨 ================================================
+2025-12-27T09:58:58.835423095Z [err]  2025-12-27 09:58:58,792 - redis_service - INFO - ➖ Removed playback Nr8MOnNEEQ, 0 remaining for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:58.835430193Z [err]  2025-12-27 09:58:58,792 - server - INFO - 🔊 Redis: Removed playback Nr8MOnNEEQ, 0 remaining
+2025-12-27T09:58:58.835436966Z [err]  2025-12-27 09:58:58,792 - server - INFO - 🔊 ALL PLAYBACKS FINISHED (via Redis) - attempting to start silence timer
+2025-12-27T09:58:58.835443979Z [err]  2025-12-27 09:58:58,797 - server - INFO - ✅ Set 'agent_done_speaking' flag in Redis for worker with session to detect
+2025-12-27T09:58:58.835651534Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:58.835659328Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 Full payload: {'data': {'event_type': 'streaming.stopped', 'id': '08ec9e7b-acd7-42c1-b051-62d91bb108b8', 'occurred_at': '2025-12-27T09:58:58.567900Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'stream_id': '5e0f0419-0fa8-4733-b3ea-369b3bcc1fc0', 'stream_params': {'stream_track': 'inbound', 'stream_url': 'wss://api.li-ai.org/api/telnyx/audio-stream'}, 'stream_type': 'websocket'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:58.835665859Z [err]  2025-12-27 09:58:58,814 - server - INFO - 🎯 Event type: streaming.stopped, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:58.835672111Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:58:58.835678315Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 ================================================
+2025-12-27T09:58:58.835684467Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.hangup', 'id': '35baabd8-bedc-460a-9808-c10d169f3884', 'occurred_at': '2025-12-27T09:58:58.389208Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_quality_stats': {'inbound': {'jitter_max_variance': '51.81', 'jitter_packet_count': '0', 'mos': '4.50', 'packet_count': '721', 'skip_packet_count': '17'}, 'outbound': {'packet_count': '696', 'skip_packet_count': '0'}}, 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'client_state': None, 'connection_id': '2777245537294877821', 'end_time': '2025-12-27T09:58:58.389208Z', 'from': '+14048000152', 'hangup_cause': 'normal_clearing', 'hangup_source': 'callee', 'sip_hangup_cause': '200', 'start_time': '2025-12-27T09:58:38.029221Z', 'to': '+17708336397'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:58:58.836193558Z [err]  2025-12-27 09:58:58,814 - server - INFO - 🎯 Event type: call.hangup, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:58.836201141Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📨 ================================================
+2025-12-27T09:58:58.836207681Z [inf]  100.64.0.10:45720 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:58:58.836214398Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📞 Call ended: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:58.836220780Z [err]  2025-12-27 09:58:58,814 - server - INFO - 📞 Hangup cause: normal_clearing
+2025-12-27T09:58:58.909037638Z [err]  2025-12-27 09:58:58,886 - elevenlabs_ws_service - WARNING - ⚠️  [TIMING] ElevenLabs timeout waiting for first chunk (2.5s) - No audio received!
+2025-12-27T09:58:58.909045893Z [err]  2025-12-27 09:58:58,886 - persistent_tts_service - WARNING - ⚠️ [Call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g] Receiver got 0 chunks for sentence #3! interrupted=False
+2025-12-27T09:58:59.837384874Z [err]  2025-12-27 09:58:59,766 - server - INFO - 📝 Updated call log: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:58:59.869105425Z [err]  2025-12-27 09:58:59,859 - server - INFO - ✅ Finalized call log: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g (duration=15s, status=completed)
+2025-12-27T09:59:00.285212030Z [err]  2025-12-27 09:59:00,258 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=False, user_speaking=False, silence=5.1s, checkin_count=0/2
+2025-12-27T09:59:00.580807772Z [err]  2025-12-27 09:59:00,561 - server - INFO - 📊 Auto-added call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g to campaign b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8
+2025-12-27T09:59:00.844893301Z [err]  2025-12-27 09:59:00,741 - server - INFO - 📤 Sending post-call webhook to: https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b
+2025-12-27T09:59:00.844900289Z [err]  2025-12-27 09:59:00,752 - redis_service - INFO - 📥 Retrieved call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.844907995Z [err]  2025-12-27 09:59:00,752 - server - INFO - 📇 [HANGUP] Data source: redis=Yes, memory=No
+2025-12-27T09:59:00.844915677Z [err]  2025-12-27 09:59:00,752 - server - INFO - 📇 [HANGUP] Missing data from cache, checking MongoDB call_logs...
+2025-12-27T09:59:00.844921973Z [err]  2025-12-27 09:59:00,764 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=False, user_speaking=False, silence=5.6s, checkin_count=0/2
+2025-12-27T09:59:00.848199533Z [err]  2025-12-27 09:59:00,844 - server - INFO - 📇 [HANGUP] Found call_log in MongoDB, extracting missing data...
+2025-12-27T09:59:00.935172524Z [err]  2025-12-27 09:59:00,931 - server - INFO - 📇 [HANGUP] After MongoDB fallback: user_id=dcafa642-6136-4096-b77d-a4cb99a62651, agent_id=bbeda238-e8d9-4d8c-b93b-1b7694581adb, to_number=+17708336397
+2025-12-27T09:59:00.935183168Z [err]  2025-12-27 09:59:00,931 - server - INFO - 📇 [HANGUP] Final extracted data: user_id=dcafa642-6136-4096-b77d-a4cb99a62651, agent_id=bbeda238-e8d9-4d8c-b93b-1b7694581adb, to_number=+17708336397, lead_id=None, agent_name=JK First Caller-optimizer3
+2025-12-27T09:59:00.935191971Z [err]  2025-12-27 09:59:00,931 - server - INFO - 📇 [HANGUP] Agent info keys: None
+2025-12-27T09:59:00.935201045Z [err]  2025-12-27 09:59:00,931 - server - INFO - 🚀 Triggered QC analysis for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.935209814Z [err]  2025-12-27 09:59:00,931 - server - INFO - 📊 Triggered Campaign QC for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.935219662Z [err]  2025-12-27 09:59:00,931 - server - INFO - 📇 Triggered CRM update for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.935229836Z [err]  2025-12-27 09:59:00,931 - server - INFO - ✅ Closed persistent TTS session for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.940402640Z [err]  2025-12-27 09:59:00,936 - redis_service - INFO - 🧹 Deleted call data from Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.940410187Z [err]  2025-12-27 09:59:00,936 - server - INFO - 🧹 Cleaned up call session from Redis and memory: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.940418819Z [inf]  100.64.0.7:47858 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:59:00.940424312Z [err]  2025-12-27 09:59:00,937 - server - INFO - 🔍 Starting QC analysis for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.940429456Z [err]  2025-12-27 09:59:00,937 - server - INFO - 🔍 [AUTO-QC] Starting campaign QC check for call=v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g, user=dcafa642-6136-4096-b77d-a4cb99a62651, agent=bbeda238-e8d9-4d8c-b93b-1b7694581adb
+2025-12-27T09:59:00.940435148Z [err]  2025-12-27 09:59:00,938 - server - INFO - 📇 CRM update starting for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: to_number=+17708336397, user_id=dcafa642-6136-4096-b77d-a4cb99a62651
+2025-12-27T09:59:00.940440365Z [err]  2025-12-27 09:59:00,938 - server - INFO - 📇 Normalized phone: +17708336397
+2025-12-27T09:59:00.961338282Z [err]  2025-12-27 09:59:00,957 - httpx - INFO - HTTP Request: POST https://n8n.outlier-agency.com/webhook/2adb150a-9e08-4053-9fa4-e47df18bf39b "HTTP/1.1 200 OK"
+2025-12-27T09:59:00.961345776Z [err]  2025-12-27 09:59:00,958 - server - INFO - ✅ Post-call webhook sent successfully (status=200)
+2025-12-27T09:59:00.966604079Z [err]  2025-12-27 09:59:00,965 - server - INFO - 📨 ========== TELNYX WEBHOOK RECEIVED ==========
+2025-12-27T09:59:00.966609326Z [err]  2025-12-27 09:59:00,965 - server - INFO - 📨 Full payload: {'data': {'event_type': 'call.recording.saved', 'id': '53cc3dc1-ec1d-4138-a9d1-a7d5fffc275e', 'occurred_at': '2025-12-27T09:59:00.455451Z', 'payload': {'call_control_id': 'v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g', 'call_leg_id': '9d6099b0-e30a-11f0-b70f-02420aef961f', 'call_session_id': '9d5dc212-e30a-11f0-8413-02420aef961f', 'channels': 'dual', 'client_state': None, 'connection_id': '2777245537294877821', 'end_time': '2025-12-27T09:58:58.481085Z', 'format': 'mp3', 'public_recording_urls': {}, 'recording_ended_at': '2025-12-27T09:58:58.481085Z', 'recording_id': 'd3504b03-1490-4026-b2bd-8aef5ac93f1d', 'recording_started_at': '2025-12-27T09:58:46.785737Z', 'recording_urls': {'mp3': 'https://s3.amazonaws.com/telephony-recorder-prod/227803fb-1717-407d-9bd5-fd04aa27c656/2025-12-27/9d6099b0-e30a-11f0-b70f-02420aef961f-1766829525881585.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIASDC5E2MJDPKMH7UW%2F20251227%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251227T095900Z&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=04e2a7dd13c64c3a3d56edfc2cb47efa65047fa4795e0cb27bcbe954106ef47c'}, 'start_time': '2025-12-27T09:58:46.785737Z'}, 'record_type': 'event'}, 'meta': {'attempt': 1, 'delivered_to': 'https://api.li-ai.org/api/telnyx/webhook'}}
+2025-12-27T09:59:00.966616934Z [err]  2025-12-27 09:59:00,965 - server - INFO - 🎯 Event type: call.recording.saved, Call ID: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.966621044Z [err]  2025-12-27 09:59:00,965 - server - INFO - 📨 ================================================
+2025-12-27T09:59:00.966624664Z [err]  2025-12-27 09:59:00,966 - server - INFO - 🎙️ Recording saved for call: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.971659028Z [err]  2025-12-27 09:59:00,971 - redis_service - WARNING - ⚠️ Call data not found in Redis: v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:00.971664982Z [err]  2025-12-27 09:59:00,971 - server - INFO - 🔍 Recording check: download_url=True, channels=dual, recording_id=d3504b03-1490-4026-b2bd-8aef5ac93f1d, call_data=False
+2025-12-27T09:59:01.045747126Z [err]  2025-12-27 09:59:01,027 - server - INFO - 📝 Converted transcript from 3 messages to 97 characters
+2025-12-27T09:59:01.132937680Z [err]  2025-12-27 09:59:01,131 - server - INFO - 💾 Saved recording URL and ID to database: d3504b03-1490-4026-b2bd-8aef5ac93f1d
+2025-12-27T09:59:01.132943764Z [err]  2025-12-27 09:59:01,131 - server - INFO - ✅ Entering dual-channel processing
+2025-12-27T09:59:01.132948494Z [err]  2025-12-27 09:59:01,131 - server - INFO - 📥 Downloading DUAL-CHANNEL recording...
+2025-12-27T09:59:01.272472961Z [err]  2025-12-27 09:59:01,218 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:59:01.316303962Z [err]  2025-12-27 09:59:01,306 - qc_agents.orchestrator - INFO - No QC agent configs found, using defaults with API key
+2025-12-27T09:59:01.397495511Z [err]  2025-12-27 09:59:01,393 - qc_agents.orchestrator - INFO - Using QC model: gpt-4o
+2025-12-27T09:59:01.397500509Z [err]  2025-12-27 09:59:01,393 - qc_agents.orchestrator - INFO - ✅ Initialized 3 QC agents for user dcafa642-6136-4096-b77d-a4cb99a62651
+2025-12-27T09:59:01.397504507Z [err]  2025-12-27 09:59:01,393 - qc_agents.orchestrator - INFO - 🔍 Running Commitment Detector on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:01.498879961Z [err]  2025-12-27 09:59:01,495 - server - INFO - 🔍 [AUTO-QC] Call log found: transcript_turns=3, logs_count=4, status=completed
+2025-12-27T09:59:01.520323673Z [err]  2025-12-27 09:59:01,510 - server - INFO - 📇 CRM: Total variables collected: []
+2025-12-27T09:59:01.520328178Z [err]  2025-12-27 09:59:01,518 - httpx - INFO - HTTP Request: GET https://s3.amazonaws.com/telephony-recorder-prod/227803fb-1717-407d-9bd5-fd04aa27c656/2025-12-27/9d6099b0-e30a-11f0-b70f-02420aef961f-1766829525881585.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIASDC5E2MJDPKMH7UW%2F20251227%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251227T095900Z&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=04e2a7dd13c64c3a3d56edfc2cb47efa65047fa4795e0cb27bcbe954106ef47c "HTTP/1.1 200 OK"
+2025-12-27T09:59:01.606435230Z [err]  2025-12-27 09:59:01,605 - server - INFO - ✅ Downloaded 46854 bytes
+2025-12-27T09:59:01.855633946Z [err]  2025-12-27 09:59:01,760 - server - INFO - ✅ Split into 2 channels
+2025-12-27T09:59:01.855646703Z [err]  2025-12-27 09:59:01,760 - server - INFO - 🎤 Using STT provider: soniox for interruption detection
+2025-12-27T09:59:01.855656386Z [err]  2025-12-27 09:59:01,760 - server - INFO - 📊 Channel 0: 254364 bytes
+2025-12-27T09:59:01.855664306Z [err]  2025-12-27 09:59:01,760 - server - ERROR - ❌ No Soniox API key available
+2025-12-27T09:59:01.855670069Z [err]  2025-12-27 09:59:01,761 - server - INFO - ❌ Channel 0: No speech
+2025-12-27T09:59:01.855675749Z [err]  2025-12-27 09:59:01,761 - server - INFO - 📊 Channel 1: 254364 bytes
+2025-12-27T09:59:01.855680766Z [err]  2025-12-27 09:59:01,761 - server - ERROR - ❌ No Soniox API key available
+2025-12-27T09:59:01.855686508Z [err]  2025-12-27 09:59:01,761 - server - INFO - ❌ Channel 1: No speech
+2025-12-27T09:59:01.855692829Z [err]  2025-12-27 09:59:01,761 - server - WARNING - ⚠️ No speech in any channel
+2025-12-27T09:59:01.855699451Z [inf]  100.64.0.9:46208 - "POST /api/telnyx/webhook HTTP/1.1" 200
+2025-12-27T09:59:01.855703759Z [err]  2025-12-27 09:59:01,761 - server - INFO - 📇 CRM: Updated lead 288a0e8e-ff8b-4249-b2ea-b84e5cb9929e (+17708336397) - fields: ['updated_at', 'last_contact', 'last_agent_id', 'last_agent_name']
+2025-12-27T09:59:01.933232835Z [err]  2025-12-27 09:59:01,927 - server - INFO - 🔍 [AUTO-QC] Agent found: name=JK First Caller-optimizer3, has_auto_qc_settings=True
+2025-12-27T09:59:02.018127269Z [err]  2025-12-27 09:59:02,014 - server - INFO - 📊 [AUTO-QC] Running full QC analysis: call=v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g → campaign=b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8 (tech=True, script=True, tonality=True)
+2025-12-27T09:59:02.018136520Z [err]  2025-12-27 09:59:02,014 - server - INFO - 📊 [AUTO-QC] LLM settings: provider=grok, model=grok-3
+2025-12-27T09:59:02.018142831Z [err]  2025-12-27 09:59:02,014 - server - ERROR - ❌ [AUTO-QC] Error in campaign QC for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: run_full_qc_analysis() got an unexpected keyword argument 'llm_provider'
+2025-12-27T09:59:02.018154729Z [err]  2025-12-27 09:59:02,015 - server - ERROR - ❌ [AUTO-QC] Traceback: Traceback (most recent call last):
+2025-12-27T09:59:02.018160700Z [err]    File "/app/backend/server.py", line 9758, in trigger_campaign_qc_for_call
+2025-12-27T09:59:02.018166821Z [err]      await run_full_qc_analysis(
+2025-12-27T09:59:02.018172507Z [err]            ^^^^^^^^^^^^^^^^^^^^^
+2025-12-27T09:59:02.018178160Z [err]  TypeError: run_full_qc_analysis() got an unexpected keyword argument 'llm_provider'
+2025-12-27T09:59:02.018183774Z [err]  
+2025-12-27T09:59:02.283653484Z [err]  2025-12-27 09:59:02,281 - calling_service - INFO - ⏰ Check-in triggered after 7.1s silence (threshold: 7s)
+2025-12-27T09:59:02.288977880Z [err]  2025-12-27 09:59:02,286 - calling_service - INFO - 💬 Sending check-in #1/2: Are you still there?
+2025-12-27T09:59:02.288985217Z [err]  2025-12-27 09:59:02,286 - dead_air_monitor - INFO - 💬 Sending check-in after 7.1s silence: Are you still there?
+2025-12-27T09:59:02.288989451Z [err]  2025-12-27 09:59:02,286 - calling_service - INFO - 🤖 Agent started speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:02.288993223Z [err]  2025-12-27 09:59:02,286 - telnyx_service - INFO - 🔊 Speaking text on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: Are you still there?...
+2025-12-27T09:59:02.288997424Z [err]  2025-12-27 09:59:02,286 - telnyx_service - INFO - 🔍 Agent config provided: True
+2025-12-27T09:59:02.289001352Z [err]  2025-12-27 09:59:02,286 - telnyx_service - INFO - 🔍 TTS provider from settings: elevenlabs
+2025-12-27T09:59:02.289005017Z [err]  2025-12-27 09:59:02,286 - telnyx_service - INFO - 🔍 WebSocket TTS: False
+2025-12-27T09:59:02.289008686Z [err]  2025-12-27 09:59:02,286 - telnyx_service - INFO - 🎙️ Attempting elevenlabs TTS (REST)
+2025-12-27T09:59:02.289012507Z [err]  2025-12-27 09:59:02,286 - server - INFO - ⏱️ [09:59:02.286] 🔊 TTS REQUEST START: provider=elevenlabs, user=dcafa642, comfort_noise=True
+2025-12-27T09:59:02.289016622Z [err]  2025-12-27 09:59:02,286 - server - INFO - ⚡ Using Turbo v2.5 (high quality)
+2025-12-27T09:59:02.289020581Z [err]  2025-12-27 09:59:02,286 - server - INFO - 🎙️ ElevenLabs streaming TTS: voice=J5iaaqzR5zn6HFG4jV3b, model=eleven_turbo_v2_5, speed=1.1, normalization=on, ssml=True
+2025-12-27T09:59:02.375675015Z [err]  2025-12-27 09:59:02,374 - key_encryption - WARNING - Failed to decrypt key, assuming unencrypted: 
+2025-12-27T09:59:02.375683570Z [err]  2025-12-27 09:59:02,374 - server - INFO - 📦 ElevenLabs Request Payload:
+2025-12-27T09:59:02.375690454Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Text length: 20 chars
+2025-12-27T09:59:02.375696082Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Text content: 'Are you still there?'
+2025-12-27T09:59:02.375701749Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Text bytes: b'Are you still there?'
+2025-12-27T09:59:02.375708718Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Model: eleven_turbo_v2_5
+2025-12-27T09:59:02.375714206Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Voice ID: J5iaaqzR5zn6HFG4jV3b
+2025-12-27T09:59:02.375719809Z [err]  2025-12-27 09:59:02,374 - server - INFO -    URL: https://api.elevenlabs.io/v1/text-to-speech/J5iaaqzR5zn6HFG4jV3b/stream
+2025-12-27T09:59:02.375725369Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Full data: {'text': 'Are you still there?', 'model_id': 'eleven_turbo_v2_5', 'voice_settings': {'stability': 0.6, 'similarity_boost': 0.65, 'use_speaker_boost': True, 'speed': 1.1, 'style': 0.2}, 'apply_text_normalization': 'on', 'enable_ssml_parsing': True, 'optimize_streaming_latency': 4}
+2025-12-27T09:59:02.375731129Z [err]  2025-12-27 09:59:02,374 - server - INFO - 🔌 Attempting ElevenLabs connection (attempt 1/2)
+2025-12-27T09:59:02.375736457Z [err]  2025-12-27 09:59:02,374 - server - INFO -    Timeout: 10.0s
+2025-12-27T09:59:02.386209899Z [err]  2025-12-27 09:59:02,382 - server - INFO -    ✓ HTTP client created (0.008s)
+2025-12-27T09:59:02.386217772Z [err]  2025-12-27 09:59:02,382 - server - INFO -    → Sending POST request to ElevenLabs (optimize_latency=0)...
+2025-12-27T09:59:02.724421806Z [err]  2025-12-27 09:59:02,715 - server - INFO - 💾 TTS CACHED: elevenlabs:Are you still there?... (17599 bytes)
+2025-12-27T09:59:02.724423771Z [err]  2025-12-27 09:59:02,702 - httpx - INFO - HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/J5iaaqzR5zn6HFG4jV3b/stream "HTTP/1.1 200 OK"
+2025-12-27T09:59:02.724431763Z [err]  2025-12-27 09:59:02,715 - telnyx_service - INFO - ⏱️  TTS generation time: 0.43s
+2025-12-27T09:59:02.724433650Z [err]  2025-12-27 09:59:02,702 - server - INFO -    ✓ Connection established (0.328s) [TARGET: <200ms]
+2025-12-27T09:59:02.724438850Z [err]  2025-12-27 09:59:02,715 - telnyx_service - INFO - ✅ Generated 17599 bytes, saved to /tmp/tts_59aded63200fa5fb87dd5793c8f91482.mp3
+2025-12-27T09:59:02.724440854Z [err]  2025-12-27 09:59:02,702 - server - INFO -    ✓ Response status: 200
+2025-12-27T09:59:02.724558951Z [err]  2025-12-27 09:59:02,702 - server - INFO -    → Streaming audio chunks...
+2025-12-27T09:59:02.724568806Z [err]  2025-12-27 09:59:02,712 - server - INFO -    ✓ FIRST CHUNK received (0.338s, 998 bytes) [TARGET: <300ms]
+2025-12-27T09:59:02.724576740Z [err]  2025-12-27 09:59:02,714 - server - INFO -    ✓ ALL CHUNKS received: 44 chunks (0.340s)
+2025-12-27T09:59:02.724584515Z [err]  2025-12-27 09:59:02,714 - server - INFO -    ✓ Total audio size: 17599 bytes
+2025-12-27T09:59:02.724592751Z [err]  2025-12-27 09:59:02,714 - server - INFO -    📊 TTS API TIMING BREAKDOWN:
+2025-12-27T09:59:02.724600686Z [err]  2025-12-27 09:59:02,714 - server - INFO -       - Connection: 328ms
+2025-12-27T09:59:02.724608589Z [err]  2025-12-27 09:59:02,714 - server - INFO -       - First chunk: 338ms
+2025-12-27T09:59:02.724615043Z [err]  2025-12-27 09:59:02,714 - server - INFO -       - All chunks: 340ms
+2025-12-27T09:59:02.724622420Z [err]  2025-12-27 09:59:02,714 - server - INFO -       - Audio generation only: 10ms
+2025-12-27T09:59:02.724628102Z [err]  2025-12-27 09:59:02,715 - server - INFO - ⏱️ [09:59:02.715] 🔊 TTS COMPLETE: 428ms, audio_size=17599 bytes
+2025-12-27T09:59:02.724900594Z [err]  2025-12-27 09:59:02,715 - telnyx_service - INFO - 🔗 Using audio URL: api.li-ai.org/api/tts-audio/tts_59aded63200fa5fb87dd5793c8f91482.mp3
+2025-12-27T09:59:03.045517681Z [err]      }
+2025-12-27T09:59:03.045531505Z [err]    ]
+2025-12-27T09:59:03.045537186Z [err]  }
+2025-12-27T09:59:03.045542167Z [err]  2025-12-27 09:59:03,021 - telnyx_service - INFO - 📢 Using Telnyx built-in TTS
+2025-12-27T09:59:03.045547501Z [err]  2025-12-27 09:59:03,021 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/playback_start "HTTP/1.1 422 Unprocessable Entity"
+2025-12-27T09:59:03.045552511Z [err]  2025-12-27 09:59:03,021 - telnyx_service - INFO - ⏱️  Playback API call time: 0.31s
+2025-12-27T09:59:03.045558865Z [err]  2025-12-27 09:59:03,021 - telnyx_service - ERROR - ❌ Telnyx playback failed: 422 - {
+2025-12-27T09:59:03.045564843Z [err]    "errors": [
+2025-12-27T09:59:03.045569342Z [err]      {
+2025-12-27T09:59:03.045573492Z [err]        "code": "90018",
+2025-12-27T09:59:03.045577613Z [err]        "title": "Call has already ended",
+2025-12-27T09:59:03.045582501Z [err]        "detail": "This call is no longer active and can't receive commands."
+2025-12-27T09:59:03.288129303Z [err]  2025-12-27 09:59:03,284 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/speak "HTTP/1.1 422 Unprocessable Entity"
+2025-12-27T09:59:03.288136927Z [err]  2025-12-27 09:59:03,285 - telnyx_service - ERROR - ❌ Error speaking text: Error code: 422 - {'errors': [{'code': '90018', 'title': 'Call has already ended', 'detail': "This call is no longer active and can't receive commands."}]}
+2025-12-27T09:59:03.288142701Z [err]  2025-12-27 09:59:03,285 - dead_air_monitor - INFO - ✅ Check-in message sent
+2025-12-27T09:59:03.843905919Z [err]  2025-12-27 09:59:03,790 - dead_air_monitor - INFO - 🚩 Detected 'agent_done_speaking' flag from webhook - marking agent as done
+2025-12-27T09:59:03.843911933Z [err]  2025-12-27 09:59:03,790 - calling_service - INFO - ⏱️ SILENCE TIMER STARTED at 1766829543.7903924 for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:03.843918407Z [err]  2025-12-27 09:59:03,790 - calling_service - INFO - 🤖 Agent stopped speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:06.025357323Z [err]  2025-12-27 09:59:06,022 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-27T09:59:06.030439186Z [err]  2025-12-27 09:59:06,026 - qc_agents.commitment_detector - ERROR - Error in CommitmentDetector LLM analysis: Expecting value: line 1 column 1 (char 0), falling back to patterns
+2025-12-27T09:59:06.030447949Z [err]  2025-12-27 09:59:06,028 - qc_agents.orchestrator - INFO - 🗺️  Running Conversion Pathfinder on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:08.900613604Z [err]  2025-12-27 09:59:08,844 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-27T09:59:08.900620863Z [err]  2025-12-27 09:59:08,847 - qc_agents.conversion_pathfinder - ERROR - Error in ConversionPathfinder LLM analysis: Expecting value: line 1 column 1 (char 0), falling back to patterns
+2025-12-27T09:59:08.900627558Z [err]  2025-12-27 09:59:08,848 - qc_agents.orchestrator - INFO - ⭐ Running Excellence Replicator on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:10.367842430Z [err]  2025-12-27 09:59:10,362 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=False, user_speaking=False, silence=6.6s, checkin_count=1/2
+2025-12-27T09:59:10.912494132Z [err]  2025-12-27 09:59:10,868 - dead_air_monitor - INFO - 🔍 MONITOR: agent_speaking=False, user_speaking=False, silence=7.1s, checkin_count=1/2
+2025-12-27T09:59:10.912501737Z [err]  2025-12-27 09:59:10,868 - calling_service - INFO - ⏰ Check-in triggered after 7.1s silence (threshold: 7s)
+2025-12-27T09:59:10.912507584Z [err]  2025-12-27 09:59:10,873 - calling_service - INFO - 💬 Sending FINAL check-in #2/2: Are you still there?
+2025-12-27T09:59:10.912512870Z [err]  2025-12-27 09:59:10,873 - calling_service - INFO - ⚠️ Will end call if no response after next silence timeout
+2025-12-27T09:59:10.912519581Z [err]  2025-12-27 09:59:10,873 - dead_air_monitor - INFO - 💬 Sending check-in after 7.1s silence: Are you still there?
+2025-12-27T09:59:10.912526597Z [err]  2025-12-27 09:59:10,873 - calling_service - INFO - 🤖 Agent started speaking for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:10.912547404Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - 🔊 Speaking text on call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: Are you still there?...
+2025-12-27T09:59:10.912552982Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - 🔍 Agent config provided: True
+2025-12-27T09:59:10.912558717Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - 🔍 TTS provider from settings: elevenlabs
+2025-12-27T09:59:10.912564208Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - 🔍 WebSocket TTS: False
+2025-12-27T09:59:10.912570460Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - 🎙️ Attempting elevenlabs TTS (REST)
+2025-12-27T09:59:10.912575769Z [err]  2025-12-27 09:59:10,873 - server - INFO - 💾 TTS CACHE HIT: Returning cached audio (17599 bytes)
+2025-12-27T09:59:10.912582488Z [err]  2025-12-27 09:59:10,873 - telnyx_service - INFO - ⏱️  TTS generation time: 0.00s
+2025-12-27T09:59:10.912587590Z [err]  2025-12-27 09:59:10,874 - telnyx_service - INFO - ✅ Generated 17599 bytes, saved to /tmp/tts_59aded63200fa5fb87dd5793c8f91482.mp3
+2025-12-27T09:59:10.912630766Z [err]  2025-12-27 09:59:10,874 - telnyx_service - INFO - 🔗 Using audio URL: api.li-ai.org/api/tts-audio/tts_59aded63200fa5fb87dd5793c8f91482.mp3
+2025-12-27T09:59:11.050330263Z [err]  2025-12-27 09:59:11,028 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-27T09:59:11.050337251Z [err]  2025-12-27 09:59:11,033 - qc_agents.excellence_replicator - ERROR - Error in ExcellenceReplicator analysis: Expecting value: line 1 column 1 (char 0)
+2025-12-27T09:59:11.161231880Z [err]  2025-12-27 09:59:11,128 - qc_agents.orchestrator - INFO - ✅ QC analysis stored for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:11.161239381Z [err]  2025-12-27 09:59:11,128 - server - INFO - ✅ QC analysis completed for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:11.161246630Z [err]  2025-12-27 09:59:11,128 - server - INFO - 📊 Scores: Commitment=50, Conversion=0, Excellence=50
+2025-12-27T09:59:11.161252998Z [err]  2025-12-27 09:59:11,155 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/playback_start "HTTP/1.1 422 Unprocessable Entity"
+2025-12-27T09:59:11.161259735Z [err]  2025-12-27 09:59:11,155 - telnyx_service - INFO - ⏱️  Playback API call time: 0.28s
+2025-12-27T09:59:11.161265341Z [err]  2025-12-27 09:59:11,155 - telnyx_service - ERROR - ❌ Telnyx playback failed: 422 - {
+2025-12-27T09:59:11.161271690Z [err]    "errors": [
+2025-12-27T09:59:11.161277860Z [err]      {
+2025-12-27T09:59:11.161284381Z [err]        "code": "90018",
+2025-12-27T09:59:11.161290370Z [err]        "title": "Call has already ended",
+2025-12-27T09:59:11.161294992Z [err]        "detail": "This call is no longer active and can't receive commands."
+2025-12-27T09:59:11.161298807Z [err]      }
+2025-12-27T09:59:11.161303178Z [err]    ]
+2025-12-27T09:59:11.161309627Z [err]  }
+2025-12-27T09:59:11.161316056Z [err]  2025-12-27 09:59:11,156 - telnyx_service - INFO - 📢 Using Telnyx built-in TTS
+2025-12-27T09:59:11.320521051Z [err]  2025-12-27 09:59:11,312 - server - INFO - 📊 Updated campaign_calls with QC scores for v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g
+2025-12-27T09:59:11.433441760Z [err]  2025-12-27 09:59:11,426 - httpx - INFO - HTTP Request: POST https://api.telnyx.com/v2/calls/v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g/actions/speak "HTTP/1.1 422 Unprocessable Entity"
+2025-12-27T09:59:11.433447726Z [err]  2025-12-27 09:59:11,426 - telnyx_service - ERROR - ❌ Error speaking text: Error code: 422 - {'errors': [{'code': '90018', 'title': 'Call has already ended', 'detail': "This call is no longer active and can't receive commands."}]}
+2025-12-27T09:59:11.433452068Z [err]  2025-12-27 09:59:11,426 - dead_air_monitor - INFO - ✅ Check-in message sent
+2025-12-27T09:59:11.506499431Z [err]  2025-12-27 09:59:11,488 - server - INFO - 📈 Synced QC scores to lead 288a0e8e-ff8b-4249-b2ea-b84e5cb9929e via phone match
+2025-12-27T09:59:11.579240514Z [err]  2025-12-27 09:59:11,576 - server - INFO - 🏷️ Updated lead status to 'needs_followup' based on risk level 'high'
+2025-12-27T09:59:11.579246158Z [err]  2025-12-27 09:59:11,576 - server - ERROR - ❌ Error in auto appointment detection for call v3:Zc6Rf1J5q93QShn2xyL1oxSHeY3X5NfJuVtepeivMv8Vtseq6V_s6g: 'str' object has no attribute 'get'
