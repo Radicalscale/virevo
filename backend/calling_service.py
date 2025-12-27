@@ -585,7 +585,8 @@ class CallSession:
                 call_data = redis_service.get_call_data(self.call_id)
                 
                 # CRITICAL FIX: Skip barge-in if this IS the silence greeting being generated
-                is_silence_timeout = user_text.strip() in ["...", "…"]
+                # Server passes "" for silence timeout, but sometimes we use "..."
+                is_silence_timeout = user_text.strip() in ["...", "…", ""]
                 
                 if call_data and call_data.get("silence_greeting_triggered") and not is_silence_timeout:
                     logger.warning(f"🚨 BARGE-IN DETECTED for call {self.call_id}: User spoke while Silence Greeting was triggering")
