@@ -603,18 +603,12 @@ class CallSession:
                         # This is expected if audio already finished or never started
                         logger.warning(f"⚠️ BARGE-IN: Could not stop audio (may have finished): {e}")
 
-                    # 2. Clean History (Remove the silence greeting)
-                    # SAFETY: Only remove if last message is the silence greeting (short, question-like)
-                    if self.conversation_history and len(self.conversation_history) >= 1:
-                        last_msg = self.conversation_history[-1]
-                        if last_msg.get("role") == "assistant":
-                            last_content = last_msg.get("content", "")
-                            # Only remove if it looks like a silence greeting (short, ends with ?)
-                            if len(last_content) < 50 and "?" in last_content:
-                                removed = self.conversation_history.pop()
-                                logger.info(f"✅ BARGE-IN: Removed silence greeting from history: '{removed.get('content')}'")
-                            else:
-                                logger.info(f"⚠️ BARGE-IN: Last message doesn't look like silence greeting, keeping history")
+                    # 2. History Preservation
+                    # PREVIOUSLY: We removed the silence greeting from history to "undo" it.
+                    # PROBLEMS: This caused the LLM to think it hadn't greeted the user, leading to re-greeting.
+                    # FIX: We now PRESERVE the history.
+                    # History: [Agent: "Kendrick?"], [User: "Hello?"] -> LLM Response: "Hi, I'm calling..."
+                    logger.info(f"✅ BARGE-IN: Preserving silence greeting in history to maintain context")
                     
                     # 3. Clear the flag so we don't trigger this again
                     redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
