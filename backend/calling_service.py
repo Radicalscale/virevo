@@ -617,9 +617,28 @@ class CallSession:
                     # The user spoke before/during our greeting - we should just deliver the greeting
                     # and THEN wait for their response. NOT treat their barge-in as a transition.
                     flow_nodes = self.agent_config.get("call_flow", [])
-                    if flow_nodes and self.current_node_id:
+                    
+                    # Logic to find the correct content to speak
+                    target_node_id = self.current_node_id
+                    
+                    # Fallback: If no current node (e.g. first interaction), find the start node
+                    if not target_node_id and flow_nodes:
+                        logger.warning("⚠️ BARGE-IN: current_node_id is missing, attempting to find Start Node...")
+                        # 1. Find node with type 'start'
+                        start_node = next((n for n in flow_nodes if n.get("type") == "start"), None)
+                        if start_node:
+                            # 2. Find the edge connecting start to the next node
+                            edges = self.agent_config.get("call_flow_edges", [])
+                            start_edge = next((e for e in edges if e.get("source") == start_node.get("id")), None)
+                            if start_edge:
+                                target_node_id = start_edge.get("target")
+                                logger.info(f"✅ BARGE-IN: Found start node target: {target_node_id}")
+                    
+                    content_to_return = None
+                    
+                    if flow_nodes and target_node_id:
                         for node in flow_nodes:
-                            if node.get("id") == self.current_node_id:
+                            if node.get("id") == target_node_id:
                                 node_data = node.get("data", {})
                                 # Get script content (conversation nodes use 'script', others use 'content')
                                 content = node_data.get("script", "") or node_data.get("content", "")
@@ -629,27 +648,37 @@ class CallSession:
                                     content = content.replace(f"{{{{{var_name}}}}}", str(var_value))
                                 
                                 if content:
-                                    logger.info(f"✅ BARGE-IN: Returning greeting script: '{content}'")
-                                    
-                                    # Add user's message to history (they did speak)
-                                    self.conversation_history.append({
-                                        "role": "user",
-                                        "content": user_text
-                                    })
-                                    
-                                    # Stream the greeting
-                                    if stream_callback:
-                                        await stream_callback(content)
-                                    
-                                    # Add greeting to history
-                                    self.conversation_history.append({
-                                        "role": "assistant",
-                                        "content": content,
-                                        "_node_id": self.current_node_id
-                                    })
-                                    
-                                    return content
+                                    content_to_return = content
                                 break
+                    
+                    if content_to_return:
+                        logger.info(f"✅ BARGE-IN: Returning greeting script: '{content_to_return}'")
+                        
+                        # Add user's message to history (they did speak)
+                        self.conversation_history.append({
+                            "role": "user",
+                            "content": user_text
+                        })
+                        
+                        # Stream the greeting
+                        if stream_callback:
+                            await stream_callback(content_to_return)
+                        
+                        # Add greeting to history
+                        self.conversation_history.append({
+                            "role": "assistant",
+                            "content": content_to_return,
+                            "_node_id": target_node_id or self.current_node_id
+                        })
+                        
+                        return content_to_return
+                    else:
+                        # CRITICAL: Even if we couldn't find the content, we MUST NOT fall through
+                        # to normal processing, because that would treat the interruption ("...")
+                        # as a user turn and generate a new LLM response (Double Speak).
+                        logger.warning("⚠️ BARGE-IN: Could not find greeting content to return, but preventing fall-through.")
+                        return None
+
 
                     
             except Exception as e:
