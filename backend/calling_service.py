@@ -624,25 +624,39 @@ class CallSession:
                     # Fallback: If no current node (e.g. first interaction), find the start node
                     if not target_node_id and flow_nodes:
                         logger.warning("⚠️ BARGE-IN: current_node_id is missing, attempting to find Start Node...")
-                        # 1. Find node with type 'start'
+                        
+                        # METHOD 1: Find node with type 'start', then follow edge
                         start_node = next((n for n in flow_nodes if n.get("type", "").lower() == "start"), None)
                         
                         if start_node:
-                            # 2. Find the edge connecting start to the next node
-                            # Check both keys just in case
+                            # Find the edge connecting start to the next node
                             edges = self.agent_config.get("call_flow_edges", []) or self.agent_config.get("edges", [])
                             start_edge = next((e for e in edges if e.get("source") == start_node.get("id")), None)
                             
                             if start_edge:
                                 target_node_id = start_edge.get("target")
-                                logger.info(f"✅ BARGE-IN: Found start node target: {target_node_id}")
+                                logger.info(f"✅ BARGE-IN: Found start node target via edge: {target_node_id}")
                         
-                        # 3. Hail Mary: If still no target, look for a node with a greeting-like label
+                        # METHOD 2: Look for a node with a greeting-like label
                         if not target_node_id:
                             greeting_node = next((n for n in flow_nodes if n.get("data", {}).get("label", "").lower() in ["greeting", "intro", "introduction", "start"]), None)
                             if greeting_node:
                                 target_node_id = greeting_node.get("id")
                                 logger.info(f"✅ BARGE-IN: Found greeting node via label: {target_node_id}")
+                        
+                        # METHOD 3: Find the FIRST conversation/collect_input node (most reliable fallback)
+                        if not target_node_id:
+                            for node in flow_nodes:
+                                node_type = node.get("type", "").lower()
+                                if node_type in ["conversation", "collect_input", "press_digit", "extract_variable"]:
+                                    target_node_id = node.get("id")
+                                    logger.info(f"✅ BARGE-IN: Using first '{node_type}' node: {target_node_id}")
+                                    break
+                        
+                        # Log diagnostic info if still failing
+                        if not target_node_id:
+                            node_types = [n.get("type", "unknown") for n in flow_nodes[:5]]
+                            logger.error(f"❌ BARGE-IN: Could not find target node. flow_nodes types: {node_types}")
                     
                     content_to_return = None
                     
@@ -683,11 +697,11 @@ class CallSession:
                         
                         return content_to_return
                     else:
-                        # CRITICAL: Even if we couldn't find the content, we MUST NOT fall through
-                        # to normal processing, because that would treat the interruption ("...")
-                        # as a user turn and generate a new LLM response (Double Speak).
-                        logger.warning("⚠️ BARGE-IN: Could not find greeting content to return, but preventing fall-through.")
-                        return None
+                        # Could not find greeting content - allow NORMAL processing to continue
+                        # This ensures the AI responds to the user's first message naturally
+                        # instead of staying silent.
+                        logger.warning("⚠️ BARGE-IN: Could not find greeting content, allowing normal LLM response")
+                        # NOTE: We fall through to normal processing below (no return)
 
 
                     
