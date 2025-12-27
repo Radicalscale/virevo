@@ -2276,6 +2276,16 @@ If absolutely none match, respond with "-1".
 
 Your response (just the number):"""
             else:
+                # [NEW] Heuristic for Greeting Node: Treats "Hello" as "Yes" to prevent "Double Speak" loops
+                greeting_heuristic = ""
+                node_name = current_node.get("name", "")
+                if node_name == "Greeting" or "greeting" in node_name.lower():
+                     greeting_heuristic = """
+CRITICAL SPECIAL RULE FOR GREETING:
+- If the user responds with a neutral greeting (e.g., "Hello?", "Hi", "Hello") or just states their name, TREAT THIS AS A POSITIVE MATCH for the "Confirms name" or "Yes" transition.
+- The user is confirming they are on the line. Do NOT return -1 if the user simply says "Hello?". Assume "Hello?" implies they are the correct person and ready to proceed.
+"""
+
                 eval_prompt = f"""You are analyzing a phone conversation to determine which transition path to take based on what the user just said.
 
 CONVERSATION HISTORY:
@@ -2283,6 +2293,8 @@ CONVERSATION HISTORY:
 
 TRANSITION OPTIONS:
 {options_text}
+
+{greeting_heuristic}
 
 Your task:
 1. Carefully read what the user ACTUALLY said in their most recent message
