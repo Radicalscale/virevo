@@ -2144,7 +2144,7 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
             node_name = current_node.get("name", "")
             if user_message and transitions and (node_name == "Greeting" or "greeting" in node_name.lower()):
                 cleaned_msg = user_message.strip().lower().rstrip('.!?,')
-                logger.info(f"🔍 Checking 'Hello=Yes' override for msg='{cleaned_msg}' on node='{node_name}'")
+                logger.info(f"🔍 Checking 'Hello=Yes' override [DEPLOYMENT VERIFIED] for msg='{cleaned_msg}' on node='{node_name}'")
                 
                 # Triggers that imply "Yes"/"I'm here" in this specific context
                 override_triggers = ["hello", "hello?", "hi", "hey", "speaking", "this is", "yeah", "yes", "sure"]
