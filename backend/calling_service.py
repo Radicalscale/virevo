@@ -2138,6 +2138,31 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                     logger.info(f"✅ Auto-transitioned (after response) to: {next_node.get('label', 'unnamed')}")
                     logger.info(f"📝 User's response captured: '{user_message[:50]}...'")
                     return next_node
+
+            # [NEW] [Try 6] Hard-Coded Override: "Hello" on "Greeting" -> First transition
+            # This bypasses the LLM for specific "double speak" triggers to ensure instant, correct transition
+            node_name = current_node.get("name", "")
+            if user_message and transitions and (node_name == "Greeting" or "greeting" in node_name.lower()):
+                cleaned_msg = user_message.strip().lower().rstrip('.!?,')
+                logger.info(f"🔍 Checking 'Hello=Yes' override for msg='{cleaned_msg}' on node='{node_name}'")
+                
+                # Triggers that imply "Yes"/"I'm here" in this specific context
+                override_triggers = ["hello", "hello?", "hi", "hey", "speaking", "this is", "yeah", "yes", "sure"]
+                
+                is_override = False
+                if cleaned_msg in override_triggers:
+                    is_override = True
+                elif any(cleaned_msg.startswith(t) for t in ["this is", "it is", "it's", "it is"]):
+                    is_override = True
+                elif "hello" in cleaned_msg or "hi " in cleaned_msg:
+                     is_override = True
+
+                if is_override:
+                     logger.info(f"⚡ OVERRIDE TRIGGERED: '{user_message}' on Greeting node -> Forcing Transition 0 (Index 0)")
+                     # We assume the first transition [0] is the positive/success path (Introduction)
+                     first_trans = transitions[0]
+                     next_node_id = first_trans.get("nextNode")
+                     return self._get_node_by_id(next_node_id, flow_nodes) or current_node
                 else:
                     logger.warning(f"⚠️ Auto-transition after response target not found: {auto_transition_after_response_node_id}, falling back to normal evaluation")
             
@@ -2276,16 +2301,6 @@ If absolutely none match, respond with "-1".
 
 Your response (just the number):"""
             else:
-                # [NEW] Heuristic for Greeting Node: Treats "Hello" as "Yes" to prevent "Double Speak" loops
-                greeting_heuristic = ""
-                node_name = current_node.get("name", "")
-                if node_name == "Greeting" or "greeting" in node_name.lower():
-                     greeting_heuristic = """
-CRITICAL SPECIAL RULE FOR GREETING:
-- If the user responds with a neutral greeting (e.g., "Hello?", "Hi", "Hello") or just states their name, TREAT THIS AS A POSITIVE MATCH for the "Confirms name" or "Yes" transition.
-- The user is confirming they are on the line. Do NOT return -1 if the user simply says "Hello?". Assume "Hello?" implies they are the correct person and ready to proceed.
-"""
-
                 eval_prompt = f"""You are analyzing a phone conversation to determine which transition path to take based on what the user just said.
 
 CONVERSATION HISTORY:
@@ -2293,8 +2308,6 @@ CONVERSATION HISTORY:
 
 TRANSITION OPTIONS:
 {options_text}
-
-{greeting_heuristic}
 
 Your task:
 1. Carefully read what the user ACTUALLY said in their most recent message
