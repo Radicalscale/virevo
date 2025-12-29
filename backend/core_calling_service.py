@@ -181,6 +181,17 @@ class CallSession:
         self.last_checkin_time = None  # Track last check-in to avoid rapid repeats
         self.max_checkins_reached = False  # Flag to indicate we've hit max and should end after next timeout
         
+        # ════════════════════════════════════════════════════════════════════════
+        # AUDIO DELIVERY CONFIRMATION SYSTEM
+        # Tracks whether audio has actually reached the user's ear before processing
+        # their input. This fixes the race condition where user speaks before
+        # hearing the agent (e.g., during greeting generation).
+        # ════════════════════════════════════════════════════════════════════════
+        self.pending_message = None              # What we're trying to say
+        self.pending_message_started_at = None   # When we started generating
+        self.audio_delivered_at = None           # When user HEARD it (confirmed by TTS)
+        self.awaiting_response_to_message = False  # Now waiting for response to THIS message
+        
         # Initialize Natural Delivery Middleware (Dual-Stream Architecture)
         from natural_delivery_middleware import NaturalDeliveryMiddleware
         self.delivery_middleware = NaturalDeliveryMiddleware()
@@ -431,6 +442,77 @@ class CallSession:
         # Don't start silence tracking yet - wait for agent to finish responding
         logger.info(f"👤 User stopped speaking for call {self.call_id}")
     
+    # ════════════════════════════════════════════════════════════════════════
+    # AUDIO DELIVERY CONFIRMATION METHODS
+    # ════════════════════════════════════════════════════════════════════════
+    
+    def start_speaking_attempt(self, message: str):
+        """Called when we START trying to speak (before TTS even begins)
+        
+        This sets up the tracking state so we can detect if user speaks
+        before they've actually heard us.
+        """
+        self.pending_message = message
+        self.pending_message_started_at = time.time()
+        self.audio_delivered_at = None  # Not delivered yet
+        self.awaiting_response_to_message = False
+        logger.info(f"📢 SPEAKING ATTEMPT STARTED: '{message[:50]}...' for call {self.call_id}")
+    
+    def confirm_audio_delivery(self):
+        """Called when we CONFIRM audio reached user's ear
+        
+        This is triggered by:
+        - Telnyx call.playback.started webhook (REST API playback)
+        - First audio chunk sent via WebSocket (streaming playback)
+        
+        After this is called, any user speech is treated as a RESPONSE
+        to the message they heard.
+        """
+        if self.pending_message:
+            self.audio_delivered_at = time.time()
+            self.awaiting_response_to_message = True
+            delivery_time_ms = (self.audio_delivered_at - self.pending_message_started_at) * 1000 if self.pending_message_started_at else 0
+            logger.info(f"✅ AUDIO DELIVERED to user after {delivery_time_ms:.0f}ms for call {self.call_id}")
+        else:
+            logger.debug(f"⚠️ confirm_audio_delivery called but no pending message for call {self.call_id}")
+    
+    def cancel_pending_audio(self) -> bool:
+        """Called when user speaks BEFORE audio was delivered
+        
+        Returns:
+            True if audio was cancelled (user spoke first)
+            False if audio already delivered (can't cancel)
+        """
+        if self.audio_delivered_at is None and self.pending_message:
+            wait_time_ms = (time.time() - self.pending_message_started_at) * 1000 if self.pending_message_started_at else 0
+            logger.info(f"🚫 CANCELLING pending audio - user spoke first (after {wait_time_ms:.0f}ms) for call {self.call_id}")
+            cancelled_message = self.pending_message
+            self.pending_message = None
+            self.pending_message_started_at = None
+            self.awaiting_response_to_message = False
+            return True
+        elif self.audio_delivered_at:
+            logger.debug(f"⚠️ Cannot cancel audio - already delivered for call {self.call_id}")
+            return False
+        else:
+            logger.debug(f"⚠️ cancel_pending_audio called but no pending message for call {self.call_id}")
+            return False
+    
+    def user_spoke_before_hearing_agent(self) -> bool:
+        """Check if user spoke before audio was delivered
+        
+        Used by process_user_input() to decide how to handle the input.
+        """
+        # If we have a pending message but no delivery confirmation, user spoke first
+        return self.pending_message is not None and self.audio_delivered_at is None
+    
+    def reset_audio_delivery_state(self):
+        """Reset the audio delivery state after processing a complete exchange"""
+        self.pending_message = None
+        self.pending_message_started_at = None
+        self.audio_delivered_at = None
+        self.awaiting_response_to_message = False
+    
     def get_silence_duration(self) -> float:
         """Get current silence duration in seconds"""
         if self.silence_start_time and not self.agent_speaking and not self.user_speaking:
@@ -575,52 +657,70 @@ class CallSession:
             logger.info(f"⏱️ [{timestamp_str}] 📥 process_user_input() ENTRY - text: '{user_text[:50]}...'")
             
             # ═══════════════════════════════════════════════════════════════════
-            # 🚨 BARGE-IN INTERCEPTOR 🚨
-            # Check if we generated a silence greeting that the user is now interrupting
-            # IMPORTANT: Only trigger barge-in if user_text is NOT the silence marker ("...")
-            # The silence marker indicates this IS the silence greeting being generated,
-            # not a user interruption.
+            # 🎧 AUDIO DELIVERY CONFIRMATION CHECK 🎧
+            # Check if user spoke BEFORE hearing the agent. If so, we need to 
+            # cancel any pending audio and treat their input as the initial message,
+            # not as a response to something they never heard.
             # ═══════════════════════════════════════════════════════════════════
+            
+            # Skip this check for silence markers (empty string means silence timeout triggered us)
+            is_silence_timeout = user_text.strip() in ["...", "…", ""]
+            
+            if not is_silence_timeout and self.user_spoke_before_hearing_agent():
+                logger.warning(f"🎧 USER SPOKE BEFORE HEARING AGENT for call {self.call_id}")
+                logger.info(f"   Pending message: '{self.pending_message[:50] if self.pending_message else 'None'}...'")
+                logger.info(f"   User said: '{user_text[:50]}...'")
+                
+                # 1. Cancel any pending TTS/playback
+                try:
+                    from telnyx_service import TelnyxService
+                    ts = TelnyxService()
+                    await ts.stop_audio_playback(self.call_id)
+                    logger.info("✅ Stopped any pending audio playback")
+                except Exception as e:
+                    logger.debug(f"Could not stop audio (may not have started): {e}")
+                
+                # 2. Cancel the pending audio state
+                self.cancel_pending_audio()
+                
+                # 3. Clear the Redis silence_greeting_triggered flag if set
+                try:
+                    from redis_service import redis_service
+                    redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
+                except Exception as e:
+                    logger.debug(f"Could not clear Redis flag: {e}")
+                
+                # 4. Log the decision
+                logger.info(f"🎤 Treating user's '{user_text[:30]}...' as initial message (they haven't heard agent yet)")
+                
+                # 5. Continue to normal processing - the agent will speak the greeting
+                #    IN RESPONSE to the user's message (Scenario 2: User Speaks First)
+                #    The conversation history should NOT contain the undelivered greeting
+            
+            # Legacy barge-in check (for calls that don't use new audio delivery tracking)
+            # This is a fallback for backward compatibility
             try:
                 from redis_service import redis_service
                 call_data = redis_service.get_call_data(self.call_id)
                 
-                # CRITICAL FIX: Skip barge-in if this IS the silence greeting being generated
-                # Server passes "" for silence timeout, but sometimes we use "..."
-                is_silence_timeout = user_text.strip() in ["...", "…", ""]
-                
                 if call_data and call_data.get("silence_greeting_triggered") and not is_silence_timeout:
-                    logger.warning(f"🚨 BARGE-IN DETECTED for call {self.call_id}: User spoke while Silence Greeting was triggering")
-                    
-                    # 1. Stop Audio Immediately (best-effort - may fail if audio already finished)
-                    try:
-                        from telnyx_service import TelnyxService
-                        # TelnyxService will use env vars for api_key and connection_id
-                        # This is safe because we're just stopping playback, not initiating calls
-                        ts = TelnyxService()
-                        await ts.stop_audio_playback(self.call_id)
-                        logger.info("✅ BARGE-IN: Audio playback STOPPED")
-                    except Exception as e:
-                        # This is expected if audio already finished or never started
-                        logger.warning(f"⚠️ BARGE-IN: Could not stop audio (may have finished): {e}")
-
-                    # 2. History Preservation
-                    # PREVIOUSLY: We removed the silence greeting from history to "undo" it.
-                    # PROBLEMS: This caused the LLM to think it hadn't greeted the user, leading to re-greeting.
-                    # FIX: We now PRESERVE the history.
-                    # History: [Agent: "Kendrick?"], [User: "Hello?"] -> LLM Response: "Hi, I'm calling..."
-                    logger.info(f"✅ BARGE-IN: Preserving silence greeting in history to maintain context")
-                    
-                    # 3. Clear the flag so we don't trigger this again
-                    redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
-                    logger.info("✅ BARGE-IN: Reset silence_greeting_triggered flag")
-                    
-                        # NOTE: We fall through to normal processing below (no return)
-
-
-                    
+                    # Check if we already handled this with the new system
+                    if self.pending_message is None:  # No pending message = we didn't track it
+                        logger.warning(f"🚨 LEGACY BARGE-IN: User spoke during silence greeting (call {self.call_id})")
+                        
+                        # Stop audio
+                        try:
+                            ts = TelnyxService()
+                            await ts.stop_audio_playback(self.call_id)
+                        except Exception as e:
+                            logger.debug(f"Could not stop audio: {e}")
+                        
+                        # Clear flag
+                        redis_service.update_call_data(self.call_id, {"silence_greeting_triggered": False})
+                        logger.info("✅ LEGACY BARGE-IN: Flag cleared, continuing processing")
+                        
             except Exception as e:
-                logger.error(f"⚠️ Error in Barge-In Interceptor: {e}")
+                logger.error(f"⚠️ Error in legacy barge-in check: {e}")
 
             
             # ═══════════════════════════════════════════════════════════════════
@@ -2139,33 +2239,13 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                     logger.info(f"✅ Auto-transitioned (after response) to: {next_node.get('label', 'unnamed')}")
                     logger.info(f"📝 User's response captured: '{user_message[:50]}...'")
                     return next_node
-
-            # [NEW] [Try 6] Hard-Coded Override: "Hello" on "Greeting" -> First transition
-            # This bypasses the LLM for specific "double speak" triggers to ensure instant, correct transition
-            node_label = current_node.get("label", "")
-            if user_message and transitions and (node_label == "Greeting" or "greeting" in node_label.lower()):
-                cleaned_msg = user_message.strip().lower().rstrip('.!?,')
-                logger.info(f"🔍 Checking 'Hello=Yes' override [DEPLOYMENT VERIFIED] for msg='{cleaned_msg}' on node='{node_label}'")
-                
-                # Triggers that imply "Yes"/"I'm here" in this specific context
-                override_triggers = ["hello", "hello?", "hi", "hey", "speaking", "this is", "yeah", "yes", "sure"]
-                
-                is_override = False
-                if cleaned_msg in override_triggers:
-                    is_override = True
-                elif any(cleaned_msg.startswith(t) for t in ["this is", "it is", "it's", "it is"]):
-                    is_override = True
-                elif "hello" in cleaned_msg or "hi " in cleaned_msg:
-                     is_override = True
-
-                if is_override:
-                     logger.info(f"⚡ OVERRIDE TRIGGERED: '{user_message}' on Greeting node -> Forcing Transition 0 (Index 0)")
-                     # We assume the first transition [0] is the positive/success path (Introduction)
-                     first_trans = transitions[0]
-                     next_node_id = first_trans.get("nextNode")
-                     return self._get_node_by_id(next_node_id, flow_nodes) or current_node
                 else:
                     logger.warning(f"⚠️ Auto-transition after response target not found: {auto_transition_after_response_node_id}, falling back to normal evaluation")
+            
+            # NOTE: [Removed] Old "Hello = Yes" hard-coded override was here.
+            # This is no longer needed now that we have proper AUDIO DELIVERY CONFIRMATION.
+            # The system now correctly handles the race condition where user speaks before 
+            # hearing the agent, so LLM evaluation works properly for all cases.
             
             if not transitions:
                 # No transitions, stay on current node

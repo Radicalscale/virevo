@@ -725,6 +725,17 @@ class PersistentTTSSession:
                 }
                 
                 await self.telnyx_ws.send_text(json.dumps(message))
+                
+                # 🎧 AUDIO DELIVERY CONFIRMATION: On first chunk, confirm delivery
+                if i == 0:
+                    try:
+                        from server import active_sessions
+                        if self.call_control_id in active_sessions:
+                            session = active_sessions[self.call_control_id]
+                            session.confirm_audio_delivery()
+                            logger.info(f"🎧 [Call {self.call_control_id}] First audio chunk sent - confirmed delivery to CallSession")
+                    except Exception as e:
+                        logger.debug(f"Could not confirm audio delivery: {e}")
             
             logger.info(f"✅ Sent {total_chunks} audio chunks via WebSocket")
             
