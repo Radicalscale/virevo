@@ -4636,6 +4636,12 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         logger.info(f"⏱️ [{timestamp_str}] STT endpoint detection latency: {stt_latency_ms}ms")
         logger.info(f"⏱️ [{timestamp_str}] 🎤 USER STOPPED SPEAKING - Beginning processing pipeline")
         
+        # 🔥 FIX: Track when user spoke for audio delivery check
+        # Used to detect if user spoke BEFORE hearing the agent's message
+        if call_control_id in call_states:
+            call_states[call_control_id]["user_spoke_at"] = transcript_received_time
+            logger.info(f"⏱️ User spoke at {transcript_received_time}")
+        
         # Mark that user has spoken (for aiSpeaksAfterSilence feature)
         if text.strip():
             if call_control_id in active_telnyx_calls:
@@ -5280,13 +5286,6 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             
                             logger.info(f"⏱️ [WebSocket Worker] Silence timeout reached - generating greeting!")
                             
-                            # 🎧 AUDIO DELIVERY TRACKING: Mark that we're starting to speak
-                            # Get the first node's script to know what we're attempting to say
-                            flow = session.agent_config.get("call_flow", [])
-                            first_conv_node = next((n for n in flow if n.get("type") == "conversation"), {})
-                            first_script = first_conv_node.get("data", {}).get("script", "Hello?")
-                            session.start_speaking_attempt(first_script[:100])  # Track what we're trying to say
-                            
                             # Generate and speak greeting
                             greeting_response = await session.process_user_input("")
                             
@@ -5321,7 +5320,6 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             
                             if user_spoke_during_gen:
                                 logger.info("⏭️ [WebSocket Worker] User spoke during greeting generation - CANCELLING silence greeting")
-                                session.cancel_pending_audio()  # Clear the audio delivery tracking state
                                 return  # Don't speak - user already started the conversation
                             
                             # Speak the greeting
@@ -5333,11 +5331,10 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             )
                             logger.info("🔊 [WebSocket Worker] Silence greeting spoken via Telnyx TTS")
                             
-                            # 🎧 AUDIO DELIVERY TRACKING: Mark that audio has been sent
-                            # Note: For REST API TTS, we mark delivery here. For WebSocket TTS,
-                            # the persistent_tts_service will call confirm_audio_delivery() when
-                            # the first audio chunk is actually sent to Telnyx.
-                            session.confirm_audio_delivery()
+                            # 🔥 FIX: Track when greeting audio playback started
+                            # Used to detect if user spoke BEFORE hearing the greeting
+                            call_states[call_control_id]["greeting_playback_started_at"] = time.time()
+                            logger.info(f"⏱️ [WebSocket Worker] Greeting playback started at {time.time()}")
                             
                             # Start silence tracking so dead air monitoring kicks in
                             # This is critical for check-in/disconnect flow to work
