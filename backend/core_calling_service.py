@@ -2143,7 +2143,9 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
             node_data = current_node.get("data", {})
             transitions = node_data.get("transitions", [])
             
-            # 🔥 ATTEMPT 12: Check if user spoke BEFORE greeting audio was delivered
+            # 🔥 ATTEMPT 14: Check if user spoke BEFORE greeting audio was HEARD
+            # This checks if user spoke before OR within the buffer window after playback API was called
+            # The buffer accounts for: TTS generation + network latency + phone buffering
             # In this case, skip ALL transition evaluation - their speech is not a response
             # We return a special marker that tells the caller to just deliver the script
             from server import call_states
@@ -2152,12 +2154,19 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                 playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
                 user_spoke_at = call_states[call_id].get("user_spoke_at", 0)
                 
-                if playback_started > 0 and user_spoke_at > 0 and user_spoke_at < playback_started:
-                    logger.info(f"⏸️ User spoke ({user_spoke_at}) BEFORE greeting playback started ({playback_started})")
-                    logger.info(f"⏸️ Skipping transition eval - user hasn't heard greeting yet, will deliver it as response")
-                    # Return special marker - current_node with _skip_sticky_prevention flag
-                    current_node["_skip_sticky_prevention"] = True
-                    return current_node
+                # Buffer window: 2 seconds to account for network latency and audio buffering
+                # Even if playback API was called, user won't hear audio for up to 2 seconds
+                GREETING_HEARD_BUFFER_SECONDS = 2.0
+                
+                if playback_started > 0 and user_spoke_at > 0:
+                    greeting_heard_at = playback_started + GREETING_HEARD_BUFFER_SECONDS
+                    if user_spoke_at < greeting_heard_at:
+                        logger.info(f"⏸️ User spoke ({user_spoke_at}) BEFORE greeting could be heard ({greeting_heard_at})")
+                        logger.info(f"⏸️ Playback API called at {playback_started}, buffer window: {GREETING_HEARD_BUFFER_SECONDS}s")
+                        logger.info(f"⏸️ Skipping transition eval - user hasn't heard greeting yet, will deliver it as response")
+                        # Return special marker - current_node with _skip_sticky_prevention flag
+                        current_node["_skip_sticky_prevention"] = True
+                        return current_node
             
             # 🎤 AUTO TRANSITION AFTER RESPONSE - Skip LLM evaluation if enabled
             # This is different from auto_transition_to which skips immediately
