@@ -13,7 +13,7 @@ import re
 import logging
 
 from auth_middleware import get_current_user
-from calling_service import CallSession
+from core_calling_service import CallSession
 
 logger = logging.getLogger(__name__)
 

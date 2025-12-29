@@ -37,7 +37,7 @@ from melo_tts_service import MeloTTSService
 from dia_tts_service import DiaTTSService
 
 # Import calling service
-from calling_service import create_call_session, get_call_session, close_call_session, CallSession
+from core_calling_service import create_call_session, get_call_session, close_call_session, CallSession
 from persistent_tts_service import persistent_tts_manager
 
 # Import Deepgram config
@@ -5180,7 +5180,7 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
         
         # Get session from call_data (created by webhook handler in same or different worker)
         # Check if session already exists (created by webhook)
-        from calling_service import get_call_session, create_call_session
+        from core_calling_service import get_call_session, create_call_session
         
         session = await get_call_session(call_control_id)
         
@@ -7141,7 +7141,7 @@ async def finalize_call_log(call_id: str, end_reason: str = None, error_message:
         
         # Save session variables to call_log for CRM and analytics
         try:
-            from calling_service import get_call_session
+            from core_calling_service import get_call_session
             session = await get_call_session(call_id)
             if session and hasattr(session, 'session_variables') and session.session_variables:
                 # Store extracted variables in call_log
@@ -9800,7 +9800,7 @@ async def update_crm_after_call(call_id: str, user_id: str, agent_id: str, agent
     try:
         from uuid import uuid4
         from datetime import timezone
-        from calling_service import get_call_session
+        from core_calling_service import get_call_session
         
         logger.info(f"📇 CRM update starting for call {call_id}: to_number={to_number}, user_id={user_id}")
         

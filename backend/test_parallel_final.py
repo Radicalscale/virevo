@@ -9,7 +9,7 @@ USER_ID = "dcafa642-6136-4096-b77d-a4cb99a62651"
 
 async def test_regular():
     """Test regular approach on complex node"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     
     mongo_url = os.environ.get('MONGO_URL')
     client = AsyncIOMotorClient(mongo_url)
@@ -45,7 +45,7 @@ async def test_regular():
 
 async def test_parallel():
     """Test parallel approach"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     from parallel_llm_team import ParallelLLMTeam
     
     mongo_url = os.environ.get('MONGO_URL')

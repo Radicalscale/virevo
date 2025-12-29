@@ -54,7 +54,7 @@ async def get_agent_from_db():
 
 async def test_regular_approach(agent_config, db, messages):
     """Test using regular/current approach"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     
     session_id = f"test_regular_{int(time.time())}"
     
@@ -116,7 +116,7 @@ async def test_regular_approach(agent_config, db, messages):
 
 async def test_parallel_approach(agent_config, db, messages):
     """Test using parallel LLM team approach"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     from parallel_llm_team import ParallelLLMTeam
     
     session_id = f"test_parallel_{int(time.time())}"

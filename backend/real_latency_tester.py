@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 
 # Import the ACTUAL calling service
-from calling_service import CallSession
+from core_calling_service import CallSession
 
 AGENT_ID = "e1f8ec18-fa7a-4da3-aa2b-3deb7723abb4"
 USER_ID = "dcafa642-6136-4096-b77d-a4cb99a62651"

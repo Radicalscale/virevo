@@ -21,7 +21,7 @@ async def main():
     print(f"✅ Agent: {agent.get('name')}\n")
     
     # Create session
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     from parallel_llm_team import ParallelLLMTeam
     
     session = CallSession(

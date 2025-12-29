@@ -45,7 +45,7 @@ async def get_agent_info():
 
 async def start_test_session(agent_config: dict) -> dict:
     """Start test session"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     
     mongo_url = os.environ.get('MONGO_URL')
     client_db = AsyncIOMotorClient(mongo_url)

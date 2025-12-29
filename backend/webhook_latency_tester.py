@@ -76,7 +76,7 @@ async def get_auth_token() -> str:
 
 async def start_test_session_direct(agent_config: dict, user_id: str) -> dict:
     """Start a test session using the calling service directly"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     
     mongo_url = os.environ.get('MONGO_URL')
     client_db = AsyncIOMotorClient(mongo_url)

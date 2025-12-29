@@ -9,7 +9,7 @@ import base64
 from fastapi import WebSocket
 from typing import Dict, Optional
 from deepgram_voice_agent import DeepgramVoiceAgent
-from calling_service import CallSession
+from core_calling_service import CallSession
 
 logger = logging.getLogger(__name__)
 

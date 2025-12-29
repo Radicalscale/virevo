@@ -52,7 +52,7 @@ TEST_CONVERSATIONS = [
 
 async def run_regular_test(agent_config, db):
     """Run test with regular approach"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     
     results = []
     
@@ -103,7 +103,7 @@ async def run_regular_test(agent_config, db):
 
 async def run_parallel_test(agent_config, db):
     """Run test with parallel approach"""
-    from calling_service import CallSession
+    from core_calling_service import CallSession
     from parallel_llm_team import ParallelLLMTeam
     
     results = []
