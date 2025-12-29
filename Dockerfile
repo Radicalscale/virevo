@@ -32,6 +32,9 @@ COPY --from=builder /root/.local /root/.local
 # Set working directory
 WORKDIR /app
 
+# Force Rebuild Trigger (Update this to invalidate cache)
+ENV REBUILD_TRIGGER_DATE=2025-12-28-MANUAL-FIX
+
 # Copy backend code
 COPY backend/ ./backend/
 

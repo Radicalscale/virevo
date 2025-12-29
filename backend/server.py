@@ -2,6 +2,7 @@ from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisco
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+# Manual Rebuild Trigger: 2025-12-28-FIX-ATTEMPT-7
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
