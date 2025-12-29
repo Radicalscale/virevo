@@ -2142,10 +2142,10 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
 
             # [NEW] [Try 6] Hard-Coded Override: "Hello" on "Greeting" -> First transition
             # This bypasses the LLM for specific "double speak" triggers to ensure instant, correct transition
-            node_name = current_node.get("name", "")
-            if user_message and transitions and (node_name == "Greeting" or "greeting" in node_name.lower()):
+            node_label = current_node.get("label", "")
+            if user_message and transitions and (node_label == "Greeting" or "greeting" in node_label.lower()):
                 cleaned_msg = user_message.strip().lower().rstrip('.!?,')
-                logger.info(f"🔍 Checking 'Hello=Yes' override [DEPLOYMENT VERIFIED] for msg='{cleaned_msg}' on node='{node_name}'")
+                logger.info(f"🔍 Checking 'Hello=Yes' override [DEPLOYMENT VERIFIED] for msg='{cleaned_msg}' on node='{node_label}'")
                 
                 # Triggers that imply "Yes"/"I'm here" in this specific context
                 override_triggers = ["hello", "hello?", "hi", "hey", "speaking", "this is", "yeah", "yes", "sure"]

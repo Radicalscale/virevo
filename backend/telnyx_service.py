@@ -962,15 +962,30 @@ class TelnyxService:
         self,
         call_control_id: str
     ) -> Dict[str, Any]:
-        """Stop audio playback (MP3/WAV via REST)"""
+        """Stop audio playback (all active playbacks on call) using REST API"""
         try:
+            import httpx
+            
             logger.info(f"🛑 Stopping audio playback on call: {call_control_id}")
             
-            self.client.calls.actions.playback_stop(
-                call_control_id=call_control_id
-            )
+            # Use REST API directly (SDK doesn't support playback_stop)
+            stop_url = f"https://api.telnyx.com/v2/calls/{call_control_id}/actions/playback_stop"
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            # Empty body = stop all playbacks on the call
+            data = {}
             
-            return {"success": True}
+            async with httpx.AsyncClient() as client:
+                response = await client.post(stop_url, headers=headers, json=data, timeout=5.0)
+                
+                if response.status_code in [200, 201, 202]:
+                    logger.info(f"✅ Successfully stopped audio playback")
+                    return {"success": True}
+                else:
+                    logger.error(f"❌ Failed to stop playback: {response.status_code} - {response.text}")
+                    return {"success": False, "error": response.text}
         except Exception as e:
             logger.error(f"❌ Error stopping audio playback: {e}")
             return {"success": False, "error": str(e)}
