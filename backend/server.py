@@ -4636,17 +4636,18 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         logger.info(f"⏱️ [{timestamp_str}] STT endpoint detection latency: {stt_latency_ms}ms")
         logger.info(f"⏱️ [{timestamp_str}] 🎤 USER STOPPED SPEAKING - Beginning processing pipeline")
         
-        # 🔥 FIX: Track when user spoke for audio delivery check
-        # Used to detect if user spoke BEFORE hearing the agent's message
-        if call_control_id in call_states:
-            call_states[call_control_id]["user_spoke_at"] = transcript_received_time
-            logger.info(f"⏱️ User spoke at {transcript_received_time}")
+        # 🔥 ATTEMPT 12: Record when user spoke for pre-audio-delivery detection
+        user_spoke_time = time.time()
+        logger.info(f"⏱️ User spoke at {user_spoke_time}")
         
         # Mark that user has spoken (for aiSpeaksAfterSilence feature)
         if text.strip():
             if call_control_id in active_telnyx_calls:
                 active_telnyx_calls[call_control_id]["user_has_spoken"] = True
                 active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True  # Prevent silence greeting
+            # 🔥 ATTEMPT 12: Store user_spoke_at in call_states for pre-audio-delivery detection
+            if call_control_id in call_states:
+                call_states[call_control_id]["user_spoke_at"] = user_spoke_time
             redis_service.set_call_data(call_control_id, {
                 "user_has_spoken": True,
                 "silence_greeting_triggered": True  # Prevent silence greeting from also firing
@@ -5331,10 +5332,12 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             )
                             logger.info("🔊 [WebSocket Worker] Silence greeting spoken via Telnyx TTS")
                             
-                            # 🔥 FIX: Track when greeting audio playback started
-                            # Used to detect if user spoke BEFORE hearing the greeting
-                            call_states[call_control_id]["greeting_playback_started_at"] = time.time()
-                            logger.info(f"⏱️ [WebSocket Worker] Greeting playback started at {time.time()}")
+                            # 🔥 ATTEMPT 12: Record when greeting playback started
+                            # This enables detecting if user spoke BEFORE hearing the greeting
+                            import time
+                            greeting_playback_time = time.time()
+                            call_states[call_control_id]["greeting_playback_started_at"] = greeting_playback_time
+                            logger.info(f"⏱️ [WebSocket Worker] Greeting playback started at {greeting_playback_time}")
                             
                             # Start silence tracking so dead air monitoring kicks in
                             # This is critical for check-in/disconnect flow to work

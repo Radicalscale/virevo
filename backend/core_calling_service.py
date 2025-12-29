@@ -1509,22 +1509,37 @@ class CallSession:
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
                         return response_text
                     else:
-                        # FIX: Prevent "Dead Air" when user input doesn't trigger transition
-                        # Instead of returning empty string (silence), generate a contextual acknowledgment
-                        logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
+                        # 🔥 ATTEMPT 12: Check if we should skip sticky-prevention
+                        # This happens when user spoke BEFORE hearing the greeting
+                        skip_sticky = selected_node.get("_skip_sticky_prevention", False)
                         
-                        # Create a prompt that acknowledges the user but keeps them on track
-                        prevention_prompt = (
-                            f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
-                            f"However, they did not answer the question or trigger a transition. "
-                            f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
-                            f"and then gently nudge them to answer the script's question or move forward. "
-                            f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
-                        )
-                        
-                        logger.info(f"🤖 Generating sticky-prevention response...")
-                        response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
-                        return response_text
+                        if skip_sticky:
+                            # User spoke before audio delivered - just deliver the script content
+                            logger.info(f"⏸️ Skip sticky-prevention - delivering script as response to user's opener")
+                            # Clear the flag
+                            if "_skip_sticky_prevention" in selected_node:
+                                del selected_node["_skip_sticky_prevention"]
+                            # Just stream the script content
+                            if stream_callback:
+                                await stream_callback(content)
+                            return content
+                        else:
+                            # FIX: Prevent "Dead Air" when user input doesn't trigger transition
+                            # Instead of returning empty string (silence), generate a contextual acknowledgment
+                            logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
+                            
+                            # Create a prompt that acknowledges the user but keeps them on track
+                            prevention_prompt = (
+                                f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
+                                f"However, they did not answer the question or trigger a transition. "
+                                f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
+                                f"and then gently nudge them to answer the script's question or move forward. "
+                                f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
+                            )
+                            
+                            logger.info(f"🤖 Generating sticky-prevention response...")
+                            response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
+                            return response_text
                 
                 # Generate and stream the response
                 response_text = ""
@@ -2125,30 +2140,24 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
             webhook_response: Optional webhook response for function nodes (used to evaluate transitions based on webhook result)
         """
         try:
-            # 🔥 FIX: Check if user spoke BEFORE hearing the greeting
-            # If so, their speech is NOT a response to the greeting - skip transition eval
-            # and just deliver the greeting content (user will respond to that next)
-            try:
-                from server import call_states
-                playback_started = call_states.get(self.call_id, {}).get("greeting_playback_started_at", 0)
-                user_spoke_at = call_states.get(self.call_id, {}).get("user_spoke_at", 0)
-                
-                # Only check on first interaction (Greeting node) and when we have timing data
-                node_label = current_node.get("label", "")
-                if playback_started > 0 and user_spoke_at > 0:
-                    if user_spoke_at < playback_started and ("greeting" in node_label.lower() or node_label == "Greeting"):
-                        logger.info(f"⏸️ User spoke ({user_spoke_at:.3f}) BEFORE greeting playback started ({playback_started:.3f})")
-                        logger.info(f"⏸️ Skipping transition eval - user hasn't heard greeting yet, will deliver it as response")
-                        # Clear the timestamps so next interaction works normally
-                        call_states[self.call_id]["greeting_playback_started_at"] = 0
-                        call_states[self.call_id]["user_spoke_at"] = 0
-                        # Return current node to deliver its content without transition
-                        return current_node
-            except Exception as e:
-                logger.debug(f"Could not check audio delivery timing: {e}")
-            
             node_data = current_node.get("data", {})
             transitions = node_data.get("transitions", [])
+            
+            # 🔥 ATTEMPT 12: Check if user spoke BEFORE greeting audio was delivered
+            # In this case, skip ALL transition evaluation - their speech is not a response
+            # We return a special marker that tells the caller to just deliver the script
+            from server import call_states
+            call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
+            if call_id and call_id in call_states:
+                playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
+                user_spoke_at = call_states[call_id].get("user_spoke_at", 0)
+                
+                if playback_started > 0 and user_spoke_at > 0 and user_spoke_at < playback_started:
+                    logger.info(f"⏸️ User spoke ({user_spoke_at}) BEFORE greeting playback started ({playback_started})")
+                    logger.info(f"⏸️ Skipping transition eval - user hasn't heard greeting yet, will deliver it as response")
+                    # Return special marker - current_node with _skip_sticky_prevention flag
+                    current_node["_skip_sticky_prevention"] = True
+                    return current_node
             
             # 🎤 AUTO TRANSITION AFTER RESPONSE - Skip LLM evaluation if enabled
             # This is different from auto_transition_to which skips immediately
