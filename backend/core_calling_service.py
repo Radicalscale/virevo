@@ -2179,15 +2179,14 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                 logger.info(f"🔍 Checking 'Hello=Yes' override [DEPLOYMENT VERIFIED] for msg='{cleaned_msg}' on node='{node_label}'")
                 
                 # Triggers that imply "Yes"/"I'm here" in this specific context
-                override_triggers = ["hello", "hello?", "hi", "hey", "speaking", "this is", "yeah", "yes", "sure"]
+                # REMOVED: "hello", "hi", "hey" - these are greetings, not confirmations
+                override_triggers = ["speaking", "this is", "yeah", "yes", "sure", "yep", "uh huh", "that's me"]
                 
                 is_override = False
                 if cleaned_msg in override_triggers:
                     is_override = True
-                elif any(cleaned_msg.startswith(t) for t in ["this is", "it is", "it's", "it is"]):
+                elif any(cleaned_msg.startswith(t) for t in ["this is", "it is", "it's", "it is", "speaking", "yes", "yeah"]):
                     is_override = True
-                elif "hello" in cleaned_msg or "hi " in cleaned_msg:
-                     is_override = True
 
                 if is_override:
                      logger.info(f"⚡ OVERRIDE TRIGGERED: '{user_message}' on Greeting node -> Forcing Transition 0 (Index 0)")
