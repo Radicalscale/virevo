@@ -1509,6 +1509,31 @@ class CallSession:
                 if stayed_on_same_node and prompt_type == "script":
                     dynamic_rephrase = node_data.get("dynamic_rephrase", False)
                     
+                    # 🔥 ATTEMPT 17: Check if greeting was ALREADY delivered BEFORE any rephrase/re-delivery
+                    # This prevents both dynamic rephrase AND direct re-delivery when audio is already playing
+                    skip_sticky = selected_node.get("_skip_sticky_prevention", False)
+                    if skip_sticky:
+                        # Clear the flag first
+                        if "_skip_sticky_prevention" in selected_node:
+                            del selected_node["_skip_sticky_prevention"]
+                        
+                        # Check if greeting TTS was already sent
+                        from server import call_states
+                        call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
+                        
+                        if call_id and call_id in call_states:
+                            playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
+                            if playback_started > 0:
+                                logger.info(f"⏸️ Greeting already delivered (playback started at {playback_started}) - NOT re-delivering or rephrasing")
+                                return ""  # Let the already-playing audio finish
+                        
+                        # If greeting wasn't delivered yet, just deliver the original script (not rephrased)
+                        logger.info(f"⏸️ Skip sticky-prevention - delivering script as response to user's opener")
+                        if stream_callback:
+                            await stream_callback(content)
+                        return content
+                    
+                    # Normal case: user stayed on same node but greeting was already heard
                     if dynamic_rephrase:
                         # Generate a rephrased version of the script
                         rephrase_prompt = node_data.get("rephrase_prompt", "")
@@ -1525,57 +1550,22 @@ class CallSession:
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
                         return response_text
                     else:
-                        # 🔥 ATTEMPT 12: Check if we should skip sticky-prevention
-                        # This happens when user spoke BEFORE hearing the greeting
-                        skip_sticky = selected_node.get("_skip_sticky_prevention", False)
+                        # FIX: Prevent "Dead Air" when user input doesn't trigger transition
+                        # Instead of returning empty string (silence), generate a contextual acknowledgment
+                        logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
                         
-                        if skip_sticky:
-                            # Clear the flag first
-                            if "_skip_sticky_prevention" in selected_node:
-                                del selected_node["_skip_sticky_prevention"]
-                            
-                            # 🔥 ATTEMPT 16: Check if greeting was ALREADY delivered to prevent double-speak
-                            # If greeting_playback_started_at > 0, the greeting TTS was already sent
-                            # Don't deliver again - the first greeting is playing or just finished
-                            from server import call_states
-                            call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
-                            already_delivered = False
-                            
-                            if call_id and call_id in call_states:
-                                playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
-                                if playback_started > 0:
-                                    logger.info(f"⏸️ Greeting already delivered (playback started at {playback_started}) - NOT re-delivering")
-                                    already_delivered = True
-                            
-                            if already_delivered:
-                                # The greeting is already playing - don't re-deliver
-                                # Just return empty to let the already-playing audio finish
-                                logger.info(f"⏸️ Skip sticky-prevention - greeting already playing, not double-speaking")
-                                return ""
-                            else:
-                                # User spoke before audio delivered - just deliver the script content
-                                logger.info(f"⏸️ Skip sticky-prevention - delivering script as response to user's opener")
-                                # Just stream the script content
-                                if stream_callback:
-                                    await stream_callback(content)
-                                return content
-                        else:
-                            # FIX: Prevent "Dead Air" when user input doesn't trigger transition
-                            # Instead of returning empty string (silence), generate a contextual acknowledgment
-                            logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
-                            
-                            # Create a prompt that acknowledges the user but keeps them on track
-                            prevention_prompt = (
-                                f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
-                                f"However, they did not answer the question or trigger a transition. "
-                                f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
-                                f"and then gently nudge them to answer the script's question or move forward. "
-                                f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
-                            )
-                            
-                            logger.info(f"🤖 Generating sticky-prevention response...")
-                            response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
-                            return response_text
+                        # Create a prompt that acknowledges the user but keeps them on track
+                        prevention_prompt = (
+                            f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
+                            f"However, they did not answer the question or trigger a transition. "
+                            f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
+                            f"and then gently nudge them to answer the script's question or move forward. "
+                            f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
+                        )
+                        
+                        logger.info(f"🤖 Generating sticky-prevention response...")
+                        response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
+                        return response_text
                 
                 # Generate and stream the response
                 response_text = ""

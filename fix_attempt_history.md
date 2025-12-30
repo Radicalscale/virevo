@@ -153,7 +153,7 @@ A chronological record of attempted fixes and their specific failures in this se
     *   If `greeting_delivered = True` AND user spoke early: **DO NOT** re-deliver the script. Just process the user input normally or wait.
     *   This prevents the double-delivery.
 
-## Attempt 16 Fix: Implemented ✅
+## Attempt 16 Fix: Implemented but Incomplete ⚠️
 *   **Location:** `core_calling_service.py` lines 1528-1561
 *   **The Logic:**
     ```python
@@ -169,38 +169,43 @@ A chronological record of attempted fixes and their specific failures in this se
             await stream_callback(content)
         return content
     ```
-*   **Status:** IMPLEMENTED. Awaiting testing.
+*   **Status:** INCOMPLETE - This fix was placed in the wrong code branch.
 
-## Attempt 17: Fix Broken Dynamic Rephrase Feature
-*   **Log:** `logs.1767076492159.log`
-*   **User Experience (Failure):** Agent said "Let me say that again - Kendrick?" instead of natural rephrase.
-*   **Root Cause:** `_generate_rephrased_script()` function at line 3969 tried to import:
+## Attempt 17: "Let me say that again" Root Cause Found ✅
+*   **Log:** `logs.1767077922925.log`
+*   **User Experience (Failure):** Agent says "Let me say that again - Kendrick?"
+*   **Timeline Analysis:**
+    1.  `06:58:12.122` - `dynamic_rephrase` detected as enabled (line 389)
+    2.  `06:58:12.131` - LLM call for rephrase FAILS: `'GrokClient' object has no attribute 'chat'` (line 399)
+    3.  `06:58:12.131` - **FALLBACK** kicks in: returns `"Let me say that again - {original_script}"` (line 4035)
+    4.  Agent speaks the hardcoded fallback message
+*   **Root Cause:** Two issues:
+    1.  **Attempt 16 fix was in the wrong branch** - it was inside `else:` of `if dynamic_rephrase:`, so it never ran when dynamic rephrase was enabled
+    2.  **GrokClient SDK incompatibility** - `_generate_rephrased_script()` uses OpenAI-style `client.chat.completions.create()` which doesn't work with GrokClient
+
+*   **The Fix (Attempt 17):**
+    1.  Move the "greeting already delivered" check **BEFORE** the `dynamic_rephrase` branch
+    2.  If `skip_sticky=True` AND `greeting_playback_started_at > 0`, return empty immediately
+    3.  This prevents BOTH dynamic rephrase AND direct re-delivery when greeting audio is already playing
+
+*   **Location:** `core_calling_service.py` lines 1509-1571
+*   **New Code Structure:**
     ```python
-    from api_key_service import get_api_key
+    if stayed_on_same_node and prompt_type == "script":
+        # 🔥 ATTEMPT 17: FIRST check if greeting already delivered
+        skip_sticky = selected_node.get("_skip_sticky_prevention", False)
+        if skip_sticky:
+            if greeting_playback_started_at > 0:
+                return ""  # ← PREVENTS double-speak AND "Let me say that again"
+            # Otherwise deliver original script
+            return content
+        
+        # Normal case: user stayed on node after hearing greeting
+        if dynamic_rephrase:
+            # Rephrase script (with fallback if LLM fails)
+            ...
+        else:
+            # Dead air prevention
+            ...
     ```
-    This module does NOT exist. The entire function crashed, triggering the fallback.
-*   **The Fix:**
-    1. Removed the broken `api_key_service` import.
-    2. Used the existing `get_llm_client_for_session()` method which properly handles API key retrieval for all providers.
-    3. Added proper handling for GrokClient wrapper (uses `create_completion()` method) vs standard OpenAI client.
-    4. Changed fallback from "Let me say that again - {script}" to just return the original script.
-*   **Location:** `core_calling_service.py` lines 3949-4017
-*   **Status:** ❌ FAILED - Introduced new bugs.
-
-### Attempt 17 Failure Analysis
-*   **Log:** `logs.1767126934670.log`
-*   **What Worked:** The LLM call succeeded! No more `api_key_service` error.
-*   **What Broke:**
-    1. **Variable substitution missing:** LLM returned `Yeah, {{customer_name}}?` but the variable was NOT replaced. User literally heard "Yeah, curly brace curly brace customer underscore name..." 
-    2. **Double-speak:** Original "Kendrick?" greeting was already playing (line 373-379) while the rephrase was generating. Then the rephrase played on top.
-*   **Evidence:**
-    *   Line 424: `📤 Sentence arrived from LLM: Yeah, {{customer_name}}?...`
-    *   Line 465: `🎤 Streaming sentence #1: Yeah, {{customer_name}}?...` (NO SUBSTITUTION!)
-    *   Line 373-379: Original greeting playback started BEFORE transition evaluation completed
-*   **Root Cause:** The rephrased script bypasses the normal variable substitution pipeline. The `_generate_rephrased_script()` function returns raw text which is then streamed directly, skipping `_replace_variables()`.
-
-## Attempt 18: Fix Variable Substitution in Rephrase
-*   **Problem:** Rephrased script doesn't go through variable substitution
-*   **Fix:** Added variable substitution loop after `_generate_rephrased_script()` call at line 1519-1523
-*   **Location:** `core_calling_service.py` lines 1519-1523
-*   **Status:** IMPLEMENTED. ✅
+*   **Status:** IMPLEMENTED. ✅ Awaiting testing.
