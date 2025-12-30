@@ -185,4 +185,22 @@ A chronological record of attempted fixes and their specific failures in this se
     3. Added proper handling for GrokClient wrapper (uses `create_completion()` method) vs standard OpenAI client.
     4. Changed fallback from "Let me say that again - {script}" to just return the original script.
 *   **Location:** `core_calling_service.py` lines 3949-4017
+*   **Status:** ❌ FAILED - Introduced new bugs.
+
+### Attempt 17 Failure Analysis
+*   **Log:** `logs.1767126934670.log`
+*   **What Worked:** The LLM call succeeded! No more `api_key_service` error.
+*   **What Broke:**
+    1. **Variable substitution missing:** LLM returned `Yeah, {{customer_name}}?` but the variable was NOT replaced. User literally heard "Yeah, curly brace curly brace customer underscore name..." 
+    2. **Double-speak:** Original "Kendrick?" greeting was already playing (line 373-379) while the rephrase was generating. Then the rephrase played on top.
+*   **Evidence:**
+    *   Line 424: `📤 Sentence arrived from LLM: Yeah, {{customer_name}}?...`
+    *   Line 465: `🎤 Streaming sentence #1: Yeah, {{customer_name}}?...` (NO SUBSTITUTION!)
+    *   Line 373-379: Original greeting playback started BEFORE transition evaluation completed
+*   **Root Cause:** The rephrased script bypasses the normal variable substitution pipeline. The `_generate_rephrased_script()` function returns raw text which is then streamed directly, skipping `_replace_variables()`.
+
+## Attempt 18: Fix Variable Substitution in Rephrase
+*   **Problem:** Rephrased script doesn't go through variable substitution
+*   **Fix:** Added variable substitution loop after `_generate_rephrased_script()` call at line 1519-1523
+*   **Location:** `core_calling_service.py` lines 1519-1523
 *   **Status:** IMPLEMENTED. ✅

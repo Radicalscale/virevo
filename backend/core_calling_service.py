@@ -1514,6 +1514,14 @@ class CallSession:
                         rephrase_prompt = node_data.get("rephrase_prompt", "")
                         logger.info(f"🔄 Dynamic rephrase enabled - generating natural variation of script")
                         response_text = await self._generate_rephrased_script(content, user_message, rephrase_prompt)
+                        
+                        # 🔧 ATTEMPT 18: Replace variables in rephrased output
+                        # The LLM may include {{customer_name}} etc. in its rephrase
+                        for var_name, var_value in self.session_variables.items():
+                            if f"{{{{{var_name}}}}}" in response_text:
+                                response_text = response_text.replace(f"{{{{{var_name}}}}}", str(var_value))
+                                logger.info(f"🔧 Replaced {{{{{var_name}}}}} with {var_value} in rephrased script")
+                        
                         if stream_callback:
                             await stream_callback(response_text)
                         # Add to conversation history and return
