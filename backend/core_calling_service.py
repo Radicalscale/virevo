@@ -1530,15 +1530,35 @@ class CallSession:
                         skip_sticky = selected_node.get("_skip_sticky_prevention", False)
                         
                         if skip_sticky:
-                            # User spoke before audio delivered - just deliver the script content
-                            logger.info(f"⏸️ Skip sticky-prevention - delivering script as response to user's opener")
-                            # Clear the flag
+                            # Clear the flag first
                             if "_skip_sticky_prevention" in selected_node:
                                 del selected_node["_skip_sticky_prevention"]
-                            # Just stream the script content
-                            if stream_callback:
-                                await stream_callback(content)
-                            return content
+                            
+                            # 🔥 ATTEMPT 16: Check if greeting was ALREADY delivered to prevent double-speak
+                            # If greeting_playback_started_at > 0, the greeting TTS was already sent
+                            # Don't deliver again - the first greeting is playing or just finished
+                            from server import call_states
+                            call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
+                            already_delivered = False
+                            
+                            if call_id and call_id in call_states:
+                                playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
+                                if playback_started > 0:
+                                    logger.info(f"⏸️ Greeting already delivered (playback started at {playback_started}) - NOT re-delivering")
+                                    already_delivered = True
+                            
+                            if already_delivered:
+                                # The greeting is already playing - don't re-deliver
+                                # Just return empty to let the already-playing audio finish
+                                logger.info(f"⏸️ Skip sticky-prevention - greeting already playing, not double-speaking")
+                                return ""
+                            else:
+                                # User spoke before audio delivered - just deliver the script content
+                                logger.info(f"⏸️ Skip sticky-prevention - delivering script as response to user's opener")
+                                # Just stream the script content
+                                if stream_callback:
+                                    await stream_callback(content)
+                                return content
                         else:
                             # FIX: Prevent "Dead Air" when user input doesn't trigger transition
                             # Instead of returning empty string (silence), generate a contextual acknowledgment

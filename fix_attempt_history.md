@@ -128,4 +128,45 @@ A chronological record of attempted fixes and their specific failures in this se
 ## Attempt 15: Removing Redundant `import time`
 *   **The Fix:** Removed the `import time` statement from line 602. The `time` module is already imported at line 4 of the file.
 *   **The Theory:** Using the existing top-level import avoids the scoping conflict.
+*   **Status:** IMPLEMENTED. ✅
+
+## Attempt 16: Double "Kendrick?" Audio Issue
+*   **Log:** `logs.1767074561269.log`
+*   **User Experience (Failure):** User heard TWO "Kendrick?" greetings at the start.
+*   **Timeline Analysis:**
+    1.  `06:02:10.096` - Silence timeout fires, generates greeting "Kendrick?"
+    2.  `06:02:10.210` - TTS starts generating "Kendrick?" (line 278)
+    3.  `06:02:10.434` - User says "Hello?" (`user_spoke_at = 1767074530.4340703`)
+    4.  `06:02:10.544` - BARGE-IN DETECTED (line 335)
+    5.  `06:02:10.993` - FIRST playback starts (`greeting_playback_started_at = 1767074530.9941165`, line 358-364)
+    6.  `06:02:10.999` - Barge-in calls `stop_audio_playback` (line 366-368) - **AUDIO ALREADY PLAYING**
+    7.  `06:02:11.014` - `_skip_sticky_prevention` logic fires (line 380-383)
+    8.  `06:02:11.014` - Queues **SECOND** "Kendrick?" response (line 400-401)
+*   **Root Cause:** **Race condition between TTS and script re-delivery.**
+    *   The FIRST "Kendrick?" was already sent to Telnyx playback API BEFORE the barge-in `process_user_input` code ran.
+    *   The barge-in tried to stop it, but the audio was already playing.
+    *   Then `_skip_sticky_prevention` logic correctly identified user spoke early and queued the SECOND "Kendrick?".
+    *   The first audio played (or mostly played before stop), then the second played.
+*   **Nature of Failure:** The system doesn't know that the greeting was already (partially) delivered, so it delivers it again.
+
+*   **Proposed Solution:** Track a `greeting_delivered` flag. Set it when the first "Kendrick?" TTS is queued. In `_skip_sticky_prevention` logic, check this flag:
+    *   If `greeting_delivered = True` AND user spoke early: **DO NOT** re-deliver the script. Just process the user input normally or wait.
+    *   This prevents the double-delivery.
+
+## Attempt 16 Fix: Implemented ✅
+*   **Location:** `core_calling_service.py` lines 1528-1561
+*   **The Logic:**
+    ```python
+    if skip_sticky:
+        # Check if greeting was ALREADY delivered
+        if call_id and call_id in call_states:
+            playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
+            if playback_started > 0:
+                # Greeting already playing - don't re-deliver
+                return ""  # Empty = no double-speak
+        # Only deliver if greeting wasn't already sent
+        if stream_callback:
+            await stream_callback(content)
+        return content
+    ```
 *   **Status:** IMPLEMENTED. Awaiting testing.
