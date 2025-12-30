@@ -1507,26 +1507,6 @@ class CallSession:
                 )
                 
                 if stayed_on_same_node and prompt_type == "script":
-                    # 🔥 ATTEMPT 17: Check if greeting was ALREADY delivered BEFORE any re-delivery logic
-                    # This must come FIRST before dynamic_rephrase or skip_sticky checks
-                    # If greeting_playback_started_at > 0 AND user spoke BEFORE they could hear it,
-                    # don't re-deliver - the first greeting is playing or just finished
-                    from server import call_states
-                    call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
-                    GREETING_HEARD_BUFFER = 2.0  # seconds - same as transition logic
-                    
-                    if call_id and call_id in call_states:
-                        playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
-                        user_spoke_at = call_states[call_id].get("user_first_spoke_at", 0)
-                        
-                        if playback_started > 0 and user_spoke_at > 0:
-                            greeting_could_be_heard_at = playback_started + GREETING_HEARD_BUFFER
-                            
-                            # Only block re-delivery if user spoke BEFORE they could hear the greeting
-                            if user_spoke_at < greeting_could_be_heard_at:
-                                logger.info(f"⏸️ ATTEMPT 17: User spoke at {user_spoke_at} before greeting heard at {greeting_could_be_heard_at} - NOT re-delivering")
-                                return ""
-                    
                     dynamic_rephrase = node_data.get("dynamic_rephrase", False)
                     
                     if dynamic_rephrase:
@@ -3979,19 +3959,17 @@ Examples:
             custom_prompt: Optional custom instructions for how to rephrase
         """
         try:
-            # Get LLM provider from agent config
-            llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
-            if not llm_provider:
-                llm_provider = "openai"  # Default
-            
-            llm_model = self.agent_config.get("settings", {}).get("llm_model") or "gpt-4o-mini"
-            
-            # Use the existing method for getting LLM clients
-            client = await self.get_llm_client_for_session(provider=llm_provider)
+            # Get LLM client using the session's existing method (handles all providers)
+            client = await self.get_llm_client_for_session()
             
             if not client:
                 logger.error("Failed to get LLM client for rephrase")
-                return f"Let me say that again - {original_script}"
+                return original_script  # Return original if no client
+            
+            # Get provider and model from agent settings
+            settings = self.agent_config.get("settings", {})
+            llm_provider = settings.get("llm_provider", "openai")
+            llm_model = self.agent_config.get("model", "gpt-4o-mini")
             
             # Build the prompt with optional custom instructions
             base_prompt = f"""The user responded: "{user_message}"
@@ -4009,25 +3987,24 @@ But the agent just said this exact phrase. Generate a natural variation that:
             
             base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
             
-            # Handle different LLM providers - Grok uses create_completion(), OpenAI uses chat.completions.create()
             messages = [{"role": "user", "content": base_prompt}]
             
+            # Handle different client types
             if llm_provider == "grok":
-                # Grok client has a different interface
+                # GrokClient has a custom create_completion method
                 response = await client.create_completion(
                     messages=messages,
                     model=llm_model,
                     temperature=0.8,
-                    max_tokens=150,
-                    stream=False
+                    max_tokens=150
                 )
-                if response and hasattr(response, 'choices') and response.choices:
+                if response:
                     return response.choices[0].message.content.strip()
                 else:
-                    logger.error("Grok response was empty or malformed")
-                    return f"Let me say that again - {original_script}"
+                    logger.error("Grok rephrase returned None")
+                    return original_script
             else:
-                # OpenAI-compatible format
+                # Standard OpenAI-compatible client
                 response = await client.chat.completions.create(
                     model=llm_model,
                     messages=messages,
@@ -4038,8 +4015,8 @@ But the agent just said this exact phrase. Generate a natural variation that:
             
         except Exception as e:
             logger.error(f"Error generating rephrased script: {e}")
-            # Fallback to slightly modified original
-            return f"Let me say that again - {original_script}"
+            # Return original script instead of weird fallback message
+            return original_script
     
     async def _generate_ai_response_streaming(self, content: str, stream_callback=None, current_node: dict = None) -> str:
         """Generate AI response with streaming support"""

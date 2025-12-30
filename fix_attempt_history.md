@@ -170,3 +170,19 @@ A chronological record of attempted fixes and their specific failures in this se
         return content
     ```
 *   **Status:** IMPLEMENTED. Awaiting testing.
+
+## Attempt 17: Fix Broken Dynamic Rephrase Feature
+*   **Log:** `logs.1767076492159.log`
+*   **User Experience (Failure):** Agent said "Let me say that again - Kendrick?" instead of natural rephrase.
+*   **Root Cause:** `_generate_rephrased_script()` function at line 3969 tried to import:
+    ```python
+    from api_key_service import get_api_key
+    ```
+    This module does NOT exist. The entire function crashed, triggering the fallback.
+*   **The Fix:**
+    1. Removed the broken `api_key_service` import.
+    2. Used the existing `get_llm_client_for_session()` method which properly handles API key retrieval for all providers.
+    3. Added proper handling for GrokClient wrapper (uses `create_completion()` method) vs standard OpenAI client.
+    4. Changed fallback from "Let me say that again - {script}" to just return the original script.
+*   **Location:** `core_calling_service.py` lines 3949-4017
+*   **Status:** IMPLEMENTED. ✅
