@@ -3954,7 +3954,45 @@ Examples:
             if not llm_provider:
                 llm_provider = "openai"  # Default
             
-            llm_model = self.agent_config.get("settings", {}).get("llm_model") or self.agent_config.get("model", "gpt-4o-mini")
+            llm_model = self.agent_config.get("settings", {}).get("llm_model") or "gpt-4o-mini"
+            
+            from api_key_service import get_api_key
+            api_key = await get_api_key(self.user_id, llm_provider)
+            
+            if llm_provider == "openai":
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
+            elif llm_provider == "anthropic":
+                from anthropic import AsyncAnthropic
+                client = AsyncAnthropic(api_key=api_key)
+                
+                # Build the prompt with optional custom instructions
+                base_prompt = f"""The user responded: "{user_message}"
+
+The agent needs to say something similar to: "{original_script}"
+
+But the agent just said this exact phrase. Generate a natural variation that:
+- Conveys the same intent/meaning
+- Sounds natural (not robotic)
+- Is concise (similar length or shorter)
+- Can acknowledge the user's response briefly if appropriate"""
+                
+                if custom_prompt:
+                    base_prompt += f"\n\nAdditional guidance: {custom_prompt}"
+                
+                base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
+                
+                # Use Anthropic's API format
+                response = await client.messages.create(
+                    model=llm_model,
+                    max_tokens=150,
+                    messages=[{"role": "user", "content": base_prompt}]
+                )
+                return response.content[0].text.strip()
+            else:
+                # Default to OpenAI-compatible
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
             
             # Build the prompt with optional custom instructions
             base_prompt = f"""The user responded: "{user_message}"
@@ -3972,59 +4010,14 @@ But the agent just said this exact phrase. Generate a natural variation that:
             
             base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
             
-            if llm_provider == "grok":
-                # Use Grok client with correct API method
-                client = await self.get_llm_client_for_session("grok")
-                if not client:
-                    raise Exception("Grok client not configured")
-                
-                # Validate model for Grok
-                grok_models = ["grok-4-1-fast-non-reasoning", "grok-4-fast-non-reasoning", "grok-4-fast-reasoning", "grok-3", "grok-2-1212", "grok-beta", "grok-4-fast"]
-                if llm_model not in grok_models:
-                    llm_model = "grok-3"
-                
-                response = await client.create_completion(
-                    messages=[{"role": "user", "content": base_prompt}],
-                    model=llm_model,
-                    temperature=0.8,
-                    max_tokens=150,
-                    stream=False
-                )
-                # Handle Grok response format
-                if hasattr(response, 'choices') and response.choices:
-                    return response.choices[0].message.content.strip()
-                elif isinstance(response, str):
-                    return response.strip()
-                else:
-                    raise Exception(f"Unexpected Grok response format: {type(response)}")
-                    
-            elif llm_provider == "anthropic":
-                from anthropic import AsyncAnthropic
-                from api_key_service import get_api_key
-                api_key = await get_api_key(self.user_id, "anthropic")
-                client = AsyncAnthropic(api_key=api_key)
-                
-                response = await client.messages.create(
-                    model=llm_model,
-                    max_tokens=150,
-                    messages=[{"role": "user", "content": base_prompt}]
-                )
-                return response.content[0].text.strip()
-                
-            else:
-                # OpenAI or OpenAI-compatible
-                from openai import AsyncOpenAI
-                from api_key_service import get_api_key
-                api_key = await get_api_key(self.user_id, llm_provider)
-                client = AsyncOpenAI(api_key=api_key)
-                
-                response = await client.chat.completions.create(
-                    model=llm_model,
-                    messages=[{"role": "user", "content": base_prompt}],
-                    max_tokens=150,
-                    temperature=0.8
-                )
-                return response.choices[0].message.content.strip()
+            # OpenAI format
+            response = await client.chat.completions.create(
+                model=llm_model,
+                messages=[{"role": "user", "content": base_prompt}],
+                max_tokens=150,
+                temperature=0.8
+            )
+            return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.error(f"Error generating rephrased script: {e}")
