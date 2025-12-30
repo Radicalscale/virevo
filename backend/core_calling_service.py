@@ -1507,6 +1507,27 @@ class CallSession:
                 )
                 
                 if stayed_on_same_node and prompt_type == "script":
+                    # 🔥 ATTEMPT 17: Check if greeting was ALREADY delivered BEFORE any re-delivery logic
+                    # This must come FIRST before dynamic_rephrase or skip_sticky checks
+                    # If greeting_playback_started_at > 0 AND user spoke BEFORE they could hear it,
+                    # don't re-deliver - the first greeting is playing or just finished
+                    from server import call_states
+                    import time
+                    call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
+                    GREETING_HEARD_BUFFER = 2.0  # seconds - same as transition logic
+                    
+                    if call_id and call_id in call_states:
+                        playback_started = call_states[call_id].get("greeting_playback_started_at", 0)
+                        user_spoke_at = call_states[call_id].get("user_first_spoke_at", 0)
+                        
+                        if playback_started > 0 and user_spoke_at > 0:
+                            greeting_could_be_heard_at = playback_started + GREETING_HEARD_BUFFER
+                            
+                            # Only block re-delivery if user spoke BEFORE they could hear the greeting
+                            if user_spoke_at < greeting_could_be_heard_at:
+                                logger.info(f"⏸️ ATTEMPT 17: User spoke at {user_spoke_at} before greeting heard at {greeting_could_be_heard_at} - NOT re-delivering")
+                                return ""
+                    
                     dynamic_rephrase = node_data.get("dynamic_rephrase", False)
                     
                     if dynamic_rephrase:
@@ -3989,14 +4010,32 @@ But the agent just said this exact phrase. Generate a natural variation that:
             
             base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
             
-            # OpenAI-compatible format (works for openai, grok, etc.)
-            response = await client.chat.completions.create(
-                model=llm_model,
-                messages=[{"role": "user", "content": base_prompt}],
-                max_tokens=150,
-                temperature=0.8
-            )
-            return response.choices[0].message.content.strip()
+            # Handle different LLM providers - Grok uses create_completion(), OpenAI uses chat.completions.create()
+            messages = [{"role": "user", "content": base_prompt}]
+            
+            if llm_provider == "grok":
+                # Grok client has a different interface
+                response = await client.create_completion(
+                    messages=messages,
+                    model=llm_model,
+                    temperature=0.8,
+                    max_tokens=150,
+                    stream=False
+                )
+                if response and hasattr(response, 'choices') and response.choices:
+                    return response.choices[0].message.content.strip()
+                else:
+                    logger.error("Grok response was empty or malformed")
+                    return f"Let me say that again - {original_script}"
+            else:
+                # OpenAI-compatible format
+                response = await client.chat.completions.create(
+                    model=llm_model,
+                    messages=messages,
+                    max_tokens=150,
+                    temperature=0.8
+                )
+                return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.error(f"Error generating rephrased script: {e}")
