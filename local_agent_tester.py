@@ -24,10 +24,10 @@ from typing import List, Dict, Optional
 import argparse
 
 # Add backend to path
-sys.path.append('/app/backend')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from calling_service import CallSession
+from core_calling_service import CallSession
 
 # MongoDB connection (same as production)
 mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://radicalscale_db_user:BqTnIhsbVjhh01Bq@andramada.rznsqrc.mongodb.net/?appName=Andramada')
