@@ -1512,7 +1512,6 @@ class CallSession:
                     # If greeting_playback_started_at > 0 AND user spoke BEFORE they could hear it,
                     # don't re-deliver - the first greeting is playing or just finished
                     from server import call_states
-                    import time
                     call_id = getattr(self, 'call_id', None) or getattr(self, 'call_control_id', None)
                     GREETING_HEARD_BUFFER = 2.0  # seconds - same as transition logic
                     
