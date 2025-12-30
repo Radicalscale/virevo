@@ -1514,14 +1514,6 @@ class CallSession:
                         rephrase_prompt = node_data.get("rephrase_prompt", "")
                         logger.info(f"🔄 Dynamic rephrase enabled - generating natural variation of script")
                         response_text = await self._generate_rephrased_script(content, user_message, rephrase_prompt)
-                        
-                        # 🔧 ATTEMPT 18: Replace variables in rephrased output
-                        # The LLM may include {{customer_name}} etc. in its rephrase
-                        for var_name, var_value in self.session_variables.items():
-                            if f"{{{{{var_name}}}}}" in response_text:
-                                response_text = response_text.replace(f"{{{{{var_name}}}}}", str(var_value))
-                                logger.info(f"🔧 Replaced {{{{{var_name}}}}} with {var_value} in rephrased script")
-                        
                         if stream_callback:
                             await stream_callback(response_text)
                         # Add to conversation history and return
@@ -3967,17 +3959,50 @@ Examples:
             custom_prompt: Optional custom instructions for how to rephrase
         """
         try:
-            # Get LLM client using the session's existing method (handles all providers)
-            client = await self.get_llm_client_for_session()
+            # Get LLM provider and appropriate client using user's API keys
+            llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
+            if not llm_provider:
+                llm_provider = "openai"  # Default
             
-            if not client:
-                logger.error("Failed to get LLM client for rephrase")
-                return original_script  # Return original if no client
+            llm_model = self.agent_config.get("settings", {}).get("llm_model") or "gpt-4o-mini"
             
-            # Get provider and model from agent settings
-            settings = self.agent_config.get("settings", {})
-            llm_provider = settings.get("llm_provider", "openai")
-            llm_model = self.agent_config.get("model", "gpt-4o-mini")
+            from api_key_service import get_api_key
+            api_key = await get_api_key(self.user_id, llm_provider)
+            
+            if llm_provider == "openai":
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
+            elif llm_provider == "anthropic":
+                from anthropic import AsyncAnthropic
+                client = AsyncAnthropic(api_key=api_key)
+                
+                # Build the prompt with optional custom instructions
+                base_prompt = f"""The user responded: "{user_message}"
+
+The agent needs to say something similar to: "{original_script}"
+
+But the agent just said this exact phrase. Generate a natural variation that:
+- Conveys the same intent/meaning
+- Sounds natural (not robotic)
+- Is concise (similar length or shorter)
+- Can acknowledge the user's response briefly if appropriate"""
+                
+                if custom_prompt:
+                    base_prompt += f"\n\nAdditional guidance: {custom_prompt}"
+                
+                base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
+                
+                # Use Anthropic's API format
+                response = await client.messages.create(
+                    model=llm_model,
+                    max_tokens=150,
+                    messages=[{"role": "user", "content": base_prompt}]
+                )
+                return response.content[0].text.strip()
+            else:
+                # Default to OpenAI-compatible
+                from openai import AsyncOpenAI
+                client = AsyncOpenAI(api_key=api_key)
             
             # Build the prompt with optional custom instructions
             base_prompt = f"""The user responded: "{user_message}"
@@ -3995,36 +4020,19 @@ But the agent just said this exact phrase. Generate a natural variation that:
             
             base_prompt += "\n\nRespond with ONLY the rephrased text, no quotes or explanation."
             
-            messages = [{"role": "user", "content": base_prompt}]
-            
-            # Handle different client types
-            if llm_provider == "grok":
-                # GrokClient has a custom create_completion method
-                response = await client.create_completion(
-                    messages=messages,
-                    model=llm_model,
-                    temperature=0.8,
-                    max_tokens=150
-                )
-                if response:
-                    return response.choices[0].message.content.strip()
-                else:
-                    logger.error("Grok rephrase returned None")
-                    return original_script
-            else:
-                # Standard OpenAI-compatible client
-                response = await client.chat.completions.create(
-                    model=llm_model,
-                    messages=messages,
-                    max_tokens=150,
-                    temperature=0.8
-                )
-                return response.choices[0].message.content.strip()
+            # OpenAI format
+            response = await client.chat.completions.create(
+                model=llm_model,
+                messages=[{"role": "user", "content": base_prompt}],
+                max_tokens=150,
+                temperature=0.8
+            )
+            return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.error(f"Error generating rephrased script: {e}")
-            # Return original script instead of weird fallback message
-            return original_script
+            # Fallback to slightly modified original
+            return f"Let me say that again - {original_script}"
     
     async def _generate_ai_response_streaming(self, content: str, stream_callback=None, current_node: dict = None) -> str:
         """Generate AI response with streaming support"""
