@@ -592,17 +592,34 @@ class CallSession:
                 if call_data and call_data.get("silence_greeting_triggered") and not is_silence_timeout:
                     logger.warning(f"🚨 BARGE-IN DETECTED for call {self.call_id}: User spoke while Silence Greeting was triggering")
                     
-                    # 1. Stop Audio Immediately (best-effort - may fail if audio already finished)
+                    # 1. Stop Audio Immediately (CONDITIONAL - Smart Barge-In)
+                    # Check if we should allow the greeting to finish (Smart Barge-In)
+                    # If user spoke very shortly after greeting started, they likely haven't heard it yet
+                    # or are responding to the "connection" rather than the content.
+                    # In this case, letting the greeting finish is more natural than cutting it off.
                     try:
-                        from telnyx_service import TelnyxService
-                        # TelnyxService will use env vars for api_key and connection_id
-                        # This is safe because we're just stopping playback, not initiating calls
-                        ts = TelnyxService()
-                        await ts.stop_audio_playback(self.call_id)
-                        logger.info("✅ BARGE-IN: Audio playback STOPPED")
+                        from server import call_states
+                        import time
+                        
+                        should_stop_audio = True
+                        if self.call_id in call_states:
+                            playback_started = call_states[self.call_id].get("greeting_playback_started_at", 0)
+                            current_time = time.time()
+                            # Buffer: 2.5 seconds (Covers generation + network + short greeting playback)
+                            if playback_started > 0 and (current_time - playback_started) < 2.5:
+                                logger.info(f"⏳ Smart Barge-In: User spoke early ({current_time - playback_started:.2f}s) - LETTING GREETING FINISH")
+                                should_stop_audio = False
+                        
+                        if should_stop_audio:
+                            from telnyx_service import TelnyxService
+                            # TelnyxService will use env vars for api_key and connection_id
+                            # This is safe because we're just stopping playback, not initiating calls
+                            ts = TelnyxService()
+                            await ts.stop_audio_playback(self.call_id)
+                            logger.info("✅ BARGE-IN: Audio playback STOPPED")
                     except Exception as e:
                         # This is expected if audio already finished or never started
-                        logger.warning(f"⚠️ BARGE-IN: Could not stop audio (may have finished): {e}")
+                        logger.warning(f"⚠️ BARGE-IN: Audio stop logic error: {e}")
 
                     # 2. History Preservation
                     # PREVIOUSLY: We removed the silence greeting from history to "undo" it.
