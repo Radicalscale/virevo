@@ -599,7 +599,6 @@ class CallSession:
                     # In this case, letting the greeting finish is more natural than cutting it off.
                     try:
                         from server import call_states
-                        import time
                         
                         should_stop_audio = True
                         if self.call_id in call_states:
