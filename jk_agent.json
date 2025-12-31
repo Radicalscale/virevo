@@ -1177,6 +1177,11 @@
       "use_llm_detection": true,
       "disconnect_on_detection": true
     },
+    "barge_in_settings": {
+      "enable_verbose_barge_in": true,
+      "word_count_threshold": 50,
+      "interruption_prompt": "The user is talking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."
+    },
     "deepgram_settings": {
       "endpointing": 500,
       "vad_turnoff": 250,

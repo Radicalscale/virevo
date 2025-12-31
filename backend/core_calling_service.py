@@ -748,6 +748,74 @@ class CallSession:
         except Exception as e:
             logger.error(f"Error processing user input: {e}")
             return None
+
+    async def handle_verbose_interruption(self, partial_transcript: str, speak_callback):
+        """Handle verbose user interruption (Barge-In) - Generate and speak an interruption"""
+        try:
+            # 1. Check settings
+            settings = self.agent_config.get("settings", {})
+            barge_in_settings = settings.get("barge_in_settings", {})
+            
+            if not barge_in_settings.get("enable_verbose_barge_in"):
+                logger.warning("🚦 handle_verbose_interruption called but feature disabled")
+                return
+
+            logger.info(f"🚦 Handling Verbose Interruption for call {self.call_id} (Length: {len(partial_transcript.split())} words)")
+
+            # 2. Construct Prompt
+            interruption_prompt = barge_in_settings.get("interruption_prompt", 
+                "The user is speaking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal.")
+            
+            system_instruction = f"""CRITICAL INSTRUCTION: {interruption_prompt}
+            
+User's current rambling speech (partial): "{partial_transcript}"
+
+Generate a short, natural interruption phrase (1 sentence only). Start speaking immediately. Do not apologize excessively."""
+
+            # 3. Call LLM
+            llm_provider = settings.get("llm_provider", "openai")
+            client = await self.get_llm_client_for_session(llm_provider)
+            model = self.agent_config.get("model", "gpt-4-turbo")
+            
+            # Use limited conversation history for context + current partial
+            messages = [
+                {"role": "system", "content": self.agent_config.get("system_prompt", "")},
+            ] + self.conversation_history[-4:] + [ # Last 4 messages for context
+                {"role": "system", "content": system_instruction}
+            ]
+
+            logger.info("🚦 Generating interruption response...")
+            
+            if llm_provider == "grok":
+                response = await client.create_completion(
+                    messages=messages,
+                    model=model,
+                    temperature=0.7,
+                    max_tokens=50
+                )
+            else:
+                response = await client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=50
+                )
+            
+            interruption_text = response.choices[0].message.content.strip()
+            logger.info(f"🚦 Generated interruption: '{interruption_text}'")
+            
+            # 4. Speak immediately
+            if speak_callback and interruption_text:
+                await speak_callback(interruption_text)
+                
+                # OPTIONAL: Add to history so the agent remembers it interrupted
+                # But careful not to duplicate if the user keeps talking and we process the full transcript later.
+                # Ideally, this should replace the pending response or merge into flow.
+                # For now, we assume the user will stop talking, and the eventual full transcript will be processed.
+            
+        except Exception as e:
+            logger.error(f"Error in handle_verbose_interruption: {e}")
+
     
     async def _process_single_prompt_streaming(self, user_text: str, stream_callback=None):
         """Process with single prompt mode and stream sentences"""

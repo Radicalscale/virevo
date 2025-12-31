@@ -105,6 +105,11 @@ class SonioxSettings(BaseModel):
     language_hints: List[str] = ["en"]  # Language hints for recognition
     context: str = ""  # Custom context for improved accuracy
 
+class BargeInSettings(BaseModel):
+    enable_verbose_barge_in: bool = False
+    word_count_threshold: int = 50
+    interruption_prompt: str = "The user is speaking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."
+
 # Agent Models
 class AgentSettings(BaseModel):
     temperature: float = 0.7
@@ -136,6 +141,7 @@ class AgentSettings(BaseModel):
     chattts_settings: Optional[ChatTTSSettings] = Field(default_factory=ChatTTSSettings)
     assemblyai_settings: Optional[AssemblyAISettings] = Field(default_factory=AssemblyAISettings)
     soniox_settings: Optional[SonioxSettings] = Field(default_factory=SonioxSettings)
+    barge_in_settings: Optional[BargeInSettings] = Field(default_factory=BargeInSettings)
     
     # Post-Call Webhook Settings
     post_call_webhook_url: Optional[str] = None  # URL to send call transcript after call ends

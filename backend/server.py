@@ -3696,6 +3696,10 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
     # Dead air prevention: Start background monitoring task
     dead_air_task = None
     
+    # 🚦 Verbose/Barge-In Handling Support
+    current_utterance_word_count = 0
+    verbose_interruption_triggered = False
+    
     async def check_in_callback(message):
         """Callback for sending check-in messages through TTS"""
         nonlocal current_playback_ids
@@ -3755,7 +3759,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
     
     # Callback for partial transcripts (for interruption detection)
     async def on_partial_transcript(text, data):
-        nonlocal partial_transcript, is_agent_speaking, agent_generating_response, current_playback_ids
+        nonlocal partial_transcript, is_agent_speaking, agent_generating_response, current_playback_ids, current_utterance_word_count, verbose_interruption_triggered
         
         # Update partial transcript
         partial_transcript = text
@@ -3800,6 +3804,25 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             # ECHO FILTER: Check if this matches recent agent speech (speakerphone echo)
             recent_agent_texts = call_states.get(call_control_id, {}).get("recent_agent_texts", [])
             is_echo = False
+            
+            # 🔥 VERBOSE USER CHECK (Barge-In)
+            # Only check if feature is enabled in agent settings
+            barge_in_settings = agent_config.get("settings", {}).get("barge_in_settings", {})
+            if barge_in_settings.get("enable_verbose_barge_in", False) and text.strip() and not is_echo and not verbose_interruption_triggered:
+                # Calculate word count for this utterance
+                # Simple split is usually sufficient for real-time check
+                words = text.strip().split()
+                current_count = len(words)
+                
+                threshold = barge_in_settings.get("word_count_threshold", 50)
+                
+                if current_count > threshold:
+                    logger.info(f"🚦 VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
+                    verbose_interruption_triggered = True
+                    
+                    # Trigger skillful interruption
+                    # We run this as a background task to not block the socket
+                    asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
             
             if recent_agent_texts:
                 import string
@@ -3921,7 +3944,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
     
     # Callback for endpoint detection (when Soniox detects end of utterance)
     async def on_endpoint_detected():
-        nonlocal accumulated_transcript, last_audio_received_time, is_agent_speaking, agent_generating_response, current_playback_ids, call_ending, stt_start_time
+        nonlocal accumulated_transcript, last_audio_received_time, is_agent_speaking, agent_generating_response, current_playback_ids, call_ending, stt_start_time, verbose_interruption_triggered, current_utterance_word_count
+        
+        # Reset verbose tracking for next utterance
+        verbose_interruption_triggered = False
+        current_utterance_word_count = 0
         
         # Small delay to ensure any concurrent final transcript callback completes first
         # This is necessary because we now run callbacks as fire-and-forget tasks
