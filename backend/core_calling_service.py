@@ -604,10 +604,10 @@ class CallSession:
                         if self.call_id in call_states:
                             playback_started = call_states[self.call_id].get("greeting_playback_started_at", 0)
                             current_time = time.time()
-                            # Buffer: 2.5 seconds (Covers generation + network + short greeting playback)
-                            if playback_started > 0 and (current_time - playback_started) < 2.5:
-                                logger.info(f"⏳ Smart Barge-In: User spoke early ({current_time - playback_started:.2f}s) - LETTING GREETING FINISH")
-                                should_stop_audio = False
+                            # Buffer: REMOVED 2.5s buffer - Allow immediate interruption even if early
+                            # if playback_started > 0 and (current_time - playback_started) < 2.5:
+                            #     logger.info(f"⏳ Smart Barge-In: User spoke early ({current_time - playback_started:.2f}s) - LETTING GREETING FINISH")
+                            #     should_stop_audio = False
                         
                         if should_stop_audio:
                             from telnyx_service import TelnyxService
@@ -1618,22 +1618,11 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
                         logger.info(f"🔄 Rephrased script: {response_text[:100]}...")
                         return response_text
                     else:
-                        # FIX: Prevent "Dead Air" when user input doesn't trigger transition
-                        # Instead of returning empty string (silence), generate a contextual acknowledgment
-                        logger.info(f"🛡️ Preventing Dead Air: User stayed on script node '{selected_node.get('label')}' without transition")
-                        
-                        # Create a prompt that acknowledges the user but keeps them on track
-                        prevention_prompt = (
-                            f"The user said '{user_message}'. They are currently at a node with this script: '{content}'. "
-                            f"However, they did not answer the question or trigger a transition. "
-                            f"Briefly acknowledge what they said (e.g. 'I hear you', 'Right', 'I understand'), "
-                            f"and then gently nudge them to answer the script's question or move forward. "
-                            f"DO NOT repeat the script verbatim. Keep it conversational and under 2 sentences."
-                        )
-                        
-                        logger.info(f"🤖 Generating sticky-prevention response...")
-                        response_text = await self._generate_ai_response_streaming(prevention_prompt, stream_callback, selected_node)
-                        return response_text
+                        # FIX: In strict Script Mode (no rephrase), if we stay on the same node,
+                        # we should simply fall through and repeat/stream the script content.
+                        # Do NOT generate unscripted AI responses/acknowledgments.
+                        logger.info(f"📜 Script Mode (Strict): User stayed on node '{selected_node.get('label')}' - repeating script")
+                        pass 
                 
                 # Generate and stream the response
                 response_text = ""

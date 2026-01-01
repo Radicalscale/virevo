@@ -3924,7 +3924,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 call_states[call_control_id]["current_playback_ids"].clear()
                 
                 # MULTI-WORKER FIX: Also clear Redis playbacks
-                redis_svc = redis_service
+                # redis_svc = redis_service
                 redis_svc.clear_playbacks(call_control_id)
                 
                 # Reset playback_expected_end_time to NOW (audio is stopped)
