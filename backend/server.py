@@ -3783,19 +3783,6 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         # DEBUG: Log ALL partials to see if they're coming through
         logger.info(f"🔍 PARTIAL TRANSCRIPT: '{text}' | Generating: {agent_generating_response}")
         
-        # 🔥 CALL CONTROL: Check for verbose user (AI interrupts rambling user)
-        # This runs on EVERY partial transcript, regardless of agent speaking state
-        barge_in_settings = agent_config.get("settings", {}).get("barge_in_settings", {})
-        if barge_in_settings.get("enable_verbose_barge_in", False) and text.strip() and not verbose_interruption_triggered:
-            words = text.strip().split()
-            current_count = len(words)
-            threshold = barge_in_settings.get("word_count_threshold", 50)
-            
-            if current_count > threshold:
-                logger.info(f"🚦 CALL CONTROL: VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
-                verbose_interruption_triggered = True
-                asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
-        
         # 🚦 INTERRUPTION DETECTION: Check partial transcripts for interruptions
         # Check if agent is actively generating OR if audio is still playing
         currently_generating = agent_generating_response and call_states.get(call_control_id, {}).get("agent_generating_response", False)
@@ -3818,7 +3805,25 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             recent_agent_texts = call_states.get(call_control_id, {}).get("recent_agent_texts", [])
             is_echo = False
             
-
+            # 🔥 VERBOSE USER CHECK (Barge-In)
+            # Only check if feature is enabled in agent settings
+            barge_in_settings = agent_config.get("settings", {}).get("barge_in_settings", {})
+            if barge_in_settings.get("enable_verbose_barge_in", False) and text.strip() and not is_echo and not verbose_interruption_triggered:
+                # Calculate word count for this utterance
+                # Simple split is usually sufficient for real-time check
+                words = text.strip().split()
+                current_count = len(words)
+                
+                threshold = barge_in_settings.get("word_count_threshold", 50)
+                
+                if current_count > threshold:
+                    logger.info(f"🚦 VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
+                    verbose_interruption_triggered = True
+                    
+                    # Trigger skillful interruption
+                    # We run this as a background task to not block the socket
+                    asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
+            
             if recent_agent_texts:
                 import string
                 transcript_lower = partial_transcript.lower().strip()
@@ -3919,7 +3924,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 call_states[call_control_id]["current_playback_ids"].clear()
                 
                 # MULTI-WORKER FIX: Also clear Redis playbacks
-                # redis_svc = redis_service
+                redis_svc = redis_service
                 redis_svc.clear_playbacks(call_control_id)
                 
                 # Reset playback_expected_end_time to NOW (audio is stopped)
@@ -4663,15 +4668,16 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         logger.info(f"⏱️ User spoke at {user_spoke_time}")
         
         # Mark that user has spoken (for aiSpeaksAfterSilence feature)
-        # Mark that user has spoken (for aiSpeaksAfterSilence feature)
         if text.strip():
             if call_control_id in active_telnyx_calls:
                 active_telnyx_calls[call_control_id]["user_has_spoken"] = True
+                active_telnyx_calls[call_control_id]["silence_greeting_triggered"] = True  # Prevent silence greeting
             # 🔥 ATTEMPT 12: Store user_spoke_at in call_states for pre-audio-delivery detection
             if call_control_id in call_states:
                 call_states[call_control_id]["user_spoke_at"] = user_spoke_time
             redis_service.set_call_data(call_control_id, {
-                "user_has_spoken": True
+                "user_has_spoken": True,
+                "silence_greeting_triggered": True  # Prevent silence greeting from also firing
             })
             logger.info(f"👤 User has spoken - aiSpeaksAfterSilence timer cancelled if pending")
         

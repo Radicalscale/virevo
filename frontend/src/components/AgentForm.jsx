@@ -871,82 +871,6 @@ const AgentForm = () => {
                     />
                     <p className="text-xs text-gray-500 mt-1">Custom context for improved recognition accuracy</p>
                   </div>
-
-
-                  {/* Barge-In Settings Section (Specific to Soniox currently) */}
-                  <div className="border-t border-gray-700 pt-4 mt-4">
-                    <Label className="text-gray-300 font-semibold block mb-3">Verbose User Barge-In</Label>
-
-                    <div className="bg-gray-800/50 rounded-lg p-4 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label className="text-gray-300">Enable Barge-In</Label>
-                          <p className="text-xs text-gray-500">Interrupt users who speak for too long</p>
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={formData.settings?.barge_in_settings?.enable_verbose_barge_in || false}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            settings: {
-                              ...formData.settings,
-                              barge_in_settings: {
-                                ...formData.settings?.barge_in_settings,
-                                enable_verbose_barge_in: e.target.checked
-                              }
-                            }
-                          })}
-                          className="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                      </div>
-
-                      {formData.settings?.barge_in_settings?.enable_verbose_barge_in && (
-                        <>
-                          <div>
-                            <Label className="text-gray-400 text-sm">Word Count Threshold</Label>
-                            <Input
-                              type="number"
-                              min="10"
-                              max="200"
-                              value={formData.settings?.barge_in_settings?.word_count_threshold || 50}
-                              onChange={(e) => setFormData({
-                                ...formData,
-                                settings: {
-                                  ...formData.settings,
-                                  barge_in_settings: {
-                                    ...formData.settings?.barge_in_settings,
-                                    word_count_threshold: parseInt(e.target.value)
-                                  }
-                                }
-                              })}
-                              className="bg-gray-900 border-gray-700 text-white mt-1"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">Number of words before triggering interruption (Default: 50)</p>
-                          </div>
-
-                          <div>
-                            <Label className="text-gray-400 text-sm">Interruption Prompt Instruction</Label>
-                            <Textarea
-                              value={formData.settings?.barge_in_settings?.interruption_prompt || "The user is talking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."}
-                              onChange={(e) => setFormData({
-                                ...formData,
-                                settings: {
-                                  ...formData.settings,
-                                  barge_in_settings: {
-                                    ...formData.settings?.barge_in_settings,
-                                    interruption_prompt: e.target.value
-                                  }
-                                }
-                              })}
-                              className="bg-gray-900 border-gray-700 text-white mt-1"
-                              rows={3}
-                            />
-                            <p className="text-xs text-gray-500 mt-1">Instructions for the LLM on how to phrase the interruption</p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -2408,8 +2332,8 @@ const AgentForm = () => {
             </Button>
           </div>
         </form>
-      </Card >
-    </div >
+      </Card>
+    </div>
   );
 };
 
