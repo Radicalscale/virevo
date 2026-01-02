@@ -2497,6 +2497,96 @@ const FlowBuilder = () => {
                       + Add Variable to Extract
                     </button>
                   </div>
+
+                  {/* Call Control (Rambler Interruption) Settings */}
+                  <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
+                    <h4 className="text-white font-medium mb-2">🚦 Call Control (Rambler Interruption)</h4>
+                    <p className="text-xs text-gray-400 mb-3">
+                      Configure when the agent should interrupt a user who is speaking too long
+                    </p>
+
+                    {/* Enable/Disable Override */}
+                    <div className="mb-4 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedNode.data?.interruption_settings?.enabled !== false}
+                        onChange={(e) => updateNode(selectedNode.id, {
+                          data: {
+                            ...selectedNode.data,
+                            interruption_settings: {
+                              ...(selectedNode.data.interruption_settings || {}),
+                              enabled: e.target.checked
+                            }
+                          }
+                        })}
+                        className="w-4 h-4 text-red-600 bg-gray-900 border-gray-700 rounded focus:ring-red-500"
+                      />
+                      <label className="text-xs text-gray-300">
+                        <span className="font-semibold text-red-400">Enable Interruption</span> on this node (uses global settings if not overridden)
+                      </label>
+                    </div>
+
+                    {/* Word Count Threshold Slider */}
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs text-gray-300">Word Count Threshold</label>
+                        <span className="text-xs text-red-400">
+                          {selectedNode.data?.interruption_settings?.word_count_threshold ?? 'default (50)'}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        step="5"
+                        value={selectedNode.data?.interruption_settings?.word_count_threshold ?? 50}
+                        onChange={(e) => updateNode(selectedNode.id, {
+                          data: {
+                            ...selectedNode.data,
+                            interruption_settings: {
+                              ...(selectedNode.data.interruption_settings || {}),
+                              word_count_threshold: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Interrupt after this many words (lower = more aggressive)</p>
+                    </div>
+
+                    {/* Custom Interruption Prompt */}
+                    <div className="mb-3">
+                      <label className="text-xs text-gray-400 mb-1 block">Custom Interruption Prompt (Optional)</label>
+                      <textarea
+                        value={selectedNode.data?.interruption_settings?.interruption_prompt || ''}
+                        onChange={(e) => updateNode(selectedNode.id, {
+                          data: {
+                            ...selectedNode.data,
+                            interruption_settings: {
+                              ...(selectedNode.data.interruption_settings || {}),
+                              interruption_prompt: e.target.value
+                            }
+                          }
+                        })}
+                        className="bg-gray-900 border border-red-700/50 text-white text-xs w-full px-3 py-2 rounded"
+                        rows={2}
+                        placeholder="e.g., 'Politely acknowledge what the user said and steer back to the appointment time'"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Leave empty to use agent's global interruption prompt
+                      </p>
+                    </div>
+
+                    {/* Reset Button */}
+                    <button
+                      onClick={() => updateNode(selectedNode.id, {
+                        data: { ...selectedNode.data, interruption_settings: undefined }
+                      })}
+                      className="text-xs text-red-400 hover:text-red-300 underline"
+                    >
+                      Reset to agent defaults
+                    </button>
+                  </div>
                 </div>
               )}
 

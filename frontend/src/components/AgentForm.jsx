@@ -1901,6 +1901,111 @@ const AgentForm = () => {
             </div>
           </details>
 
+          {/* Call Control (Barge-In) Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🚦 Call Control (Rambler Interruption)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-6">
+              <p className="text-gray-400 text-sm mb-4">
+                Configure when the agent should interrupt a user who is speaking for too long.
+                This prevents filibustering and keeps the conversation on track.
+              </p>
+
+              {/* Enable Barge-In */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.barge_in_settings?.enable_verbose_barge_in ?? false}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        enable_verbose_barge_in: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                />
+                <Label className="text-gray-300">Enable Rambler Interruption</Label>
+              </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Agent will interrupt the user if they speak continuously beyond the threshold
+              </p>
+
+              {/* Word Count Threshold */}
+              <div>
+                <Label className="text-gray-300 font-semibold">
+                  Word Count Threshold: {formData.settings?.barge_in_settings?.word_count_threshold ?? 50} words
+                </Label>
+                <input
+                  type="range"
+                  min="10"
+                  max="100"
+                  step="5"
+                  value={formData.settings?.barge_in_settings?.word_count_threshold ?? 50}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        word_count_threshold: parseInt(e.target.value)
+                      }
+                    }
+                  })}
+                  disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
+                  className="w-full mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Interrupt after the user speaks this many words continuously (lower = more aggressive)
+                </p>
+              </div>
+
+              {/* Interruption Prompt */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Interruption Prompt</Label>
+                <Textarea
+                  placeholder="The user is speaking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."
+                  value={formData.settings?.barge_in_settings?.interruption_prompt || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        interruption_prompt: e.target.value
+                      }
+                    }
+                  })}
+                  disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Instructions for how the AI should interrupt the user. Leave empty for default behavior.
+                </p>
+              </div>
+
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-400 text-lg">⚠️</span>
+                  <div className="text-xs text-red-200">
+                    <strong>Safeguards:</strong> The agent will NOT interrupt if:
+                    <ul className="list-disc ml-4 mt-1">
+                      <li>A webhook is currently executing</li>
+                      <li>Another interruption happened in the last 15 seconds (cooldown)</li>
+                      <li>The user stops talking before the interruption is ready (Ghost Prevention)</li>
+                    </ul>
+                    Individual nodes can override or disable this setting in the Flow Builder.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
           {/* Voicemail & IVR Detection Settings */}
           <details className="border border-gray-700 rounded-lg bg-gray-900">
             <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
