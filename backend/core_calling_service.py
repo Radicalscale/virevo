@@ -184,6 +184,12 @@ class CallSession:
         # Initialize Natural Delivery Middleware (Dual-Stream Architecture)
         from natural_delivery_middleware import NaturalDeliveryMiddleware
         self.delivery_middleware = NaturalDeliveryMiddleware()
+        
+        # Call Control (Rambling User Interruption) state tracking
+        self.last_interruption_time = 0  # Timestamp of last AI-triggered interruption
+        self.interruption_cooldown = 15.0  # Seconds before another interruption can trigger
+        self.was_interrupted_by_agent = False  # Flag to skip process_user_input after interruption
+        self.interruption_check_active = False  # Lock to prevent concurrent interruption checks
     
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
@@ -553,6 +559,11 @@ class CallSession:
                     # Update current transcript for interim results
                     self.current_transcript = transcript
                     
+                    # ═══════════════════════════════════════════════════════════════════
+                    # CALL CONTROL: Rambling User Interruption Check (on interim results)
+                    # ═══════════════════════════════════════════════════════════════════
+                    await self._check_rambling_interruption(transcript)
+                    
         except Exception as e:
             logger.error(f"Error processing transcript: {e}")
     
@@ -573,6 +584,16 @@ class CallSession:
             latency_start = time.time()
             timestamp_str = datetime.now().strftime("%H:%M:%S.%f")[:-3]
             logger.info(f"⏱️ [{timestamp_str}] 📥 process_user_input() ENTRY - text: '{user_text[:50]}...'")
+            
+            # ═══════════════════════════════════════════════════════════════════
+            # CALL CONTROL: Post-Interruption Bypass
+            # If we just interrupted the user, skip processing this (rambling) transcript
+            # to prevent double responses. The agent already spoke the interruption.
+            # ═══════════════════════════════════════════════════════════════════
+            if self.was_interrupted_by_agent:
+                logger.info("🚦 BYPASSING process_user_input: Agent just interrupted user (post-interruption cleanup)")
+                self.was_interrupted_by_agent = False  # Reset flag
+                return None
             
             # ═══════════════════════════════════════════════════════════════════
             # 🚨 BARGE-IN INTERCEPTOR 🚨
@@ -750,7 +771,14 @@ class CallSession:
             return None
 
     async def handle_verbose_interruption(self, partial_transcript: str, speak_callback):
-        """Handle verbose user interruption (Barge-In) - Generate and speak an interruption"""
+        """Handle verbose user interruption (Rambler Control) - Generate and speak an interruption
+        
+        Safeguards:
+        - Ghost Interruption Check: Aborts if user stopped speaking before audio plays
+        - State Sync: Marks agent as speaking to pause Dead Air monitoring
+        - Cooldown: Sets last_interruption_time to prevent loops
+        - Flag: Sets was_interrupted_by_agent to skip process_user_input
+        """
         try:
             # 1. Check settings
             settings = self.agent_config.get("settings", {})
@@ -804,18 +832,102 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
             interruption_text = response.choices[0].message.content.strip()
             logger.info(f"🚦 Generated interruption: '{interruption_text}'")
             
+            # ═══════════════════════════════════════════════════════════════════
+            # GHOST INTERRUPTION CHECK: User may have stopped talking during LLM call
+            # If user is no longer speaking, ABORT to avoid interrupting silence
+            # ═══════════════════════════════════════════════════════════════════
+            if not self.user_speaking:
+                logger.info("👻 GHOST INTERRUPTION ABORTED: User stopped speaking during generation")
+                return
+            
             # 4. Speak immediately
             if speak_callback and interruption_text:
+                # MARK STATE: Tell the system agent is speaking (pauses Dead Air)
+                self.mark_agent_speaking_start()
+                
                 await speak_callback(interruption_text)
                 
-                # OPTIONAL: Add to history so the agent remembers it interrupted
-                # But careful not to duplicate if the user keeps talking and we process the full transcript later.
-                # Ideally, this should replace the pending response or merge into flow.
-                # For now, we assume the user will stop talking, and the eventual full transcript will be processed.
+                # SET FLAGS: Prevent double response and start cooldown
+                self.was_interrupted_by_agent = True
+                self.last_interruption_time = time.time()
+                
+                # CLEAR BUFFER: Discard the rambling transcript so it's not processed
+                self.current_transcript = ""
+                
+                logger.info(f"🚦 Interruption complete. Cooldown started ({self.interruption_cooldown}s)")
             
         except Exception as e:
             logger.error(f"Error in handle_verbose_interruption: {e}")
 
+    async def _check_rambling_interruption(self, transcript: str):
+        """Check if user is rambling and trigger interruption if threshold exceeded
+        
+        Called from on_transcript on interim results. Uses local word count check
+        for speed, and only invokes handle_verbose_interruption when needed.
+        """
+        try:
+            # Skip if feature disabled
+            settings = self.agent_config.get("settings", {})
+            barge_in_settings = settings.get("barge_in_settings", {})
+            if not barge_in_settings.get("enable_verbose_barge_in"):
+                return
+            
+            # Skip if in cooldown period (prevents loops)
+            if time.time() - self.last_interruption_time < self.interruption_cooldown:
+                return
+            
+            # Skip if already checking (prevents concurrent calls)
+            if self.interruption_check_active:
+                return
+            
+            # Skip if webhook is executing (agent will respond naturally when done)
+            if self.executing_webhook:
+                return
+            
+            # Get threshold (node-level override or global setting)
+            word_count_threshold = barge_in_settings.get("word_count_threshold", 50)
+            
+            # Check node-level override if we have a current node
+            if self.current_node_id:
+                flow_nodes = self.agent_config.get("call_flow", [])
+                for node in flow_nodes:
+                    if node.get("id") == self.current_node_id:
+                        node_data = node.get("data", {})
+                        node_interruption = node_data.get("interruption_settings", {})
+                        if node_interruption.get("enabled") is False:
+                            # Node explicitly disabled this feature
+                            return
+                        if node_interruption.get("word_count_threshold"):
+                            word_count_threshold = node_interruption["word_count_threshold"]
+                        break
+            
+            # Check word count
+            word_count = len(transcript.split())
+            if word_count < word_count_threshold:
+                return
+            
+            logger.info(f"🚦 RAMBLING DETECTED: {word_count} words >= {word_count_threshold} threshold")
+            
+            # Set lock to prevent concurrent checks
+            self.interruption_check_active = True
+            
+            try:
+                # Create speak callback using current session's TTS
+                async def speak_callback(text: str):
+                    """Speak the interruption via the delivery middleware"""
+                    if hasattr(self, 'delivery_middleware') and self.delivery_middleware:
+                        await self.delivery_middleware.stream_speech(text)
+                    else:
+                        logger.warning("🚦 No delivery middleware available for interruption speech")
+                
+                await self.handle_verbose_interruption(transcript, speak_callback)
+                
+            finally:
+                self.interruption_check_active = False
+                
+        except Exception as e:
+            self.interruption_check_active = False
+            logger.error(f"Error in _check_rambling_interruption: {e}")
     
     async def _process_single_prompt_streaming(self, user_text: str, stream_callback=None):
         """Process with single prompt mode and stream sentences"""
