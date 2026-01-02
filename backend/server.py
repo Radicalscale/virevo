@@ -3794,6 +3794,8 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             if current_count > threshold:
                 logger.info(f"🚦 CALL CONTROL: VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
                 verbose_interruption_triggered = True
+                # 🔥 Set flag to prevent barge-in from cancelling this interruption
+                call_states[call_control_id]["call_control_interruption_active"] = True
                 asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
         
         # 🚦 INTERRUPTION DETECTION: Check partial transcripts for interruptions
@@ -3859,6 +3861,12 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             
             # Only trigger interruption if >= 3 words AND not an echo
             if word_count >= 3 and not is_echo:
+                # 🔥 CALL CONTROL GUARD: Don't cancel AI when it's interrupting a rambling user
+                call_control_active = call_states.get(call_control_id, {}).get("call_control_interruption_active", False)
+                if call_control_active:
+                    logger.info(f"🚦 BARGE-IN BLOCKED: Call Control interruption active - AI needs to 'push through' to interrupt rambling user")
+                    return
+                
                 # 🔥 GUARD: Prevent multiple simultaneous interrupts
                 # Use a flag to ensure we only process one interrupt at a time
                 interrupt_in_progress = call_states.get(call_control_id, {}).get("interrupt_in_progress", False)
