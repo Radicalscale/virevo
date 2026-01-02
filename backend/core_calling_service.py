@@ -808,16 +808,6 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
             if speak_callback and interruption_text:
                 await speak_callback(interruption_text)
                 
-                # 🔥 Clear the Call Control flag after audio starts
-                # This allows barge-in to work normally again after the AI's interruption is delivered
-                try:
-                    from server import call_states
-                    if self.call_id in call_states:
-                        call_states[self.call_id]["call_control_interruption_active"] = False
-                        logger.info("🚦 CALL CONTROL: Reset call_control_interruption_active flag")
-                except Exception as e:
-                    logger.warning(f"Failed to reset call_control_interruption_active: {e}")
-                
                 # OPTIONAL: Add to history so the agent remembers it interrupted
                 # But careful not to duplicate if the user keeps talking and we process the full transcript later.
                 # Ideally, this should replace the pending response or merge into flow.
