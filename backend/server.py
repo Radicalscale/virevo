@@ -3783,6 +3783,55 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         # DEBUG: Log ALL partials to see if they're coming through
         logger.info(f"🔍 PARTIAL TRANSCRIPT: '{text}' | Generating: {agent_generating_response}")
         
+        # ═══════════════════════════════════════════════════════════════════════════
+        # 🚦 CALL CONTROL: Rambling User Interruption (runs even when agent is silent)
+        # This check happens BEFORE the agent_interruptible block so it triggers
+        # whenever the user is speaking too long, regardless of agent state.
+        # ═══════════════════════════════════════════════════════════════════════════
+        if text.strip() and not verbose_interruption_triggered:
+            # Get global barge-in settings
+            barge_in_settings = agent_config.get("settings", {}).get("barge_in_settings", {})
+            
+            # Check node-level override (if current node has interruption_settings)
+            current_node_id = getattr(session, 'current_node_id', None)
+            node_settings = None
+            if current_node_id:
+                flow_nodes = agent_config.get("flow", {}).get("nodes", [])
+                for node in flow_nodes:
+                    if str(node.get("id")) == str(current_node_id):
+                        node_settings = node.get("data", {}).get("interruption_settings")
+                        break
+            
+            # Determine if feature is enabled (node override takes precedence)
+            feature_enabled = barge_in_settings.get("enable_verbose_barge_in", False)
+            if node_settings is not None:
+                feature_enabled = node_settings.get("enabled", feature_enabled)
+            
+            if feature_enabled:
+                # Check cooldown to prevent rapid-fire interruptions
+                last_interruption = getattr(session, 'last_interruption_time', 0)
+                cooldown = getattr(session, 'interruption_cooldown', 15)
+                time_since_last = time.time() - last_interruption
+                
+                if time_since_last >= cooldown:
+                    # Get threshold (node override takes precedence)
+                    threshold = barge_in_settings.get("word_count_threshold", 50)
+                    if node_settings and node_settings.get("word_count_threshold"):
+                        threshold = node_settings.get("word_count_threshold")
+                    
+                    # Count words in current transcript
+                    words = text.strip().split()
+                    current_count = len(words)
+                    
+                    if current_count >= threshold:
+                        logger.info(f"🚦 VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
+                        verbose_interruption_triggered = True
+                        
+                        # Trigger skillful interruption (background task to not block)
+                        asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
+                else:
+                    logger.debug(f"🚦 Rambling check skipped: cooldown ({time_since_last:.1f}s / {cooldown}s)")
+        
         # 🚦 INTERRUPTION DETECTION: Check partial transcripts for interruptions
         # Check if agent is actively generating OR if audio is still playing
         currently_generating = agent_generating_response and call_states.get(call_control_id, {}).get("agent_generating_response", False)
@@ -3804,25 +3853,6 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             # ECHO FILTER: Check if this matches recent agent speech (speakerphone echo)
             recent_agent_texts = call_states.get(call_control_id, {}).get("recent_agent_texts", [])
             is_echo = False
-            
-            # 🔥 VERBOSE USER CHECK (Barge-In)
-            # Only check if feature is enabled in agent settings
-            barge_in_settings = agent_config.get("settings", {}).get("barge_in_settings", {})
-            if barge_in_settings.get("enable_verbose_barge_in", False) and text.strip() and not is_echo and not verbose_interruption_triggered:
-                # Calculate word count for this utterance
-                # Simple split is usually sufficient for real-time check
-                words = text.strip().split()
-                current_count = len(words)
-                
-                threshold = barge_in_settings.get("word_count_threshold", 50)
-                
-                if current_count > threshold:
-                    logger.info(f"🚦 VERBOSE USER DETECTED: {current_count} words (Threshold: {threshold})")
-                    verbose_interruption_triggered = True
-                    
-                    # Trigger skillful interruption
-                    # We run this as a background task to not block the socket
-                    asyncio.create_task(session.handle_verbose_interruption(text, check_in_callback))
             
             if recent_agent_texts:
                 import string
