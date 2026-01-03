@@ -4758,6 +4758,15 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             # Agent is actively speaking (audio playing)
             logger.info(f"🚦 Agent SPEAKING - User said {word_count} word(s), tts_speaking={tts_is_speaking}, time_until_done={time_until_audio_done:.1f}s")
             
+            # 🛡️ CALL CONTROL PROTECTION: Check if we're in the protected window
+            # If so, don't interrupt - the agent is playing a Call Control interruption
+            protected_until = getattr(session, 'interrupt_playback_protected_until', 0) if session else 0
+            call_control_protected = time.time() < protected_until
+            
+            if call_control_protected:
+                logger.info(f"🛡️ CALL CONTROL: Final transcript barge-in skipped - interruption audio protected ({protected_until - time.time():.1f}s left)")
+                return  # Don't interrupt the agent's interruption!
+            
             if word_count >= 3:
                 # Real interruption (3+ words) - stop agent immediately
                 logger.info(f"🛑 INTERRUPTION DETECTED - User said {word_count} words: '{accumulated_transcript}'")
