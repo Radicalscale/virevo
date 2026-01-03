@@ -3845,6 +3845,14 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         # Agent is "interruptible" if generating OR audio still playing
         agent_interruptible = currently_generating or audio_still_playing
         
+        # 🛡️ CALL CONTROL PROTECTION: Skip barge-in if we're playing a Call Control interruption
+        # This prevents the agent's "interrupt the rambler" audio from being cancelled by the rambler
+        protected_until = getattr(session, 'interrupt_playback_protected_until', 0) if session else 0
+        call_control_protected = time.time() < protected_until
+        if call_control_protected:
+            logger.info(f"🛡️ CALL CONTROL: Barge-in skipped - interruption audio protected ({protected_until - time.time():.1f}s left)")
+            agent_interruptible = False  # Disable interruption temporarily
+        
         if agent_interruptible and partial_transcript.strip():
             word_count = len(partial_transcript.strip().split())
             interrupt_reason = "during response generation" if currently_generating else f"during audio playback ({time_until_audio_done:.1f}s left)"

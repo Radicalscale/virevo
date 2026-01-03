@@ -190,6 +190,7 @@ class CallSession:
         self.interruption_cooldown = 15.0  # Seconds before another interruption can trigger
         self.was_interrupted_by_agent = False  # Flag to skip process_user_input after interruption
         self.interruption_check_active = False  # Lock to prevent concurrent interruption checks
+        self.interrupt_playback_protected_until = 0  # Timestamp when barge-in protection expires (Call Control audio)
     
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
@@ -842,6 +843,12 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
             
             # 4. Speak immediately
             if speak_callback and interruption_text:
+                # START PROTECTION: Set time-based protection so barge-in can't cancel our interruption
+                # We set this BEFORE speak_callback to ensure protection is active when audio starts
+                # 5-second protection covers typical interruption audio length
+                self.interrupt_playback_protected_until = time.time() + 5.0
+                logger.info("🛡️ CALL CONTROL: Started 5-second barge-in protection")
+                
                 # MARK STATE: Tell the system agent is speaking (pauses Dead Air)
                 self.mark_agent_speaking_start()
                 
@@ -853,6 +860,8 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
                 
                 # CLEAR BUFFER: Discard the rambling transcript so it's not processed
                 self.current_transcript = ""
+                
+                # NOTE: Protection was already set BEFORE speak_callback (5-second window)
                 
                 logger.info(f"🚦 Interruption complete. Cooldown started ({self.interruption_cooldown}s)")
             
