@@ -8429,11 +8429,25 @@ async def telnyx_webhook(payload: dict):
                             
                             if len(agent_words) >= 2:  # Lower threshold - even 2 words can be echo
                                 common_words = agent_words.intersection(transcript_words)
-                                similarity = len(common_words) / len(agent_words) if len(agent_words) > 0 else 0
-                                logger.info(f"🔍 Checking similarity with '{agent_text[:30]}...': {similarity:.2f}")
                                 
-                                if similarity > 0.6:  # Lower threshold to 60%
-                                    logger.info(f"🔇 ECHO DETECTED (similarity: {similarity:.2f}) - Ignoring: {transcript_text[:50]}")
+                                # Multiple echo detection strategies:
+                                # 1. Similarity based on agent words (original)
+                                similarity_agent = len(common_words) / len(agent_words) if len(agent_words) > 0 else 0
+                                
+                                # 2. Similarity based on transcript words (catches short echoes from long agent text)
+                                similarity_transcript = len(common_words) / len(transcript_words) if len(transcript_words) > 0 else 0
+                                
+                                # 3. Substring match (catches "I was just" in "I was just, um, wondering...")
+                                transcript_in_agent = transcript_normalized in agent_normalized
+                                
+                                logger.info(f"🔍 Echo check: agent_sim={similarity_agent:.2f}, transcript_sim={similarity_transcript:.2f}, substring={transcript_in_agent}")
+                                
+                                # Echo detected if:
+                                # - High similarity either direction (60%+)
+                                # - OR transcript is a substring of agent text
+                                # - OR 80%+ of USER's words match agent (they're echoing what agent said)
+                                if similarity_agent > 0.6 or similarity_transcript > 0.8 or transcript_in_agent:
+                                    logger.info(f"🔇 ECHO DETECTED - Ignoring: {transcript_text[:50]}")
                                     return {"status": "ok"}
                     
                     # Mark as processing (update both Redis and in-memory)
