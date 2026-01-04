@@ -191,6 +191,10 @@ class CallSession:
         self.was_interrupted_by_agent = False  # Flag to skip process_user_input after interruption
         self.interruption_check_active = False  # Lock to prevent concurrent interruption checks
         self.interrupt_playback_protected_until = 0  # Timestamp when barge-in protection expires (Call Control audio)
+        
+        # Hybrid Discernment System state tracking
+        self._discernment_passed = False  # Has user passed discernment check for current speaking turn?
+        self._active_word_threshold = None  # Current active threshold (may be extended after discernment)
     
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
@@ -430,6 +434,11 @@ class CallSession:
         # DON'T reset checkin_count here - only reset when user gives meaningful response
         # (handled in process_user_response after we know what they said)
         self.reset_silence_timer_only()
+        
+        # Reset discernment state for new speaking turn
+        self._discernment_passed = False
+        self._active_word_threshold = None
+        
         logger.info(f"👤 User started speaking for call {self.call_id}")
     
     def mark_user_speaking_end(self):
@@ -910,17 +919,38 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
                             word_count_threshold = node_interruption["word_count_threshold"]
                         break
             
+            # Use active threshold (may have been extended by discernment)
+            effective_threshold = self._active_word_threshold or word_count_threshold
+            
             # Check word count
             word_count = len(transcript.split())
-            if word_count < word_count_threshold:
+            if word_count < effective_threshold:
                 return
             
-            logger.info(f"🚦 RAMBLING DETECTED: {word_count} words >= {word_count_threshold} threshold")
+            logger.info(f"🚦 WORD COUNT THRESHOLD HIT: {word_count} words >= {effective_threshold} threshold")
             
             # Set lock to prevent concurrent checks
             self.interruption_check_active = True
             
             try:
+                # ════════════════════════════════════════════════════════════════
+                # STAGE 2: LLM DISCERNMENT CHECK (New Hybrid System)
+                # ════════════════════════════════════════════════════════════════
+                use_discernment = barge_in_settings.get("use_discernment", True)
+                
+                if use_discernment and not self._discernment_passed:
+                    discernment_result = await self._check_discernment(transcript, word_count_threshold)
+                    
+                    if discernment_result == "ON_TRACK":
+                        # User is being helpful - extend threshold and continue listening
+                        multiplier = barge_in_settings.get("threshold_extension_multiplier", 2.0)
+                        self._active_word_threshold = int(word_count_threshold * multiplier)
+                        self._discernment_passed = True
+                        logger.info(f"🟢 DISCERNMENT: ON_TRACK - Extending threshold to {self._active_word_threshold} words")
+                        return  # Don't interrupt, let them continue
+                    else:
+                        logger.info(f"🔴 DISCERNMENT: RAMBLING - Proceeding with interruption")
+                
                 # Create speak callback using current session's TTS
                 async def speak_callback(text: str):
                     """Speak the interruption via the delivery middleware"""
@@ -937,6 +967,113 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
         except Exception as e:
             self.interruption_check_active = False
             logger.error(f"Error in _check_rambling_interruption: {e}")
+    
+    async def _check_discernment(self, transcript: str, base_threshold: int) -> str:
+        """Check if user's speech is helpful (ON_TRACK) or rambling (RAMBLING)
+        
+        Uses LLM to evaluate whether the user is providing useful information
+        toward the node goal, or if they're off-topic/stalling.
+        
+        Args:
+            transcript: The user's current speech
+            base_threshold: The original word count threshold
+            
+        Returns:
+            "ON_TRACK" if helpful, "RAMBLING" if not
+        """
+        try:
+            import asyncio
+            
+            # Get node goal for context
+            node_goal = "Continue the conversation"
+            last_agent_message = ""
+            
+            if self.current_node_id:
+                flow_nodes = self.agent_config.get("call_flow", [])
+                for node in flow_nodes:
+                    if node.get("id") == self.current_node_id:
+                        node_data = node.get("data", {})
+                        node_goal = node_data.get("goal") or node_data.get("label") or node_goal
+                        # Check for custom goal hint in interruption settings
+                        interruption_settings = node_data.get("interruption_settings", {})
+                        if interruption_settings.get("goal_hint"):
+                            node_goal = interruption_settings["goal_hint"]
+                        break
+            
+            # Get last agent message for context
+            for msg in reversed(self.conversation_history):
+                if msg.get("role") == "assistant":
+                    last_agent_message = msg.get("content", "")[:200]
+                    break
+            
+            # Build discernment prompt
+            prompt = f"""NODE GOAL: {node_goal}
+AGENT'S LAST QUESTION: {last_agent_message}
+
+USER'S SPEECH: "{transcript[:500]}"
+
+Is this speech HELPFUL toward the goal, or RAMBLING?
+- ON_TRACK = Relevant info, answering question, or useful context (even if verbose)
+- RAMBLING = Off-topic tangent, stalling, avoiding question, or circular with no new info
+
+Answer (one word only):"""
+
+            messages = [
+                {"role": "system", "content": "You are a speech analyst. Answer with exactly one word: ON_TRACK or RAMBLING."},
+                {"role": "user", "content": prompt}
+            ]
+            
+            # Get LLM client
+            settings = self.agent_config.get("settings", {})
+            llm_provider = settings.get("llm_provider", "grok")
+            client = await self.get_llm_client_for_session(llm_provider)
+            model = self.agent_config.get("model", "grok-3")
+            
+            logger.info(f"🧠 DISCERNMENT CHECK: Evaluating {len(transcript.split())} words against goal: {node_goal[:50]}...")
+            
+            # Make fast LLM call with timeout
+            discernment_timeout = settings.get("barge_in_settings", {}).get("discernment_timeout_ms", 1500) / 1000
+            
+            try:
+                if llm_provider == "grok":
+                    response = await asyncio.wait_for(
+                        client.create_completion(
+                            messages=messages,
+                            model=model,
+                            temperature=0.1,
+                            max_tokens=10
+                        ),
+                        timeout=discernment_timeout
+                    )
+                else:
+                    response = await asyncio.wait_for(
+                        client.chat.completions.create(
+                            model=model,
+                            messages=messages,
+                            temperature=0.1,
+                            max_tokens=10
+                        ),
+                        timeout=discernment_timeout
+                    )
+                
+                result = response.choices[0].message.content.strip().upper()
+                
+                # Parse response - look for ON_TRACK or RAMBLING
+                if "ON_TRACK" in result or "ON TRACK" in result:
+                    return "ON_TRACK"
+                elif "RAMBLING" in result:
+                    return "RAMBLING"
+                else:
+                    logger.warning(f"🧠 DISCERNMENT: Unexpected response '{result}', defaulting to RAMBLING")
+                    return "RAMBLING"  # Fail-safe
+                    
+            except asyncio.TimeoutError:
+                logger.warning(f"🧠 DISCERNMENT: Timeout after {discernment_timeout}s, defaulting to RAMBLING")
+                return "RAMBLING"  # Fail-safe: timeout means interrupt
+                
+        except Exception as e:
+            logger.error(f"🧠 DISCERNMENT ERROR: {e}, defaulting to RAMBLING")
+            return "RAMBLING"  # Fail-safe: any error means interrupt
     
     async def _process_single_prompt_streaming(self, user_text: str, stream_callback=None):
         """Process with single prompt mode and stream sentences"""
