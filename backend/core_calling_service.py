@@ -877,11 +877,15 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
         except Exception as e:
             logger.error(f"Error in handle_verbose_interruption: {e}")
 
-    async def _check_rambling_interruption(self, transcript: str):
+    async def _check_rambling_interruption(self, transcript: str, speak_callback=None):
         """Check if user is rambling and trigger interruption if threshold exceeded
         
         Called from on_transcript on interim results. Uses local word count check
         for speed, and only invokes handle_verbose_interruption when needed.
+        
+        Args:
+            transcript: The user's current speech
+            speak_callback: Callback function to speak interruption (from server.py)
         """
         try:
             # Skip if feature disabled
@@ -951,15 +955,11 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
                     else:
                         logger.info(f"🔴 DISCERNMENT: RAMBLING - Proceeding with interruption")
                 
-                # Create speak callback using current session's TTS
-                async def speak_callback(text: str):
-                    """Speak the interruption via the delivery middleware"""
-                    if hasattr(self, 'delivery_middleware') and self.delivery_middleware:
-                        await self.delivery_middleware.stream_speech(text)
-                    else:
-                        logger.warning("🚦 No delivery middleware available for interruption speech")
-                
-                await self.handle_verbose_interruption(transcript, speak_callback)
+                # Use the provided speak_callback from server.py (has access to TTS)
+                if speak_callback:
+                    await self.handle_verbose_interruption(transcript, speak_callback)
+                else:
+                    logger.warning("🚦 No speak_callback provided - cannot deliver interruption audio")
                 
             finally:
                 self.interruption_check_active = False

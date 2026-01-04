@@ -3828,7 +3828,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         verbose_interruption_triggered = True
                         
                         # Route through discernment-aware method (includes LLM check)
-                        asyncio.create_task(session._check_rambling_interruption(text))
+                        asyncio.create_task(session._check_rambling_interruption(text, check_in_callback))
                 else:
                     logger.debug(f"🚦 Rambling check skipped: cooldown ({time_since_last:.1f}s / {cooldown}s)")
         
