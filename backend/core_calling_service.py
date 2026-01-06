@@ -854,9 +854,11 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
             if speak_callback and interruption_text:
                 # START PROTECTION: Set time-based protection so barge-in can't cancel our interruption
                 # We set this BEFORE speak_callback to ensure protection is active when audio starts
-                # 5-second protection covers typical interruption audio length
-                self.interrupt_playback_protected_until = time.time() + 5.0
-                logger.info("🛡️ CALL CONTROL: Started 5-second barge-in protection")
+                # Calculate protection based on word count: ~0.4s per word + 2s buffer
+                word_count = len(interruption_text.split())
+                protection_duration = max(5.0, (word_count * 0.4) + 2.0)
+                self.interrupt_playback_protected_until = time.time() + protection_duration
+                logger.info(f"🛡️ CALL CONTROL: Started {protection_duration:.1f}s barge-in protection ({word_count} words)")
                 
                 # MARK STATE: Tell the system agent is speaking (pauses Dead Air)
                 self.mark_agent_speaking_start()
