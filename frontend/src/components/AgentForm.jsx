@@ -370,7 +370,7 @@ const AgentForm = () => {
                   value={formData.settings?.llm_provider || 'openai'}
                   onValueChange={(value) => {
                     // Reset model when provider changes
-                    const defaultModel = value === 'grok' ? 'grok-3' : 'gpt-4-turbo';
+                    const defaultModel = value === 'grok' ? 'grok-3' : value === 'gemini' ? 'gemini-3-flash-preview' : 'gpt-4-turbo';
                     setFormData({
                       ...formData,
                       model: defaultModel,
@@ -384,6 +384,7 @@ const AgentForm = () => {
                   <SelectContent className="bg-gray-900 border-gray-700">
                     <SelectItem value="openai">OpenAI (GPT)</SelectItem>
                     <SelectItem value="grok">Grok (xAI)</SelectItem>
+                    <SelectItem value="gemini">Gemini (Google)</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500 mt-1">Choose your AI provider</p>
@@ -409,6 +410,11 @@ const AgentForm = () => {
                         <SelectItem value="grok-2-1212">Grok 2 (Dec 2024)</SelectItem>
                         <SelectItem value="grok-beta">Grok Beta</SelectItem>
                       </>
+                    ) : (formData.settings?.llm_provider === 'gemini') ? (
+                      <>
+                        <SelectItem value="gemini-3-flash-preview">Gemini 3.0 Flash Preview (Fastest)</SelectItem>
+                        <SelectItem value="gemini-3-pro-preview">Gemini 3.0 Pro Preview (Most Capable)</SelectItem>
+                      </>
                     ) : (
                       <>
                         <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1 (Latest)</SelectItem>
@@ -420,7 +426,9 @@ const AgentForm = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500 mt-1">
-                  {(formData.settings?.llm_provider === 'grok') ? 'Grok model for conversation' : 'OpenAI model for conversation'}
+                  {(formData.settings?.llm_provider === 'grok') ? 'Grok model for conversation' :
+                    (formData.settings?.llm_provider === 'gemini') ? 'Gemini model for conversation' :
+                      'OpenAI model for conversation'}
                 </p>
               </div>
 

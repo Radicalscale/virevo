@@ -41,10 +41,10 @@ def get_openai_client():
     return _openai_client
 
 async def get_llm_client(provider: str = "openai", api_key: str = None, session=None):
-    """Get LLM client based on provider (openai or grok)
+    """Get LLM client based on provider (openai, grok, or gemini)
     
     Args:
-        provider: "openai" or "grok"
+        provider: "openai", "grok", or "gemini"
         api_key: Optional API key (if not provided, retrieves from session)
         session: CallSession instance (used to retrieve user API keys)
     """
@@ -103,6 +103,62 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
             return None
         except Exception as e:
             logger.error(f"Error creating Grok client: {e}")
+            return None
+    elif provider == "gemini":
+        # Use OpenAI library with Google's OpenAI-compatible API for Gemini
+        try:
+            import openai
+            
+            # Get API key from parameter, session, or environment (fallback)
+            if api_key:
+                gemini_key = api_key
+            elif session:
+                try:
+                    gemini_key = await session.get_api_key("gemini")
+                except ValueError as e:
+                    logger.error(f"Failed to get Gemini API key: {e}")
+                    return None
+            else:
+                gemini_key = os.environ.get('GEMINI_API_KEY')
+            
+            if not gemini_key:
+                logger.error("Gemini API key not found")
+                return None
+            
+            # Create OpenAI client with Google's OpenAI-compatible base URL
+            client = openai.AsyncOpenAI(
+                api_key=gemini_key,
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+            )
+            
+            # Create a wrapper to match our interface
+            class GeminiClient:
+                def __init__(self, openai_client):
+                    self.client = openai_client
+                    
+                async def create_completion(self, messages, model, temperature, max_tokens, stream=False):
+                    """Create a completion using Gemini via Google's OpenAI-compatible API"""
+                    try:
+                        response = await self.client.chat.completions.create(
+                            model=model or "gemini-2.0-flash",
+                            messages=messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens,
+                            stream=stream
+                        )
+                        return response
+                        
+                    except Exception as e:
+                        logger.error(f"Error with Gemini API: {e}")
+                        return None
+                        
+            return GeminiClient(client)
+            
+        except ImportError as e:
+            logger.error(f"OpenAI library not available: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error creating Gemini client: {e}")
             return None
     else:
         # Default to OpenAI
@@ -824,7 +880,7 @@ Generate a short, natural interruption phrase (1 sentence only). Start speaking 
 
             logger.info("🚦 Generating interruption response...")
             
-            if llm_provider == "grok":
+            if llm_provider == "grok" or llm_provider == "gemini":
                 response = await client.create_completion(
                     messages=messages,
                     model=model,
@@ -1037,7 +1093,7 @@ Answer (one word only):"""
             discernment_timeout = settings.get("barge_in_settings", {}).get("discernment_timeout_ms", 1500) / 1000
             
             try:
-                if llm_provider == "grok":
+                if llm_provider == "grok" or llm_provider == "gemini":
                     response = await asyncio.wait_for(
                         client.create_completion(
                             messages=messages,
@@ -1102,14 +1158,22 @@ Answer (one word only):"""
         # Validate model matches provider and fix if mismatched
         grok_models = ["grok-4-1-fast-non-reasoning", "grok-4-fast-non-reasoning", "grok-4-fast-reasoning", "grok-3", "grok-2-1212", "grok-beta", "grok-4-fast"]
         openai_models = ["gpt-4.1-2025-04-14", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"]
+        gemini_models = ["gemini-3-flash-preview", "gemini-3-pro-preview"]
         
         if llm_provider == "grok":
             if model not in grok_models:
                 logger.warning(f"⚠️  Model '{model}' not valid for Grok, using 'grok-3'")
                 model = "grok-3"
+        elif llm_provider == "gemini":
+            if model not in gemini_models:
+                logger.warning(f"⚠️  Model '{model}' not valid for Gemini, using 'gemini-3-flash-preview'")
+                model = "gemini-3-flash-preview"
         else:
             if model in grok_models:
                 logger.warning(f"⚠️  Model '{model}' is a Grok model but provider is OpenAI, using 'gpt-4-turbo'")
+                model = "gpt-4-turbo"
+            elif model in gemini_models:
+                logger.warning(f"⚠️  Model '{model}' is a Gemini model but provider is OpenAI, using 'gpt-4-turbo'")
                 model = "gpt-4-turbo"
         
         logger.info(f"🤖 Using LLM provider: {llm_provider}, model: {model}")
@@ -1117,6 +1181,8 @@ Answer (one word only):"""
         # Get appropriate client
         if llm_provider == "grok":
             client = await self.get_llm_client_for_session("grok")
+        elif llm_provider == "gemini":
+            client = await self.get_llm_client_for_session("gemini")
         else:
             client = await self.get_llm_client_for_session("openai")
         
@@ -1126,7 +1192,7 @@ Answer (one word only):"""
         # Stream LLM response and process sentence by sentence
         llm_request_start = time.time()
         
-        if llm_provider == "grok":
+        if llm_provider == "grok" or llm_provider == "gemini":
             response = await client.create_completion(
                 messages=messages,
                 model=model,
@@ -1161,7 +1227,7 @@ Answer (one word only):"""
                 first_token_received = True
             
             # Extract content from chunk
-            if llm_provider == "grok":
+            if llm_provider == "grok" or llm_provider == "gemini":
                 if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
                     delta = chunk.choices[0].delta
                     if hasattr(delta, 'content') and delta.content:
@@ -1235,14 +1301,22 @@ Answer (one word only):"""
             # Validate model matches provider and fix if mismatched
             grok_models = ["grok-4-1-fast-non-reasoning", "grok-4-fast-non-reasoning", "grok-4-fast-reasoning", "grok-3", "grok-2-1212", "grok-beta", "grok-4-fast"]
             openai_models = ["gpt-4.1-2025-04-14", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"]
+            gemini_models = ["gemini-3-flash-preview", "gemini-3-pro-preview"]
             
             if llm_provider == "grok":
                 if model not in grok_models:
                     logger.warning(f"⚠️  Model '{model}' not valid for Grok, using 'grok-3'")
                     model = "grok-3"
+            elif llm_provider == "gemini":
+                if model not in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' not valid for Gemini, using 'gemini-3-flash-preview'")
+                    model = "gemini-3-flash-preview"
             else:
                 if model in grok_models:
                     logger.warning(f"⚠️  Model '{model}' is a Grok model but provider is OpenAI, using 'gpt-4-turbo'")
+                    model = "gpt-4-turbo"
+                elif model in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' is a Gemini model but provider is OpenAI, using 'gpt-4-turbo'")
                     model = "gpt-4-turbo"
             
             logger.info(f"🤖 Using LLM provider: {llm_provider}, model: {model}")
@@ -1250,6 +1324,8 @@ Answer (one word only):"""
             # Get appropriate client
             if llm_provider == "grok":
                 client = await self.get_llm_client_for_session("grok")
+            elif llm_provider == "gemini":
+                client = await self.get_llm_client_for_session("gemini")
             else:
                 client = await self.get_llm_client_for_session("openai")
                 
@@ -1260,7 +1336,7 @@ Answer (one word only):"""
             llm_request_start = time.time()
             
             # Use the appropriate client method WITH STREAMING for faster TTFT
-            if llm_provider == "grok":
+            if llm_provider == "grok" or llm_provider == "gemini":
                 response = await client.create_completion(
                     messages=messages,
                     model=model,
@@ -2375,8 +2451,8 @@ Answer (one word only):"""
                                     return None
                                 model = self.agent_config.get("model", "gpt-4-turbo")
                                 
-                                if llm_provider == "grok":
-                                    client = await self.get_llm_client_for_session("grok")
+                                if llm_provider == "grok" or llm_provider == "gemini":
+                                    client = await self.get_llm_client_for_session(llm_provider)
                                 else:
                                     client = await self.get_llm_client_for_session("openai")
                                 
@@ -2432,7 +2508,7 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                                         {"role": "system", "content": recovery_instruction}
                                     ] + self.conversation_history  # Full history
                                     
-                                    if llm_provider == "grok":
+                                    if llm_provider == "grok" or llm_provider == "gemini":
                                         response = await client.create_completion(
                                             messages=messages,
                                             model=model,
@@ -2626,8 +2702,8 @@ Use your natural conversational style to handle this smoothly with NEW phrasing.
                 return None
             model = self.agent_config.get("model", "gpt-4")
             
-            if llm_provider == "grok":
-                client = await self.get_llm_client_for_session("grok")
+            if llm_provider == "grok" or llm_provider == "gemini":
+                client = await self.get_llm_client_for_session(llm_provider)
             else:
                 client = await self.get_llm_client_for_session("openai")
             
@@ -2736,7 +2812,7 @@ Your response (just the number):"""
             try:
                 # Call LLM based on provider with timeout wrapper
                 async def call_llm_for_transition():
-                    if llm_provider == "grok":
+                    if llm_provider == "grok" or llm_provider == "gemini":
                         return await client.create_completion(
                             messages=[
                                 {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
@@ -3005,14 +3081,14 @@ Return ONLY a JSON object with the extracted values. If a value was NOT explicit
             logger.info(f"🤖 Using configured LLM provider: {llm_provider} ({model}) for extraction")
             
             # Get appropriate client based on provider
-            if llm_provider == "grok":
-                client = await self.get_llm_client_for_session("grok")
+            if llm_provider == "grok" or llm_provider == "gemini":
+                client = await self.get_llm_client_for_session(llm_provider)
             else:
                 client = await self.get_llm_client_for_session("openai")
             
             # Helper function to make the extraction call
             async def call_extraction():
-                if llm_provider == "grok":
+                if llm_provider == "grok" or llm_provider == "gemini":
                     return await client.create_completion(
                         messages=[{"role": "user", "content": extraction_prompt}],
                         model=model,
@@ -4326,6 +4402,32 @@ But the agent just said this exact phrase. Generate a natural variation that:
                     return response.choices[0].message.content.strip()
                 else:
                     raise Exception("Empty response from Grok")
+            
+            elif llm_provider == "gemini":
+                # Use the proper Gemini client
+                client = await self.get_llm_client_for_session("gemini")
+                if not client:
+                    raise Exception("Gemini client not configured")
+                
+                # Validate model for Gemini
+                gemini_models = ["gemini-3-flash-preview", "gemini-3-pro-preview"]
+                if llm_model not in gemini_models:
+                    llm_model = "gemini-3-flash-preview"
+                
+                # Gemini uses create_completion, not chat.completions.create
+                response = await client.create_completion(
+                    messages=[{"role": "user", "content": base_prompt}],
+                    model=llm_model,
+                    temperature=0.8,
+                    max_tokens=150,
+                    stream=False
+                )
+                
+                # Extract content from Gemini response
+                if hasattr(response, 'choices') and len(response.choices) > 0:
+                    return response.choices[0].message.content.strip()
+                else:
+                    raise Exception("Empty response from Gemini")
                     
             elif llm_provider == "anthropic":
                 from anthropic import AsyncAnthropic
@@ -4594,7 +4696,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         llm_request_start = time.time()
         
         # Call LLM based on provider with streaming
-        if llm_provider == "grok":
+        if llm_provider == "grok" or llm_provider == "gemini":
             response = await client.create_completion(
                 messages=messages,
                 model=model,
@@ -4629,7 +4731,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
                 first_token_received = True
             
             # Extract content from chunk
-            if llm_provider == "grok":
+            if llm_provider == "grok" or llm_provider == "gemini":
                 if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
                     delta = chunk.choices[0].delta
                     if hasattr(delta, 'content') and delta.content:
@@ -4874,14 +4976,22 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
             # Validate model matches provider and fix if mismatched
             grok_models = ["grok-4-1-fast-non-reasoning", "grok-4-fast-non-reasoning", "grok-4-fast-reasoning", "grok-3", "grok-2-1212", "grok-beta", "grok-4-fast"]
             openai_models = ["gpt-4.1-2025-04-14", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"]
+            gemini_models = ["gemini-3-flash-preview", "gemini-3-pro-preview"]
             
             if llm_provider == "grok":
                 if model not in grok_models:
                     logger.warning(f"⚠️  Model '{model}' not valid for Grok, using 'grok-3'")
                     model = "grok-3"
+            elif llm_provider == "gemini":
+                if model not in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' not valid for Gemini, using 'gemini-3-flash-preview'")
+                    model = "gemini-3-flash-preview"
             else:
                 if model in grok_models:
                     logger.warning(f"⚠️  Model '{model}' is a Grok model but provider is OpenAI, using 'gpt-4-turbo'")
+                    model = "gpt-4-turbo"
+                elif model in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' is a Gemini model but provider is OpenAI, using 'gpt-4-turbo'")
                     model = "gpt-4-turbo"
             
             logger.info(f"🤖 Using LLM provider: {llm_provider}, model: {model}")
@@ -4889,6 +4999,8 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
             # Get appropriate client
             if llm_provider == "grok":
                 client = await self.get_llm_client_for_session("grok")
+            elif llm_provider == "gemini":
+                client = await self.get_llm_client_for_session("gemini")
             else:
                 client = await self.get_llm_client_for_session("openai")
                 
@@ -4948,7 +5060,7 @@ IMPORTANT: Based on these instructions, generate a natural, conversational respo
             logger.info(f"🤖 Conversation history: {len(self.conversation_history)} messages (sending last 5)")
             
             # Call LLM based on provider
-            if llm_provider == "grok":
+            if llm_provider == "grok" or llm_provider == "gemini":
                 response = await client.create_completion(
                     messages=messages,
                     model=model,

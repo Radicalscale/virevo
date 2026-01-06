@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Save, 
-  Trash2, 
-  Upload, 
+import {
+  ArrowLeft,
+  Save,
+  Trash2,
+  Upload,
   Plus,
   Brain,
   Mic,
@@ -139,8 +139,8 @@ const LLM_MODELS = {
     { value: 'claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' }
   ],
   gemini: [
-    { value: 'gemini-3.0', label: 'Gemini 3.0' },
-    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' }
+    { value: 'gemini-3-flash-preview', label: 'Gemini 3.0 Flash Preview' },
+    { value: 'gemini-3-pro-preview', label: 'Gemini 3.0 Pro Preview' }
   ]
 };
 
@@ -153,10 +153,10 @@ const QCAgentEditor = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const fileInputRef = useRef(null);
-  
+
   const isNew = !agentId || agentId === 'new';
   const initialType = searchParams.get('type') || 'generic';
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -174,20 +174,20 @@ const QCAgentEditor = () => {
     custom_criteria: '',
     output_format_instructions: ''
   });
-  
+
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [kbItems, setKbItems] = useState([]);
   const [uploadingKB, setUploadingKB] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
-  
+
   // Fetch existing agent
   useEffect(() => {
     if (!isNew) {
       fetchAgent();
     }
   }, [agentId, isNew]);
-  
+
   // Update default prompt when type changes (for new agents)
   useEffect(() => {
     if (isNew && formData.agent_type) {
@@ -197,13 +197,13 @@ const QCAgentEditor = () => {
       }
     }
   }, [formData.agent_type, isNew, initialType]);
-  
+
   const fetchAgent = async () => {
     try {
       setLoading(true);
       const response = await qcAgentsAPI.get(agentId);
       setFormData(response.data);
-      
+
       // Fetch KB items
       try {
         const kbResponse = await qcAgentsAPI.listKB(agentId);
@@ -223,14 +223,14 @@ const QCAgentEditor = () => {
       setLoading(false);
     }
   };
-  
+
   // Handle form changes
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-    
+
     // Reset model when provider changes
     if (field === 'llm_provider') {
       const models = LLM_MODELS[value] || [];
@@ -241,7 +241,7 @@ const QCAgentEditor = () => {
       }));
     }
   };
-  
+
   // Handle save
   const handleSave = async () => {
     if (!formData.name.trim()) {
@@ -252,10 +252,10 @@ const QCAgentEditor = () => {
       });
       return;
     }
-    
+
     try {
       setSaving(true);
-      
+
       if (isNew) {
         const response = await qcAgentsAPI.create(formData);
         toast({
@@ -282,12 +282,12 @@ const QCAgentEditor = () => {
       setSaving(false);
     }
   };
-  
+
   // Handle KB upload
   const handleKBUpload = async (event) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-    
+
     if (isNew) {
       toast({
         title: 'Save First',
@@ -296,23 +296,23 @@ const QCAgentEditor = () => {
       });
       return;
     }
-    
+
     try {
       setUploadingKB(true);
-      
+
       for (const file of files) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', file);
         formDataUpload.append('description', `Uploaded: ${file.name}`);
-        
+
         await qcAgentsAPI.uploadKB(agentId, formDataUpload);
       }
-      
+
       toast({
         title: 'Success',
         description: `${files.length} file(s) uploaded to knowledge base`
       });
-      
+
       // Refresh KB items
       const kbResponse = await qcAgentsAPI.listKB(agentId);
       setKbItems(kbResponse.data || []);
@@ -328,7 +328,7 @@ const QCAgentEditor = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
-  
+
   // Handle KB delete
   const handleKBDelete = async (kbItemId) => {
     try {
@@ -347,7 +347,7 @@ const QCAgentEditor = () => {
       });
     }
   };
-  
+
   // Reset prompt to default
   const resetToDefaultPrompt = () => {
     const defaultPrompt = QC_AGENT_TYPES[formData.agent_type]?.defaultPrompt || '';
@@ -357,10 +357,10 @@ const QCAgentEditor = () => {
       description: 'Prompt reset to default template'
     });
   };
-  
+
   const typeConfig = QC_AGENT_TYPES[formData.agent_type] || QC_AGENT_TYPES.generic;
   const TypeIcon = typeConfig.icon;
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -368,7 +368,7 @@ const QCAgentEditor = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
       {/* Header */}
@@ -387,7 +387,7 @@ const QCAgentEditor = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {!isNew && (
             <Badge variant="outline" className="mr-2">
@@ -400,7 +400,7 @@ const QCAgentEditor = () => {
           </Button>
         </div>
       </div>
-      
+
       {/* Agent Type Selection (only for new agents) */}
       {isNew && (
         <Card className="mb-6">
@@ -413,15 +413,14 @@ const QCAgentEditor = () => {
               {Object.entries(QC_AGENT_TYPES).map(([type, config]) => {
                 const Icon = config.icon;
                 const isSelected = formData.agent_type === type;
-                
+
                 return (
-                  <Card 
+                  <Card
                     key={type}
-                    className={`cursor-pointer transition-all ${
-                      isSelected 
-                        ? `border-2 border-primary ${config.bgColor}` 
+                    className={`cursor-pointer transition-all ${isSelected
+                        ? `border-2 border-primary ${config.bgColor}`
                         : 'hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => handleChange('agent_type', type)}
                   >
                     <CardContent className="p-4 text-center">
@@ -436,7 +435,7 @@ const QCAgentEditor = () => {
           </CardContent>
         </Card>
       )}
-      
+
       {/* Main Form */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
@@ -459,7 +458,7 @@ const QCAgentEditor = () => {
             </TabsTrigger>
           )}
         </TabsList>
-        
+
         {/* General Tab */}
         <TabsContent value="general">
           <Card>
@@ -485,11 +484,11 @@ const QCAgentEditor = () => {
                     placeholder="e.g., Sales Tonality Analyzer"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="mode">Operating Mode</Label>
-                  <Select 
-                    value={formData.mode} 
+                  <Select
+                    value={formData.mode}
                     onValueChange={(v) => handleChange('mode', v)}
                   >
                     <SelectTrigger>
@@ -502,7 +501,7 @@ const QCAgentEditor = () => {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -513,7 +512,7 @@ const QCAgentEditor = () => {
                   rows={3}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between pt-4 border-t">
                 <div>
                   <Label>Active</Label>
@@ -527,7 +526,7 @@ const QCAgentEditor = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* Prompt & Instructions Tab */}
         <TabsContent value="prompt">
           <div className="space-y-6">
@@ -562,7 +561,7 @@ const QCAgentEditor = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             {/* Analysis Focus */}
             <Card>
               <CardHeader>
@@ -580,7 +579,7 @@ const QCAgentEditor = () => {
                 />
               </CardContent>
             </Card>
-            
+
             {/* Custom Criteria */}
             <Card>
               <CardHeader>
@@ -602,7 +601,7 @@ const QCAgentEditor = () => {
                 />
               </CardContent>
             </Card>
-            
+
             {/* Output Format */}
             <Card>
               <CardHeader>
@@ -628,7 +627,7 @@ Provide the analysis in the following format:
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* Knowledge Base Tab */}
         <TabsContent value="kb">
           <Card>
@@ -652,7 +651,7 @@ Provide the analysis in the following format:
                     multiple
                     onChange={handleKBUpload}
                   />
-                  <Button 
+                  <Button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingKB || isNew}
                   >
@@ -695,7 +694,7 @@ Provide the analysis in the following format:
                     {kbItems.length} file(s) uploaded. These documents provide context for the agent&apos;s analysis.
                   </div>
                   {kbItems.map((item) => (
-                    <div 
+                    <div
                       key={item.id}
                       className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border"
                     >
@@ -705,8 +704,8 @@ Provide the analysis in the following format:
                           <p className="font-medium">{item.source_name}</p>
                           <div className="flex items-center gap-2 text-xs text-gray-500">
                             <span>
-                              {item.file_size > 0 
-                                ? item.file_size > 1024 * 1024 
+                              {item.file_size > 0
+                                ? item.file_size > 1024 * 1024
                                   ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB`
                                   : `${(item.file_size / 1024).toFixed(1)} KB`
                                 : 'Size unknown'}
@@ -732,7 +731,7 @@ Provide the analysis in the following format:
                   ))}
                 </div>
               )}
-              
+
               {/* KB Usage Tips */}
               <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2">
@@ -750,7 +749,7 @@ Provide the analysis in the following format:
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* LLM Settings Tab */}
         <TabsContent value="llm">
           <Card>
@@ -762,8 +761,8 @@ Provide the analysis in the following format:
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>LLM Provider</Label>
-                  <Select 
-                    value={formData.llm_provider} 
+                  <Select
+                    value={formData.llm_provider}
                     onValueChange={(v) => handleChange('llm_provider', v)}
                   >
                     <SelectTrigger>
@@ -778,11 +777,11 @@ Provide the analysis in the following format:
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label>Model</Label>
-                  <Select 
-                    value={formData.llm_model} 
+                  <Select
+                    value={formData.llm_model}
                     onValueChange={(v) => handleChange('llm_model', v)}
                   >
                     <SelectTrigger>
@@ -798,7 +797,7 @@ Provide the analysis in the following format:
                   </Select>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <h4 className="font-medium mb-2">Model Recommendations</h4>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
@@ -810,7 +809,7 @@ Provide the analysis in the following format:
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* Analysis Rules Tab */}
         <TabsContent value="rules">
           <Card>
@@ -834,7 +833,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Include SSML/Prosody</Label>
@@ -848,7 +847,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Analyze Energy Matching</Label>
@@ -864,7 +863,7 @@ Provide the analysis in the following format:
                   </div>
                 </div>
               )}
-              
+
               {formData.agent_type === 'language_pattern' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -880,7 +879,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Focus on Brevity</Label>
@@ -894,7 +893,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Check Script Adherence</Label>
@@ -908,7 +907,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Suggest Rewrites</Label>
@@ -924,7 +923,7 @@ Provide the analysis in the following format:
                   </div>
                 </div>
               )}
-              
+
               {formData.agent_type === 'tech_issues' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -940,7 +939,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Generate AI Coder Prompt</Label>
@@ -954,7 +953,7 @@ Provide the analysis in the following format:
                       })}
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Classify Issue Severity</Label>
@@ -970,7 +969,7 @@ Provide the analysis in the following format:
                   </div>
                 </div>
               )}
-              
+
               {formData.agent_type === 'generic' && (
                 <div className="text-center py-8 text-gray-500">
                   <Brain className="h-12 w-12 mx-auto mb-3 text-gray-400" />
@@ -981,7 +980,7 @@ Provide the analysis in the following format:
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* Learning & Memory Tab */}
         {!isNew && formData.agent_type !== 'tech_issues' && (
           <TabsContent value="learning">

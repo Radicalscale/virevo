@@ -5,7 +5,7 @@ import uuid
 
 # API Key Management Models
 class APIKeyCreate(BaseModel):
-    service_name: str  # "openai", "deepgram", "elevenlabs", "grok", "hume"
+    service_name: str  # "openai", "deepgram", "elevenlabs", "grok", "hume", "gemini"
     api_key: str
     
 class APIKey(BaseModel):
@@ -117,7 +117,7 @@ class AgentSettings(BaseModel):
     tts_speed: float = 1.0
     
     # Advanced Provider Settings
-    llm_provider: str = "openai"  # "openai" or "grok"
+    llm_provider: str = "openai"  # "openai", "grok", or "gemini"
     tts_provider: str = "cartesia"  # "elevenlabs", "hume", "cartesia", "kokoro", "chattts", etc.
     stt_provider: str = "deepgram"  # "deepgram", "assemblyai", or "soniox"
     
