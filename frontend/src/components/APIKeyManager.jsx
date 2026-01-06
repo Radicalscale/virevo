@@ -36,6 +36,14 @@ const API_SERVICES = [
     required: false
   },
   {
+    name: 'gemini',
+    label: 'Gemini (Google)',
+    description: 'Alternative LLM provider - Google AI',
+    placeholder: 'AIza...',
+    getKeyUrl: 'https://aistudio.google.com/app/apikey',
+    required: false
+  },
+  {
     name: 'hume',
     label: 'Hume AI',
     description: 'Alternative TTS provider with emotional voices',
