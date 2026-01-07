@@ -1695,99 +1695,83 @@ const AgentForm = () => {
                   </div>
                 </div>
               )}
-              value={formData.settings?.hume_settings?.description || ''}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  hume_settings: {
-                    ...formData.settings?.hume_settings,
-                    description: e.target.value
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-1"
-                    />
-              <p className="text-xs text-gray-500 mt-1">Describe the emotional tone of the voice</p>
-            </div>
-          </div>
+
+
+              {/* Sesame TTS Settings */}
+              {formData.settings?.tts_provider === 'sesame' && (
+                <div className="space-y-4 border-t border-gray-700 pt-4">
+                  <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-3 mb-4">
+                    <p className="text-purple-400 text-sm font-semibold">🎙️ Custom Sesame TTS (RunPod)</p>
+                    <p className="text-purple-300 text-xs mt-1">24kHz WAV audio, optimized for Telnyx</p>
+                  </div>
+
+                  <Label className="text-gray-300 font-semibold block">Sesame TTS Settings</Label>
+
+                  <div>
+                    <Label className="text-gray-400 text-sm">Speaker ID (Voice)</Label>
+                    <Select
+                      value={String(formData.settings?.sesame_settings?.speaker_id ?? 0)}
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          sesame_settings: {
+                            ...formData.settings?.sesame_settings,
+                            speaker_id: parseInt(value)
+                          }
+                        }
+                      })}
+                    >
+                      <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 border-gray-700">
+                        <SelectItem value="0">Speaker 0</SelectItem>
+                        <SelectItem value="1">Speaker 1</SelectItem>
+                        <SelectItem value="2">Speaker 2</SelectItem>
+                        <SelectItem value="3">Speaker 3</SelectItem>
+                        <SelectItem value="4">Speaker 4</SelectItem>
+                        <SelectItem value="5">Speaker 5</SelectItem>
+                        <SelectItem value="6">Speaker 6</SelectItem>
+                        <SelectItem value="7">Speaker 7</SelectItem>
+                        <SelectItem value="8">Speaker 8</SelectItem>
+                        <SelectItem value="9">Speaker 9</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">Select speaker voice (0-9)</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-gray-400 text-sm">Output Format</Label>
+                    <Select
+                      value={formData.settings?.sesame_settings?.output_format || 'wav'}
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          sesame_settings: {
+                            ...formData.settings?.sesame_settings,
+                            output_format: value
+                          }
+                        }
+                      })}
+                    >
+                      <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 border-gray-700">
+                        <SelectItem value="wav">WAV (Recommended - 24kHz PCM)</SelectItem>
+                        <SelectItem value="mp3">MP3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">Audio output format</p>
+                  </div>
+                </div>
               )}
 
-          {/* Sesame TTS Settings */}
-          {formData.settings?.tts_provider === 'sesame' && (
-            <div className="space-y-4 border-t border-gray-700 pt-4">
-              <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-3 mb-4">
-                <p className="text-purple-400 text-sm font-semibold">🎙️ Custom Sesame TTS (RunPod)</p>
-                <p className="text-purple-300 text-xs mt-1">24kHz WAV audio, optimized for Telnyx</p>
-              </div>
-
-              <Label className="text-gray-300 font-semibold block">Sesame TTS Settings</Label>
-
-              <div>
-                <Label className="text-gray-400 text-sm">Speaker ID (Voice)</Label>
-                <Select
-                  value={String(formData.settings?.sesame_settings?.speaker_id ?? 0)}
-                  onValueChange={(value) => setFormData({
-                    ...formData,
-                    settings: {
-                      ...formData.settings,
-                      sesame_settings: {
-                        ...formData.settings?.sesame_settings,
-                        speaker_id: parseInt(value)
-                      }
-                    }
-                  })}
-                >
-                  <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-700">
-                    <SelectItem value="0">Speaker 0</SelectItem>
-                    <SelectItem value="1">Speaker 1</SelectItem>
-                    <SelectItem value="2">Speaker 2</SelectItem>
-                    <SelectItem value="3">Speaker 3</SelectItem>
-                    <SelectItem value="4">Speaker 4</SelectItem>
-                    <SelectItem value="5">Speaker 5</SelectItem>
-                    <SelectItem value="6">Speaker 6</SelectItem>
-                    <SelectItem value="7">Speaker 7</SelectItem>
-                    <SelectItem value="8">Speaker 8</SelectItem>
-                    <SelectItem value="9">Speaker 9</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500 mt-1">Select speaker voice (0-9)</p>
-              </div>
-
-              <div>
-                <Label className="text-gray-400 text-sm">Output Format</Label>
-                <Select
-                  value={formData.settings?.sesame_settings?.output_format || 'wav'}
-                  onValueChange={(value) => setFormData({
-                    ...formData,
-                    settings: {
-                      ...formData.settings,
-                      sesame_settings: {
-                        ...formData.settings?.sesame_settings,
-                        output_format: value
-                      }
-                    }
-                  })}
-                >
-                  <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-700">
-                    <SelectItem value="wav">WAV (Recommended - 24kHz PCM)</SelectItem>
-                    <SelectItem value="mp3">MP3</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500 mt-1">Audio output format</p>
-              </div>
-            </div>
-          )}
-
-          {/* MeloTTS Settings */}
-          {/* MeloTTS Settings - DISABLED */}
-          {/* {formData.settings?.tts_provider === 'melo' && (
+              {/* MeloTTS Settings */}
+              {/* MeloTTS Settings - DISABLED */}
+              {/* {formData.settings?.tts_provider === 'melo' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <div className="bg-green-900/20 border border-green-700 rounded-lg p-3 mb-4">
                     <p className="text-green-400 text-sm font-semibold">🎤 MeloTTS - Open Source</p>
@@ -1852,696 +1836,696 @@ const AgentForm = () => {
                 </div>
               )} */}
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-            <strong>Note:</strong> API keys for these services must be configured in Settings. Go to Settings → API Key Management.
-          </div>
-        </div>
-      </details>
-
-      {/* Dead Air Prevention Settings */}
-      <details className="border border-gray-700 rounded-lg bg-gray-900">
-        <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
-          🔇 Dead Air Prevention & Call Management
-        </summary>
-        <div className="p-4 border-t border-gray-700 space-y-6">
-          <p className="text-gray-400 text-sm mb-4">
-            Configure automatic check-ins when the user goes silent and set maximum call duration limits.
-            These settings help maintain engagement and prevent abandoned calls.
-          </p>
-
-          {/* Normal Silence Timeout */}
-          <div>
-            <Label className="text-gray-300 font-semibold">Normal Silence Timeout (seconds)</Label>
-            <Input
-              type="number"
-              min="1"
-              max="60"
-              value={formData.settings?.dead_air_settings?.silence_timeout_normal ?? 7}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  dead_air_settings: {
-                    ...formData.settings?.dead_air_settings,
-                    silence_timeout_normal: parseInt(e.target.value) || 7
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              How long to wait (in seconds) before checking in when the user goes silent
-            </p>
-          </div>
-
-          {/* Hold On Silence Timeout */}
-          <div>
-            <Label className="text-gray-300 font-semibold">"Hold On" Silence Timeout (seconds)</Label>
-            <Input
-              type="number"
-              min="1"
-              max="120"
-              value={formData.settings?.dead_air_settings?.silence_timeout_hold_on ?? 25}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  dead_air_settings: {
-                    ...formData.settings?.dead_air_settings,
-                    silence_timeout_hold_on: parseInt(e.target.value) || 25
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Longer timeout when user says "hold on", "wait", "one moment", etc. (allows time for user to handle something)
-            </p>
-          </div>
-
-          {/* Max Check-ins */}
-          <div>
-            <Label className="text-gray-300 font-semibold">Max Check-ins Before Disconnect</Label>
-            <Input
-              type="number"
-              min="1"
-              max="10"
-              value={formData.settings?.dead_air_settings?.max_checkins_before_disconnect ?? 2}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  dead_air_settings: {
-                    ...formData.settings?.dead_air_settings,
-                    max_checkins_before_disconnect: parseInt(e.target.value) || 2
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Call will end after this many unanswered check-ins per silence period (resets when user responds)
-            </p>
-          </div>
-
-          {/* Max Call Duration */}
-          <div>
-            <Label className="text-gray-300 font-semibold">Max Call Duration (minutes)</Label>
-            <Input
-              type="number"
-              min="1"
-              max="120"
-              value={Math.round((formData.settings?.dead_air_settings?.max_call_duration ?? 1500) / 60)}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  dead_air_settings: {
-                    ...formData.settings?.dead_air_settings,
-                    max_call_duration: parseInt(e.target.value) * 60 || 1500
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Call will automatically end after this duration, regardless of activity (prevents runaway calls)
-            </p>
-          </div>
-
-          {/* Check-in Message */}
-          <div>
-            <Label className="text-gray-300 font-semibold">Check-in Message</Label>
-            <Input
-              type="text"
-              placeholder="Are you still there?"
-              value={formData.settings?.dead_air_settings?.checkin_message ?? "Are you still there?"}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  dead_air_settings: {
-                    ...formData.settings?.dead_air_settings,
-                    checkin_message: e.target.value || "Are you still there?"
-                  }
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Custom message the agent will say when checking in with a silent user
-            </p>
-          </div>
-
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
-            <div className="flex items-start gap-2">
-              <span className="text-blue-400 text-lg">ℹ️</span>
-              <div className="text-xs text-blue-200">
-                <strong>How it works:</strong> The system only counts silence between when the agent stops speaking and when the user starts.
-                Time when either party is speaking is not counted. After a check-in, if the user responds, the count resets.
-                This prevents accidental disconnects while maintaining natural conversation flow.
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                <strong>Note:</strong> API keys for these services must be configured in Settings. Go to Settings → API Key Management.
               </div>
             </div>
-          </div>
-        </div>
-      </details>
+          </details>
 
-      {/* Call Control (Barge-In) Settings */}
-      <details className="border border-gray-700 rounded-lg bg-gray-900">
-        <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
-          🚦 Call Control (Rambler Interruption)
-        </summary>
-        <div className="p-4 border-t border-gray-700 space-y-6">
-          <p className="text-gray-400 text-sm mb-4">
-            Configure when the agent should interrupt a user who is speaking for too long.
-            This prevents filibustering and keeps the conversation on track.
-          </p>
-
-          {/* Enable Barge-In */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.settings?.barge_in_settings?.enable_verbose_barge_in ?? false}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  barge_in_settings: {
-                    ...formData.settings?.barge_in_settings,
-                    enable_verbose_barge_in: e.target.checked
-                  }
-                }
-              })}
-              className="w-4 h-4"
-            />
-            <Label className="text-gray-300">Enable Rambler Interruption</Label>
-          </div>
-          <p className="text-xs text-gray-500 ml-6">
-            Agent will interrupt the user if they speak continuously beyond the threshold
-          </p>
-
-          {/* Word Count Threshold */}
-          <div>
-            <Label className="text-gray-300 font-semibold">
-              Word Count Threshold: {formData.settings?.barge_in_settings?.word_count_threshold ?? 50} words
-            </Label>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              step="5"
-              value={formData.settings?.barge_in_settings?.word_count_threshold ?? 50}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  barge_in_settings: {
-                    ...formData.settings?.barge_in_settings,
-                    word_count_threshold: parseInt(e.target.value)
-                  }
-                }
-              })}
-              disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
-              className="w-full mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Interrupt after the user speaks this many words continuously (lower = more aggressive)
-            </p>
-          </div>
-
-          {/* Interruption Prompt */}
-          <div>
-            <Label className="text-gray-300 font-semibold">Interruption Prompt</Label>
-            <Textarea
-              placeholder="The user is speaking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."
-              value={formData.settings?.barge_in_settings?.interruption_prompt || ''}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  barge_in_settings: {
-                    ...formData.settings?.barge_in_settings,
-                    interruption_prompt: e.target.value
-                  }
-                }
-              })}
-              disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
-              className="bg-gray-900 border-gray-700 text-white mt-2"
-              rows={3}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Instructions for how the AI should interrupt the user. Leave empty for default behavior.
-            </p>
-          </div>
-
-          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mt-4">
-            <div className="flex items-start gap-2">
-              <span className="text-red-400 text-lg">⚠️</span>
-              <div className="text-xs text-red-200">
-                <strong>Safeguards:</strong> The agent will NOT interrupt if:
-                <ul className="list-disc ml-4 mt-1">
-                  <li>A webhook is currently executing</li>
-                  <li>Another interruption happened in the last 15 seconds (cooldown)</li>
-                  <li>The user stops talking before the interruption is ready (Ghost Prevention)</li>
-                </ul>
-                Individual nodes can override or disable this setting in the Flow Builder.
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      {/* Voicemail & IVR Detection Settings */}
-      <details className="border border-gray-700 rounded-lg bg-gray-900">
-        <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
-          🤖 Voicemail & IVR Detection (Hybrid)
-        </summary>
-        <div className="p-4 border-t border-gray-700 space-y-6">
-          <p className="text-gray-400 text-sm mb-4">
-            Automatically detect and disconnect voicemail greetings and automated phone systems (IVR).
-            Uses both Telnyx's ML-powered detection and real-time AI analysis for maximum accuracy.
-          </p>
-
-          {/* Enable Detection */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.settings?.voicemail_detection?.enabled ?? true}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  voicemail_detection: {
-                    ...formData.settings?.voicemail_detection,
-                    enabled: e.target.checked
-                  }
-                }
-              })}
-              className="w-4 h-4"
-            />
-            <Label className="text-gray-300">Enable Voicemail/IVR Detection</Label>
-          </div>
-
-          {/* Telnyx AMD */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.settings?.voicemail_detection?.use_telnyx_amd ?? true}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  voicemail_detection: {
-                    ...formData.settings?.voicemail_detection,
-                    use_telnyx_amd: e.target.checked
-                  }
-                }
-              })}
-              className="w-4 h-4"
-              disabled={!formData.settings?.voicemail_detection?.enabled}
-            />
-            <Label className="text-gray-300">Use Telnyx AMD (First Line of Defense)</Label>
-          </div>
-          <p className="text-xs text-gray-500 ml-6">
-            ML-powered detection at call answer. Premium: $0.0065/call, Standard: $0.002/call
-          </p>
-
-          {/* AMD Mode */}
-          {formData.settings?.voicemail_detection?.use_telnyx_amd && (
-            <div className="ml-6">
-              <Label className="text-gray-300 font-semibold">Telnyx AMD Mode</Label>
-              <Select
-                value={formData.settings?.voicemail_detection?.telnyx_amd_mode || 'premium'}
-                onValueChange={(value) => setFormData({
-                  ...formData,
-                  settings: {
-                    ...formData.settings,
-                    voicemail_detection: {
-                      ...formData.settings?.voicemail_detection,
-                      telnyx_amd_mode: value
-                    }
-                  }
-                })}
-              >
-                <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-700">
-                  <SelectItem value="premium">Premium ($0.0065) - Most Accurate</SelectItem>
-                  <SelectItem value="standard">Standard ($0.002) - Basic</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">
-                Premium uses advanced ML for higher accuracy and detects greeting end
+          {/* Dead Air Prevention Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🔇 Dead Air Prevention & Call Management
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-6">
+              <p className="text-gray-400 text-sm mb-4">
+                Configure automatic check-ins when the user goes silent and set maximum call duration limits.
+                These settings help maintain engagement and prevent abandoned calls.
               </p>
+
+              {/* Normal Silence Timeout */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Normal Silence Timeout (seconds)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={formData.settings?.dead_air_settings?.silence_timeout_normal ?? 7}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      dead_air_settings: {
+                        ...formData.settings?.dead_air_settings,
+                        silence_timeout_normal: parseInt(e.target.value) || 7
+                      }
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  How long to wait (in seconds) before checking in when the user goes silent
+                </p>
+              </div>
+
+              {/* Hold On Silence Timeout */}
+              <div>
+                <Label className="text-gray-300 font-semibold">"Hold On" Silence Timeout (seconds)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={formData.settings?.dead_air_settings?.silence_timeout_hold_on ?? 25}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      dead_air_settings: {
+                        ...formData.settings?.dead_air_settings,
+                        silence_timeout_hold_on: parseInt(e.target.value) || 25
+                      }
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Longer timeout when user says "hold on", "wait", "one moment", etc. (allows time for user to handle something)
+                </p>
+              </div>
+
+              {/* Max Check-ins */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Max Check-ins Before Disconnect</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={formData.settings?.dead_air_settings?.max_checkins_before_disconnect ?? 2}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      dead_air_settings: {
+                        ...formData.settings?.dead_air_settings,
+                        max_checkins_before_disconnect: parseInt(e.target.value) || 2
+                      }
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Call will end after this many unanswered check-ins per silence period (resets when user responds)
+                </p>
+              </div>
+
+              {/* Max Call Duration */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Max Call Duration (minutes)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={Math.round((formData.settings?.dead_air_settings?.max_call_duration ?? 1500) / 60)}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      dead_air_settings: {
+                        ...formData.settings?.dead_air_settings,
+                        max_call_duration: parseInt(e.target.value) * 60 || 1500
+                      }
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Call will automatically end after this duration, regardless of activity (prevents runaway calls)
+                </p>
+              </div>
+
+              {/* Check-in Message */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Check-in Message</Label>
+                <Input
+                  type="text"
+                  placeholder="Are you still there?"
+                  value={formData.settings?.dead_air_settings?.checkin_message ?? "Are you still there?"}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      dead_air_settings: {
+                        ...formData.settings?.dead_air_settings,
+                        checkin_message: e.target.value || "Are you still there?"
+                      }
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Custom message the agent will say when checking in with a silent user
+                </p>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">ℹ️</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>How it works:</strong> The system only counts silence between when the agent stops speaking and when the user starts.
+                    Time when either party is speaking is not counted. After a check-in, if the user responds, the count resets.
+                    This prevents accidental disconnects while maintaining natural conversation flow.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Call Control (Barge-In) Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🚦 Call Control (Rambler Interruption)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-6">
+              <p className="text-gray-400 text-sm mb-4">
+                Configure when the agent should interrupt a user who is speaking for too long.
+                This prevents filibustering and keeps the conversation on track.
+              </p>
+
+              {/* Enable Barge-In */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.barge_in_settings?.enable_verbose_barge_in ?? false}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        enable_verbose_barge_in: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                />
+                <Label className="text-gray-300">Enable Rambler Interruption</Label>
+              </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Agent will interrupt the user if they speak continuously beyond the threshold
+              </p>
+
+              {/* Word Count Threshold */}
+              <div>
+                <Label className="text-gray-300 font-semibold">
+                  Word Count Threshold: {formData.settings?.barge_in_settings?.word_count_threshold ?? 50} words
+                </Label>
+                <input
+                  type="range"
+                  min="10"
+                  max="100"
+                  step="5"
+                  value={formData.settings?.barge_in_settings?.word_count_threshold ?? 50}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        word_count_threshold: parseInt(e.target.value)
+                      }
+                    }
+                  })}
+                  disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
+                  className="w-full mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Interrupt after the user speaks this many words continuously (lower = more aggressive)
+                </p>
+              </div>
+
+              {/* Interruption Prompt */}
+              <div>
+                <Label className="text-gray-300 font-semibold">Interruption Prompt</Label>
+                <Textarea
+                  placeholder="The user is speaking for a long time. Interrupt them politely but firmly to acknowledge what they said and guide the conversation back to the goal."
+                  value={formData.settings?.barge_in_settings?.interruption_prompt || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      barge_in_settings: {
+                        ...formData.settings?.barge_in_settings,
+                        interruption_prompt: e.target.value
+                      }
+                    }
+                  })}
+                  disabled={!formData.settings?.barge_in_settings?.enable_verbose_barge_in}
+                  className="bg-gray-900 border-gray-700 text-white mt-2"
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Instructions for how the AI should interrupt the user. Leave empty for default behavior.
+                </p>
+              </div>
+
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-400 text-lg">⚠️</span>
+                  <div className="text-xs text-red-200">
+                    <strong>Safeguards:</strong> The agent will NOT interrupt if:
+                    <ul className="list-disc ml-4 mt-1">
+                      <li>A webhook is currently executing</li>
+                      <li>Another interruption happened in the last 15 seconds (cooldown)</li>
+                      <li>The user stops talking before the interruption is ready (Ghost Prevention)</li>
+                    </ul>
+                    Individual nodes can override or disable this setting in the Flow Builder.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Voicemail & IVR Detection Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🤖 Voicemail & IVR Detection (Hybrid)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-6">
+              <p className="text-gray-400 text-sm mb-4">
+                Automatically detect and disconnect voicemail greetings and automated phone systems (IVR).
+                Uses both Telnyx's ML-powered detection and real-time AI analysis for maximum accuracy.
+              </p>
+
+              {/* Enable Detection */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.voicemail_detection?.enabled ?? true}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      voicemail_detection: {
+                        ...formData.settings?.voicemail_detection,
+                        enabled: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                />
+                <Label className="text-gray-300">Enable Voicemail/IVR Detection</Label>
+              </div>
+
+              {/* Telnyx AMD */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.voicemail_detection?.use_telnyx_amd ?? true}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      voicemail_detection: {
+                        ...formData.settings?.voicemail_detection,
+                        use_telnyx_amd: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                  disabled={!formData.settings?.voicemail_detection?.enabled}
+                />
+                <Label className="text-gray-300">Use Telnyx AMD (First Line of Defense)</Label>
+              </div>
+              <p className="text-xs text-gray-500 ml-6">
+                ML-powered detection at call answer. Premium: $0.0065/call, Standard: $0.002/call
+              </p>
+
+              {/* AMD Mode */}
+              {formData.settings?.voicemail_detection?.use_telnyx_amd && (
+                <div className="ml-6">
+                  <Label className="text-gray-300 font-semibold">Telnyx AMD Mode</Label>
+                  <Select
+                    value={formData.settings?.voicemail_detection?.telnyx_amd_mode || 'premium'}
+                    onValueChange={(value) => setFormData({
+                      ...formData,
+                      settings: {
+                        ...formData.settings,
+                        voicemail_detection: {
+                          ...formData.settings?.voicemail_detection,
+                          telnyx_amd_mode: value
+                        }
+                      }
+                    })}
+                  >
+                    <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="premium">Premium ($0.0065) - Most Accurate</SelectItem>
+                      <SelectItem value="standard">Standard ($0.002) - Basic</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Premium uses advanced ML for higher accuracy and detects greeting end
+                  </p>
+                </div>
+              )}
+
+              {/* LLM Detection */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.voicemail_detection?.use_llm_detection ?? true}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      voicemail_detection: {
+                        ...formData.settings?.voicemail_detection,
+                        use_llm_detection: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                  disabled={!formData.settings?.voicemail_detection?.enabled}
+                />
+                <Label className="text-gray-300">Use AI Detection (Second Line of Defense)</Label>
+              </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Real-time pattern matching during conversation. Zero latency, runs in parallel.
+              </p>
+
+              {/* Auto Disconnect */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.settings?.voicemail_detection?.disconnect_on_detection ?? true}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      voicemail_detection: {
+                        ...formData.settings?.voicemail_detection,
+                        disconnect_on_detection: e.target.checked
+                      }
+                    }
+                  })}
+                  className="w-4 h-4"
+                  disabled={!formData.settings?.voicemail_detection?.enabled}
+                />
+                <Label className="text-gray-300">Auto-Disconnect on Detection</Label>
+              </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Automatically hang up when voicemail or IVR is detected
+              </p>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">🛡️</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>Hybrid Detection:</strong> Telnyx AMD detects at call answer (voicemail, business greeting).
+                    AI detection monitors during the call for IVR menus ("press 1 for sales") that appear mid-conversation.
+                    Together, they provide comprehensive protection with zero latency impact.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Post-Call Webhook Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              🔗 Post-Call Webhook (Optional)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-4">
+              <p className="text-gray-400 text-sm mb-4">
+                Send call transcript and details to an external webhook (n8n, Zapier, Make, etc.) when calls end.
+                This is useful for custom analytics, CRM updates, or AI-powered call analysis.
+              </p>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="webhook-active"
+                      checked={formData.settings?.post_call_webhook_url ? formData.settings?.post_call_webhook_active !== false : false}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          post_call_webhook_active: e.target.checked
+                        }
+                      })}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <Label htmlFor="webhook-active" className="text-sm text-gray-300 cursor-pointer">
+                      Enable Webhook
+                    </Label>
+                  </div>
+                </div>
+                <Input
+                  type="url"
+                  placeholder="https://your-n8n-instance.com/webhook/your-webhook-id"
+                  value={formData.settings?.post_call_webhook_url || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      post_call_webhook_url: e.target.value,
+                      // Auto-enable when URL is entered (for backwards compatibility)
+                      post_call_webhook_active: e.target.value ? (formData.settings?.post_call_webhook_active !== false ? true : formData.settings?.post_call_webhook_active) : formData.settings?.post_call_webhook_active
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter your webhook URL and check "Enable Webhook" to activate.
+                </p>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">📤</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>Webhook Payload:</strong> The webhook will receive: call_id, agent_name, transcript (full array),
+                    duration, status, from_number, to_number, extracted_variables, custom_variables, and timestamps.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Call Started Webhook Settings */}
+          <details className="border border-gray-700 rounded-lg bg-gray-900">
+            <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
+              📞 Call Started Webhook (Optional)
+            </summary>
+            <div className="p-4 border-t border-gray-700 space-y-4">
+              <p className="text-gray-400 text-sm mb-4">
+                Send a notification to an external webhook the moment a call is answered.
+                Useful for tracking when calls are placed to leads, triggering CRM updates, or real-time dashboards.
+              </p>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-gray-300 font-semibold">Webhook URL</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="call-started-webhook-active"
+                      checked={formData.settings?.call_started_webhook_url ? formData.settings?.call_started_webhook_active !== false : false}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          call_started_webhook_active: e.target.checked
+                        }
+                      })}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <Label htmlFor="call-started-webhook-active" className="text-sm text-gray-300 cursor-pointer">
+                      Enable Webhook
+                    </Label>
+                  </div>
+                </div>
+                <Input
+                  type="url"
+                  placeholder="https://your-webhook.com/call-started"
+                  value={formData.settings?.call_started_webhook_url || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    settings: {
+                      ...formData.settings,
+                      call_started_webhook_url: e.target.value,
+                      // Auto-enable when URL is entered (for backwards compatibility)
+                      call_started_webhook_active: e.target.value ? (formData.settings?.call_started_webhook_active !== false ? true : formData.settings?.call_started_webhook_active) : formData.settings?.call_started_webhook_active
+                    }
+                  })}
+                  className="bg-gray-900 border-gray-700 text-white mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter your webhook URL and check "Enable Webhook" to activate.
+                </p>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-400 text-lg">📤</span>
+                  <div className="text-xs text-blue-200">
+                    <strong>Webhook Payload:</strong> The webhook will receive: event ("call.started"), call_id, agent_name,
+                    from_number, to_number, direction, and start_time.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Auto QC Settings Section - Only for existing agents */}
+          {isEdit && (
+            <div className="mt-6">
+              <AutoQCSettings agentId={id} agentName={formData.name} />
             </div>
           )}
 
-          {/* LLM Detection */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.settings?.voicemail_detection?.use_llm_detection ?? true}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  voicemail_detection: {
-                    ...formData.settings?.voicemail_detection,
-                    use_llm_detection: e.target.checked
-                  }
-                }
-              })}
-              className="w-4 h-4"
-              disabled={!formData.settings?.voicemail_detection?.enabled}
-            />
-            <Label className="text-gray-300">Use AI Detection (Second Line of Defense)</Label>
-          </div>
-          <p className="text-xs text-gray-500 ml-6">
-            Real-time pattern matching during conversation. Zero latency, runs in parallel.
-          </p>
-
-          {/* Auto Disconnect */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.settings?.voicemail_detection?.disconnect_on_detection ?? true}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  voicemail_detection: {
-                    ...formData.settings?.voicemail_detection,
-                    disconnect_on_detection: e.target.checked
-                  }
-                }
-              })}
-              className="w-4 h-4"
-              disabled={!formData.settings?.voicemail_detection?.enabled}
-            />
-            <Label className="text-gray-300">Auto-Disconnect on Detection</Label>
-          </div>
-          <p className="text-xs text-gray-500 ml-6">
-            Automatically hang up when voicemail or IVR is detected
-          </p>
-
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
-            <div className="flex items-start gap-2">
-              <span className="text-blue-400 text-lg">🛡️</span>
-              <div className="text-xs text-blue-200">
-                <strong>Hybrid Detection:</strong> Telnyx AMD detects at call answer (voicemail, business greeting).
-                AI detection monitors during the call for IVR menus ("press 1 for sales") that appear mid-conversation.
-                Together, they provide comprehensive protection with zero latency impact.
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      {/* Post-Call Webhook Settings */}
-      <details className="border border-gray-700 rounded-lg bg-gray-900">
-        <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
-          🔗 Post-Call Webhook (Optional)
-        </summary>
-        <div className="p-4 border-t border-gray-700 space-y-4">
-          <p className="text-gray-400 text-sm mb-4">
-            Send call transcript and details to an external webhook (n8n, Zapier, Make, etc.) when calls end.
-            This is useful for custom analytics, CRM updates, or AI-powered call analysis.
-          </p>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label className="text-gray-300 font-semibold">Webhook URL</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="webhook-active"
-                  checked={formData.settings?.post_call_webhook_url ? formData.settings?.post_call_webhook_active !== false : false}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    settings: {
-                      ...formData.settings,
-                      post_call_webhook_active: e.target.checked
-                    }
-                  })}
-                  className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <Label htmlFor="webhook-active" className="text-sm text-gray-300 cursor-pointer">
-                  Enable Webhook
-                </Label>
-              </div>
-            </div>
-            <Input
-              type="url"
-              placeholder="https://your-n8n-instance.com/webhook/your-webhook-id"
-              value={formData.settings?.post_call_webhook_url || ''}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  post_call_webhook_url: e.target.value,
-                  // Auto-enable when URL is entered (for backwards compatibility)
-                  post_call_webhook_active: e.target.value ? (formData.settings?.post_call_webhook_active !== false ? true : formData.settings?.post_call_webhook_active) : formData.settings?.post_call_webhook_active
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Enter your webhook URL and check "Enable Webhook" to activate.
-            </p>
-          </div>
-
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
-            <div className="flex items-start gap-2">
-              <span className="text-blue-400 text-lg">📤</span>
-              <div className="text-xs text-blue-200">
-                <strong>Webhook Payload:</strong> The webhook will receive: call_id, agent_name, transcript (full array),
-                duration, status, from_number, to_number, extracted_variables, custom_variables, and timestamps.
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      {/* Call Started Webhook Settings */}
-      <details className="border border-gray-700 rounded-lg bg-gray-900">
-        <summary className="cursor-pointer p-4 font-semibold text-white hover:bg-gray-800">
-          📞 Call Started Webhook (Optional)
-        </summary>
-        <div className="p-4 border-t border-gray-700 space-y-4">
-          <p className="text-gray-400 text-sm mb-4">
-            Send a notification to an external webhook the moment a call is answered.
-            Useful for tracking when calls are placed to leads, triggering CRM updates, or real-time dashboards.
-          </p>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label className="text-gray-300 font-semibold">Webhook URL</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="call-started-webhook-active"
-                  checked={formData.settings?.call_started_webhook_url ? formData.settings?.call_started_webhook_active !== false : false}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    settings: {
-                      ...formData.settings,
-                      call_started_webhook_active: e.target.checked
-                    }
-                  })}
-                  className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <Label htmlFor="call-started-webhook-active" className="text-sm text-gray-300 cursor-pointer">
-                  Enable Webhook
-                </Label>
-              </div>
-            </div>
-            <Input
-              type="url"
-              placeholder="https://your-webhook.com/call-started"
-              value={formData.settings?.call_started_webhook_url || ''}
-              onChange={(e) => setFormData({
-                ...formData,
-                settings: {
-                  ...formData.settings,
-                  call_started_webhook_url: e.target.value,
-                  // Auto-enable when URL is entered (for backwards compatibility)
-                  call_started_webhook_active: e.target.value ? (formData.settings?.call_started_webhook_active !== false ? true : formData.settings?.call_started_webhook_active) : formData.settings?.call_started_webhook_active
-                }
-              })}
-              className="bg-gray-900 border-gray-700 text-white mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Enter your webhook URL and check "Enable Webhook" to activate.
-            </p>
-          </div>
-
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
-            <div className="flex items-start gap-2">
-              <span className="text-blue-400 text-lg">📤</span>
-              <div className="text-xs text-blue-200">
-                <strong>Webhook Payload:</strong> The webhook will receive: event ("call.started"), call_id, agent_name,
-                from_number, to_number, direction, and start_time.
-              </div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      {/* Auto QC Settings Section - Only for existing agents */}
-      {isEdit && (
-        <div className="mt-6">
-          <AutoQCSettings agentId={id} agentName={formData.name} />
-        </div>
-      )}
-
-      {/* Knowledge Base Section */}
-      {isEdit && (
-        <details className="bg-gray-800 rounded-lg p-6 border border-gray-700" open>
-          <summary className="text-xl font-semibold text-white cursor-pointer mb-4">
-            📚 Knowledge Base
-          </summary>
-          <div className="space-y-4">
-            <p className="text-gray-400 text-sm">
-              Upload documents or add website URLs to provide your agent with product information, company details, or any reference material.
-              The AI will use this knowledge to answer questions accurately.
-            </p>
-
-            {/* File Upload */}
-            <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-              <Label className="text-gray-300 font-medium mb-2 block">Upload Document</Label>
-              <div className="flex items-center gap-2">
-                <label className="flex-1 cursor-pointer">
-                  <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 hover:border-blue-500 transition-colors text-center">
-                    <Upload className="mx-auto mb-2 text-gray-400" size={24} />
-                    <p className="text-sm text-gray-400">
-                      {uploadingFile ? 'Uploading...' : 'Click to upload PDF, TXT, or DOCX'}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    accept=".pdf,.txt,.docx"
-                    onChange={handleFileUpload}
-                    disabled={uploadingFile}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
-
-            {/* URL Input */}
-            <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-              <Label className="text-gray-300 font-medium mb-2 block">Add Website URL</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="https://example.com/product-info"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  disabled={addingUrl}
-                  className="flex-1 bg-gray-800 border-gray-600 text-white"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddUrl}
-                  disabled={addingUrl || !urlInput.trim()}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <LinkIcon size={16} className="mr-1" />
-                  {addingUrl ? 'Adding...' : 'Add'}
-                </Button>
-              </div>
-            </div>
-
-            {/* KB Items List */}
-            <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-              <Label className="text-gray-300 font-medium mb-3 block">
-                Knowledge Base Items ({kbItems.length})
-              </Label>
-              {kbLoading ? (
-                <p className="text-gray-400 text-sm">Loading...</p>
-              ) : kbItems.length === 0 ? (
-                <p className="text-gray-500 text-sm italic">
-                  No knowledge base items yet. Upload documents or add URLs above.
+          {/* Knowledge Base Section */}
+          {isEdit && (
+            <details className="bg-gray-800 rounded-lg p-6 border border-gray-700" open>
+              <summary className="text-xl font-semibold text-white cursor-pointer mb-4">
+                📚 Knowledge Base
+              </summary>
+              <div className="space-y-4">
+                <p className="text-gray-400 text-sm">
+                  Upload documents or add website URLs to provide your agent with product information, company details, or any reference material.
+                  The AI will use this knowledge to answer questions accurately.
                 </p>
-              ) : (
-                <div className="space-y-2">
-                  {kbItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-3 bg-gray-800 rounded border border-gray-700 hover:border-gray-600 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        {item.source_type === 'file' ? (
-                          <FileText className="text-blue-400 flex-shrink-0" size={20} />
-                        ) : (
-                          <ExternalLink className="text-green-400 flex-shrink-0" size={20} />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-white text-sm font-medium truncate">
-                            {item.source_name}
-                          </p>
-                          {item.description && (
-                            <p className="text-blue-400 text-xs mb-1 italic">
-                              Contains: {item.description}
-                            </p>
-                          )}
-                          <p className="text-gray-500 text-xs">
-                            {(item.content_length / 1000).toFixed(1)}K chars • {new Date(item.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
+
+                {/* File Upload */}
+                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <Label className="text-gray-300 font-medium mb-2 block">Upload Document</Label>
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 hover:border-blue-500 transition-colors text-center">
+                        <Upload className="mx-auto mb-2 text-gray-400" size={24} />
+                        <p className="text-sm text-gray-400">
+                          {uploadingFile ? 'Uploading...' : 'Click to upload PDF, TXT, or DOCX'}
+                        </p>
                       </div>
-                      <Button
-                        type="button"
-                        onClick={() => handleDeleteKbItem(item.id)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  ))}
+                      <input
+                        type="file"
+                        accept=".pdf,.txt,.docx"
+                        onChange={handleFileUpload}
+                        disabled={uploadingFile}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
-              )}
-            </div>
 
-            <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-4 text-sm text-blue-200 space-y-2">
-              <div className="font-semibold text-blue-100 mb-2">📖 How to Use Knowledge Base Effectively:</div>
-              <ul className="space-y-1 list-disc list-inside text-xs">
-                <li><strong>Upload focused documents:</strong> Each file should cover a specific topic (e.g., "company_info.pdf", "pricing.pdf", "sales_scripts.pdf")</li>
-                <li><strong>Name files clearly:</strong> Use descriptive names so you can identify content easily</li>
-                <li><strong>Keep it relevant:</strong> Only upload information your agent needs to reference during conversations</li>
-                <li><strong>The agent will intelligently match:</strong> When users ask questions, the AI will identify which KB source(s) contain relevant information</li>
-                <li><strong>Multiple sources work together:</strong> You can have different KB items for different purposes (company info, products, methodologies, FAQs)</li>
-              </ul>
-              <div className="mt-3 pt-2 border-t border-blue-700/50 text-xs">
-                <strong>✨ Pro Tip:</strong> The AI is instructed to ONLY use information from your KB - it will not make up facts or improvise details not in your documents.
+                {/* URL Input */}
+                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <Label className="text-gray-300 font-medium mb-2 block">Add Website URL</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/product-info"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      disabled={addingUrl}
+                      className="flex-1 bg-gray-800 border-gray-600 text-white"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddUrl}
+                      disabled={addingUrl || !urlInput.trim()}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <LinkIcon size={16} className="mr-1" />
+                      {addingUrl ? 'Adding...' : 'Add'}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* KB Items List */}
+                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <Label className="text-gray-300 font-medium mb-3 block">
+                    Knowledge Base Items ({kbItems.length})
+                  </Label>
+                  {kbLoading ? (
+                    <p className="text-gray-400 text-sm">Loading...</p>
+                  ) : kbItems.length === 0 ? (
+                    <p className="text-gray-500 text-sm italic">
+                      No knowledge base items yet. Upload documents or add URLs above.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {kbItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 bg-gray-800 rounded border border-gray-700 hover:border-gray-600 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {item.source_type === 'file' ? (
+                              <FileText className="text-blue-400 flex-shrink-0" size={20} />
+                            ) : (
+                              <ExternalLink className="text-green-400 flex-shrink-0" size={20} />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className="text-white text-sm font-medium truncate">
+                                {item.source_name}
+                              </p>
+                              {item.description && (
+                                <p className="text-blue-400 text-xs mb-1 italic">
+                                  Contains: {item.description}
+                                </p>
+                              )}
+                              <p className="text-gray-500 text-xs">
+                                {(item.content_length / 1000).toFixed(1)}K chars • {new Date(item.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={() => handleDeleteKbItem(item.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-4 text-sm text-blue-200 space-y-2">
+                  <div className="font-semibold text-blue-100 mb-2">📖 How to Use Knowledge Base Effectively:</div>
+                  <ul className="space-y-1 list-disc list-inside text-xs">
+                    <li><strong>Upload focused documents:</strong> Each file should cover a specific topic (e.g., "company_info.pdf", "pricing.pdf", "sales_scripts.pdf")</li>
+                    <li><strong>Name files clearly:</strong> Use descriptive names so you can identify content easily</li>
+                    <li><strong>Keep it relevant:</strong> Only upload information your agent needs to reference during conversations</li>
+                    <li><strong>The agent will intelligently match:</strong> When users ask questions, the AI will identify which KB source(s) contain relevant information</li>
+                    <li><strong>Multiple sources work together:</strong> You can have different KB items for different purposes (company info, products, methodologies, FAQs)</li>
+                  </ul>
+                  <div className="mt-3 pt-2 border-t border-blue-700/50 text-xs">
+                    <strong>✨ Pro Tip:</strong> The AI is instructed to ONLY use information from your KB - it will not make up facts or improvise details not in your documents.
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </details>
-      )}
+            </details>
+          )}
 
-      <div className="flex gap-4">
-        <Button
-          type="submit"
-          disabled={loading}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex-1"
-        >
-          <Save size={20} className="mr-2" />
-          {loading ? 'Saving...' : (isNew ? 'Create Agent' : 'Update Agent')}
-        </Button>
-        <Button
-          type="button"
-          onClick={() => navigate('/agents')}
-          variant="outline"
-          className="border-gray-700 text-gray-300 hover:bg-gray-800"
-        >
-          Cancel
-        </Button>
-      </div>
-    </form>
+          <div className="flex gap-4">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex-1"
+            >
+              <Save size={20} className="mr-2" />
+              {loading ? 'Saving...' : (isNew ? 'Create Agent' : 'Update Agent')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => navigate('/agents')}
+              variant="outline"
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
       </Card >
     </div >
   );
