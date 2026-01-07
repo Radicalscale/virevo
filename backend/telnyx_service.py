@@ -7,6 +7,7 @@ from datetime import datetime
 import httpx
 import json
 
+from maya_tts_service import MayaTTSService
 logger = logging.getLogger(__name__)
 
 class TelnyxService:
@@ -439,19 +440,37 @@ class TelnyxService:
                         logger.warning(f"⚠️  WebSocket TTS ({tts_provider}) error, falling back to REST: {e}")
                 
                 # Try to use external TTS if provider is set (REST API)
-                if tts_provider in ["elevenlabs", "hume", "sesame", "cartesia"]:
+                if tts_provider in ["elevenlabs", "hume", "sesame", "cartesia", "maya"]:
                     logger.info(f"🎙️ Attempting {tts_provider} TTS (REST)")
                     
                     try:
-                        from server import generate_tts_audio
-                        import hashlib
-                        import os
-                        import time
-                        
-                        tts_start = time.time()
-                        
-                        # Generate audio using configured provider
-                        audio_bytes = await generate_tts_audio(text, agent_config)
+                        # Special handling for Maya TTS
+                        if tts_provider == "maya":
+                            maya_service = MayaTTSService()
+                            # Use voice_ref from agent config or default
+                            voice_ref = settings.get("maya_settings", {}).get("voice_ref", "default") 
+
+                            # ---------------------------------------------------------
+                            # ✨ Maya Dynamic Voice Steering
+                            # Check for "emotional guidance" in the text itself
+                            # Pattern: "(Whispering) I have a secret"
+                            # ---------------------------------------------------------
+                            import re
+                            # Match leading parens with reasonable length limit (to avoid false positives)
+                            match = re.search(r'^\s*\(([^)]{1,60})\)\s*(.*)', text, re.DOTALL)
+                            if match:
+                                instruction = match.group(1)
+                                content = match.group(2)
+                                logger.info(f"🎭 Maya Dynamic Override: '{instruction}'")
+                                voice_ref = instruction
+                                text = content  # Speak only the content
+                            # ---------------------------------------------------------
+
+                            audio_bytes = await maya_service.generate_speech(text, voice_ref=voice_ref)
+                        else:
+                            from server import generate_tts_audio
+                            # Generate audio using configured provider
+                            audio_bytes = await generate_tts_audio(text, agent_config)
                         
                         tts_gen_time = time.time() - tts_start
                         logger.info(f"⏱️  TTS generation time: {tts_gen_time:.2f}s")
