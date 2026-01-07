@@ -1600,6 +1600,21 @@ const AgentForm = () => {
                     <Label className="text-gray-400 text-sm">Emotional Description</Label>
                     <Input
                       type="text"
+                      placeholder="e.g., warm and friendly"
+                      value={formData.settings?.hume_settings?.description || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          hume_settings: {
+                            ...formData.settings?.hume_settings,
+                            description: e.target.value
+                          }
+                        }
+                      })}
+                      className="bg-gray-900 border-gray-700 text-white mt-1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Optional emotional guidance for Hume</p>
                   </div>
                 </div>
               )}
