@@ -1630,8 +1630,9 @@ const AgentForm = () => {
                   <Label className="text-gray-300 font-semibold block">Maya Voice Settings</Label>
 
                   <div>
-                    <Label className="text-gray-400 text-sm">Quick Presets</Label>
+                    <Label className="text-gray-400 text-sm font-medium">Voice Type & Style</Label>
                     <Select
+                      value={formData.settings?.maya_settings?.voice_ref || 'default'}
                       onValueChange={(value) => setFormData({
                         ...formData,
                         settings: {
@@ -1644,16 +1645,29 @@ const AgentForm = () => {
                       })}
                     >
                       <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
-                        <SelectValue placeholder="Select a preset to auto-fill description..." />
+                        <SelectValue placeholder="Select voice type..." />
                       </SelectTrigger>
                       <SelectContent className="bg-gray-900 border-gray-700">
-                        <SelectItem value="default">Default Balanced</SelectItem>
-                        <SelectItem value="American female voice, professional and clear">🇺🇸 American Female (Professional)</SelectItem>
-                        <SelectItem value="American male voice, friendly and conversational">🇺🇸 American Male (Friendly)</SelectItem>
-                        <SelectItem value="British female voice, calm and soothing">🇬🇧 British Female (Calm)</SelectItem>
-                        <SelectItem value="Energetic and helpful customer support agent">⚡ Enthusiastic Support</SelectItem>
+                        <SelectItem value="default">🎭 Default (Neutral)</SelectItem>
+
+                        {/* Female Voices */}
+                        <SelectItem value="Female voice, professional and clear">👩 Female - Professional</SelectItem>
+                        <SelectItem value="Female voice, warm and friendly conversational tone">👩 Female - Warm & Friendly</SelectItem>
+                        <SelectItem value="Female voice, calm and soothing with a gentle pace">👩 Female - Calm & Soothing</SelectItem>
+                        <SelectItem value="Female voice, energetic and enthusiastic">👩 Female - Energetic</SelectItem>
+
+                        {/* Male Voices */}
+                        <SelectItem value="Male voice, professional and authoritative">👨 Male - Professional</SelectItem>
+                        <SelectItem value="Male voice, friendly and conversational">👨 Male - Friendly</SelectItem>
+                        <SelectItem value="Male voice, calm and reassuring">👨 Male - Calm & Reassuring</SelectItem>
+                        <SelectItem value="Male voice, energetic and upbeat sales tone">👨 Male - Energetic Sales</SelectItem>
+
+                        {/* Specialized */}
+                        <SelectItem value="Customer support agent, helpful and patient female voice">📞 Support Agent (Female)</SelectItem>
+                        <SelectItem value="Customer support agent, helpful and patient male voice">📞 Support Agent (Male)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-gray-500 mt-1">Select a voice type or customize below</p>
                   </div>
 
                   <div>

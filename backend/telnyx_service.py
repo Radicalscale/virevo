@@ -446,8 +446,12 @@ class TelnyxService:
                     try:
                         # Special handling for Maya TTS
                         if tts_provider == "maya":
+                            # Get voice_ref from agent settings first (default fallback)
+                            voice_ref = settings.get("maya_settings", {}).get("voice_ref", "default")
+                            
                             # ---------------------------------------------------------
                             # ✨ Maya Dynamic Voice Steering & Streaming
+                            # Check if text starts with (instruction) to override
                             # ---------------------------------------------------------
                             import re
                             match = re.search(r'^\s*\(([^)]{1,60})\)\s*(.*)', text, re.DOTALL)
@@ -455,8 +459,10 @@ class TelnyxService:
                                 instruction = match.group(1)
                                 content = match.group(2)
                                 logger.info(f"🎭 Maya Dynamic Override: '{instruction}'")
-                                voice_ref = instruction
+                                voice_ref = instruction  # Override with inline instruction
                                 text = content
+                            
+                            logger.info(f"🎤 Maya TTS with voice_ref: '{voice_ref[:50]}...'")
 
                             # Use streaming implementation for lower latency
                             result = await self._speak_text_maya_streaming(call_control_id, text, voice_ref)
