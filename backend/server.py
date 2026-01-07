@@ -2104,6 +2104,12 @@ async def test_api_key(service_name: str, current_user: dict = Depends(get_curre
                     "https://api.x.ai/v1/models",
                     headers={"Authorization": f"Bearer {api_key}"}
                 )
+            elif service_name == "gemini":
+                # Use Google's OpenAI-compatible endpoint to test the key
+                response = await client.get(
+                    "https://generativelanguage.googleapis.com/v1beta/openai/models",
+                    headers={"Authorization": f"Bearer {api_key}"}
+                )
             elif service_name == "hume":
                 response = await client.get(
                     "https://api.hume.ai/v0/batch/jobs",
