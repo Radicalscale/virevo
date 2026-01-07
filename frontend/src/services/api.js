@@ -29,7 +29,7 @@ export const agentAPI = {
   updateFlow: (id, flow) => apiClient.put(`/agents/${id}/flow`, flow),
   getFlow: (id) => apiClient.get(`/agents/${id}/flow`),
   getKBItems: (id) => apiClient.get(`/agents/${id}/kb`),
-  optimizeNode: (id, content, guidelines, model, fileContext = null, useKB = true) => 
+  optimizeNode: (id, content, guidelines, model, fileContext = null, useKB = true) =>
     apiClient.post(`/agents/${id}/optimize-node`, { content, guidelines, model, file_context: fileContext, use_kb: useKB }),
   enhanceScript: (id, script, model) => apiClient.post(`/agents/${id}/enhance-script`, { script, model }),
   optimizeTransition: (id, condition, model) => apiClient.post(`/agents/${id}/optimize-transition`, { condition, model }),
@@ -50,23 +50,23 @@ export const callAPI = {
 // QC Enhanced APIs
 export const qcEnhancedAPI = {
   // Call data fetching - pass campaign_id to get results from campaign_calls collection
-  fetchCallForQC: (callId, campaignId = null) => apiClient.post('/qc/enhanced/calls/fetch', { 
+  fetchCallForQC: (callId, campaignId = null) => apiClient.post('/qc/enhanced/calls/fetch', {
     call_id: callId,
-    campaign_id: campaignId 
+    campaign_id: campaignId
   }),
-  
+
   // Campaign management
   createCampaign: (data) => apiClient.post('/qc/enhanced/campaigns', data),
   listCampaigns: () => apiClient.get('/qc/enhanced/campaigns'),
   getCampaign: (id) => apiClient.get(`/qc/enhanced/campaigns/${id}`),
   updateCampaign: (id, data) => apiClient.put(`/qc/enhanced/campaigns/${id}`, data),
   deleteCampaign: (id) => apiClient.delete(`/qc/enhanced/campaigns/${id}`),
-  
+
   // Campaign call management
   addCallToCampaign: (campaignId, data) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/add-call`, data),
   getCampaignCalls: (campaignId) => apiClient.get(`/qc/enhanced/campaigns/${campaignId}/calls`),
   deleteCampaignCalls: (campaignId, callIds) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/delete-calls`, { call_ids: callIds }),
-  
+
   // Training calls
   uploadTrainingCall: (campaignId, formData) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/training-calls`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -75,7 +75,7 @@ export const qcEnhancedAPI = {
   getTrainingCall: (campaignId, trainingCallId) => apiClient.get(`/qc/enhanced/campaigns/${campaignId}/training-calls/${trainingCallId}`),
   deleteTrainingCall: (campaignId, trainingCallId) => apiClient.delete(`/qc/enhanced/campaigns/${campaignId}/training-calls/${trainingCallId}`),
   updateTrainingCallOutcome: (campaignId, trainingCallId, outcomeData) => apiClient.put(
-    `/qc/enhanced/campaigns/${campaignId}/training-calls/${trainingCallId}/outcome`, 
+    `/qc/enhanced/campaigns/${campaignId}/training-calls/${trainingCallId}/outcome`,
     outcomeData
   ),
   analyzeTrainingCall: (campaignId, trainingCallId, data = {}) => apiClient.post(
@@ -86,50 +86,50 @@ export const qcEnhancedAPI = {
     `/qc/enhanced/campaigns/${campaignId}/training-calls/analyze-all`,
     data
   ),
-  
+
   // Custom calls (not from agents)
   uploadCustomCall: (campaignId, data) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/custom-calls`, data),
-  
+
   // Campaign KB
   uploadCampaignKB: (campaignId, formData) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/kb`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   getCampaignKB: (campaignId) => apiClient.get(`/qc/enhanced/campaigns/${campaignId}/kb`),
-  
+
   // Campaign agents configuration
   updateCampaignAgents: (campaignId, data) => apiClient.put(`/qc/enhanced/campaigns/${campaignId}/agents`, data),
-  
+
   // Campaign analysis
   analyzePatterns: (campaignId) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/analyze-patterns`),
   generateReport: (campaignId) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/generate-report`),
-  
+
   // Batch analysis - Analyze all pending calls
   analyzeAllCalls: (campaignId, data) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/analyze-all`, data),
-  
+
   // Reset analysis
   resetAllAnalysis: (campaignId) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/reset-all-analysis`),
   resetCallAnalysis: (campaignId, callId) => apiClient.post(`/qc/enhanced/campaigns/${campaignId}/calls/${encodeURIComponent(callId)}/reset-analysis`),
-  
+
   // Campaign auto settings
   getCampaignAutoSettings: (campaignId) => apiClient.get(`/qc/enhanced/campaigns/${campaignId}/auto-settings`),
-  
+
   // Campaign QC Results - get all analyzed calls and their results
   getCampaignQCResults: (campaignId) => apiClient.get(`/qc/enhanced/campaigns/${campaignId}/qc-results`),
-  
+
   // QC Analysis
   analyzeTech: (data) => apiClient.post('/qc/enhanced/analyze/tech', data),
   analyzeScript: (data) => apiClient.post('/qc/enhanced/analyze/script', data),
   analyzeTonality: (data) => apiClient.post('/qc/enhanced/analyze/tonality', data),
   analyzeAudioTonality: (data) => apiClient.post('/qc/enhanced/analyze/audio-tonality', data),
-  
+
   // Auto QC Settings
   getAgentAutoQCSettings: (agentId) => apiClient.get(`/qc/enhanced/agents/${agentId}/auto-qc-settings`),
   updateAgentAutoQCSettings: (agentId, settings) => apiClient.put(`/qc/enhanced/agents/${agentId}/auto-qc-settings`, settings),
-  
+
   // Process QC (manual trigger or background)
   processCallQC: (data) => apiClient.post('/qc/enhanced/process-call-qc', data),
   triggerAutoQC: (callId) => apiClient.post(`/qc/enhanced/trigger-auto-qc/${callId}`),
-  
+
   // Node Optimization
   optimizeNode: (data) => apiClient.post('/qc/enhanced/optimize/node', data),
   applyNodeOptimization: (data) => apiClient.post('/qc/enhanced/optimize/node/apply', data),
@@ -144,28 +144,28 @@ export const qcAgentsAPI = {
   get: (id) => apiClient.get(`/qc/agents/${id}`),
   update: (id, data) => apiClient.put(`/qc/agents/${id}`, data),
   delete: (id) => apiClient.delete(`/qc/agents/${id}`),
-  
+
   // Knowledge Base
   uploadKB: (agentId, formData) => apiClient.post(`/qc/agents/${agentId}/kb`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   listKB: (agentId) => apiClient.get(`/qc/agents/${agentId}/kb`),
   deleteKB: (agentId, kbItemId) => apiClient.delete(`/qc/agents/${agentId}/kb/${kbItemId}`),
-  
+
   // Pattern MD
   uploadPatternMD: (agentId, patternMd) => apiClient.post(`/qc/agents/${agentId}/pattern-md`, { pattern_md: patternMd }),
-  
+
   // Assignments
   assign: (data) => apiClient.post('/qc/agents/assign', data),
   listAssignments: (params = {}) => apiClient.get('/qc/agents/assignments', { params }),
   deleteAssignment: (assignmentId) => apiClient.delete(`/qc/agents/assignments/${assignmentId}`),
-  
+
   // Emotional Directions (for tonality agents)
   generateEmotionalDirections: (agentId, data) => apiClient.post(`/qc/agents/${agentId}/emotional-directions`, data),
-  
+
   // Tech Issues Analysis
   analyzeTechIssues: (agentId, data) => apiClient.post(`/qc/agents/${agentId}/analyze-tech-issues`, data),
-  
+
   // Interruption System
   checkInterruption: (data) => apiClient.post('/qc/agents/interruption/check', data),
   getInterruptionPhrases: () => apiClient.get('/qc/agents/interruption/phrases'),
@@ -180,24 +180,24 @@ export const qcLearningAPI = {
   getPlaybookHistory: (agentId) => apiClient.get(`/qc/learning/agents/${agentId}/playbook/history`),
   getPlaybookVersion: (agentId, version) => apiClient.get(`/qc/learning/agents/${agentId}/playbook/version/${version}`),
   restorePlaybookVersion: (agentId, version) => apiClient.post(`/qc/learning/agents/${agentId}/playbook/restore/${version}`),
-  
+
   // Learning Control
   getLearningConfig: (agentId) => apiClient.get(`/qc/learning/agents/${agentId}/config`),
   updateLearningConfig: (agentId, config) => apiClient.put(`/qc/learning/agents/${agentId}/config`, config),
   triggerLearning: (agentId) => apiClient.post(`/qc/learning/agents/${agentId}/learn`),
   getLearningStats: (agentId) => apiClient.get(`/qc/learning/agents/${agentId}/stats`),
-  
+
   // Analysis Logs
   getAnalysisLogs: (agentId, params = {}) => apiClient.get(`/qc/learning/agents/${agentId}/analysis-logs`, { params }),
   updateLogOutcome: (agentId, logId, outcome) => apiClient.put(`/qc/learning/agents/${agentId}/analysis-logs/${logId}/outcome`, outcome),
-  
+
   // Patterns
   getPatterns: (agentId, params = {}) => apiClient.get(`/qc/learning/agents/${agentId}/patterns`, { params }),
   deletePattern: (agentId, patternId) => apiClient.delete(`/qc/learning/agents/${agentId}/patterns/${patternId}`),
-  
+
   // Learning Sessions
   getLearningSessions: (agentId, limit = 20) => apiClient.get(`/qc/learning/agents/${agentId}/sessions`, { params: { limit } }),
-  
+
   // Brain Prompts
   getBrainPrompts: (agentId) => apiClient.get(`/qc/learning/agents/${agentId}/brain-prompts`),
   updateBrainPrompts: (agentId, prompts) => apiClient.put(`/qc/learning/agents/${agentId}/brain-prompts`, prompts),
@@ -233,6 +233,17 @@ export const kbAPI = {
   }),
   addUrl: (agentId, url) => apiClient.post(`/agents/${agentId}/kb/url?url=${encodeURIComponent(url)}`),
   delete: (agentId, kbId) => apiClient.delete(`/agents/${agentId}/kb/${kbId}`),
+};
+
+// Voice Library APIs (Maya TTS Voice Cloning)
+export const voiceLibraryAPI = {
+  list: () => apiClient.get('/voice-library'),
+  upload: (formData) => apiClient.post('/voice-library', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  get: (id) => apiClient.get(`/voice-library/${id}`),
+  delete: (id) => apiClient.delete(`/voice-library/${id}`),
+  getAudio: (id) => apiClient.get(`/voice-library/${id}/audio`, { responseType: 'blob' }),
 };
 
 // Warmup APIs - Call before initiating calls to reduce latency

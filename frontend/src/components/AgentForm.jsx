@@ -1623,12 +1623,15 @@ const AgentForm = () => {
               {formData.settings?.tts_provider === 'maya' && (
                 <div className="space-y-4 border-t border-gray-700 pt-4">
                   <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-3 mb-4">
-                    <p className="text-purple-400 text-sm font-semibold">✨ Maya - Adaptive Voice</p>
-                    <p className="text-purple-300 text-xs mt-1">Control voice style and emotion using natural language descriptions</p>
+                    <p className="text-purple-400 text-sm font-semibold">✨ Maya - Adaptive Voice with Emotions</p>
+                    <p className="text-purple-300 text-xs mt-1">
+                      Natural language voice descriptions • 20+ emotion tags • Voice cloning
+                    </p>
                   </div>
 
-                  <Label className="text-gray-300 font-semibold block">Maya Voice Settings</Label>
+                  <Label className="text-gray-300 font-semibold block">Voice Configuration</Label>
 
+                  {/* Voice Type Preset */}
                   <div>
                     <Label className="text-gray-400 text-sm font-medium">Voice Type & Style</Label>
                     <Select
@@ -1667,22 +1670,23 @@ const AgentForm = () => {
                         <SelectItem value="Customer support agent, helpful and patient male voice">📞 Support Agent (Male)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-gray-500 mt-1">Select a voice type or customize below</p>
+                    <p className="text-xs text-gray-500 mt-1">Select a preset or customize below</p>
                   </div>
 
+                  {/* Custom Voice Description */}
                   <div>
                     <Label className="text-gray-400 text-sm flex items-center gap-1">
-                      Voice Description (Emotional Guidance)
+                      Voice Description
                       <div className="relative group">
                         <Info size={14} className="text-blue-400 cursor-help" />
-                        <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-72 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
-                          <strong className="text-blue-400">Emotional Guidance</strong>
-                          <p className="mt-1">Maya adapts the voice based on this description.</p>
-                          <p className="mt-1">Try describing:</p>
-                          <ul className="list-disc list-inside mt-1 text-gray-400">
-                            <li>Accent (e.g., "British", "Southern")</li>
-                            <li>Tone (e.g., "Serious", "Excited")</li>
-                            <li>Persona (e.g., "Old wizard", "News anchor")</li>
+                        <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-80 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                          <strong className="text-blue-400">Natural Language Description</strong>
+                          <p className="mt-1">Describe the voice like you're briefing a voice actor:</p>
+                          <ul className="list-disc list-inside mt-1 text-gray-400 space-y-1">
+                            <li><strong>Gender/Age:</strong> "Female, mid-30s"</li>
+                            <li><strong>Accent:</strong> "American", "British", "Southern"</li>
+                            <li><strong>Tone:</strong> "Professional", "Friendly", "Calm"</li>
+                            <li><strong>Pace:</strong> "Conversational", "Brisk", "Slow"</li>
                           </ul>
                         </div>
                       </div>
@@ -1699,13 +1703,109 @@ const AgentForm = () => {
                           }
                         }
                       })}
-                      placeholder="e.g., A calm and soothing female voice..."
+                      placeholder="e.g., Female voice, mid-30s, American accent, warm and professional, conversational pace"
                       className="bg-gray-900 border-gray-700 text-white mt-1"
-                      rows={3}
+                      rows={2}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Describe the voice you want. The AI will generate audio matching this description.
-                    </p>
+                  </div>
+
+                  {/* Voice Consistency Settings */}
+                  <div className="bg-gray-800/50 rounded-lg p-4 space-y-4">
+                    <Label className="text-gray-300 font-semibold flex items-center gap-2">
+                      🔒 Voice Consistency Settings
+                      <span className="text-xs font-normal text-gray-500">(Prevents voice drift during calls)</span>
+                    </Label>
+
+                    {/* Temperature Slider */}
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <Label className="text-gray-400 text-sm">Temperature</Label>
+                        <span className="text-purple-400 text-sm font-mono">
+                          {formData.settings?.maya_settings?.temperature ?? 0.35}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.3"
+                        max="0.7"
+                        step="0.05"
+                        value={formData.settings?.maya_settings?.temperature ?? 0.35}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            maya_settings: {
+                              ...formData.settings?.maya_settings,
+                              temperature: parseFloat(e.target.value)
+                            }
+                          }
+                        })}
+                        className="w-full mt-1 accent-purple-500"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.3 (Most Consistent)</span>
+                        <span>0.7 (Most Natural)</span>
+                      </div>
+                    </div>
+
+                    {/* Seed Input */}
+                    <div>
+                      <Label className="text-gray-400 text-sm flex items-center gap-1">
+                        Seed (for reproducibility)
+                        <div className="relative group">
+                          <Info size={14} className="text-blue-400 cursor-help" />
+                          <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-64 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                            <strong className="text-blue-400">Random Seed</strong>
+                            <p className="mt-1">Set a specific number for consistent voice between calls. Leave at 0 for random.</p>
+                          </div>
+                        </div>
+                      </Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="999999"
+                        value={formData.settings?.maya_settings?.seed ?? 0}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            maya_settings: {
+                              ...formData.settings?.maya_settings,
+                              seed: parseInt(e.target.value) || 0
+                            }
+                          }
+                        })}
+                        placeholder="0 = random"
+                        className="bg-gray-900 border-gray-700 text-white mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        0 = random each time, any other number = same voice characteristics
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Emotion Tags Reference */}
+                  <div className="bg-gray-800/30 rounded-lg p-3">
+                    <Label className="text-gray-400 text-sm flex items-center gap-1 mb-2">
+                      🎭 Emotion Tags (use in agent responses)
+                      <div className="relative group">
+                        <Info size={14} className="text-blue-400 cursor-help" />
+                        <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-80 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                          <strong className="text-blue-400">Dynamic Emotions</strong>
+                          <p className="mt-1">Add these tags in your agent responses to control emotion:</p>
+                          <code className="block mt-2 p-2 bg-gray-900 rounded text-green-400">
+                            {"<laugh>"} Great to hear! {"<excited>"} Let's get started!
+                          </code>
+                        </div>
+                      </div>
+                    </Label>
+                    <div className="flex flex-wrap gap-1">
+                      {['<laugh>', '<chuckle>', '<sarcastic>', '<angry>', '<excited>', '<curious>', '<sigh>', '<gasp>'].map(tag => (
+                        <span key={tag} className="px-2 py-0.5 bg-purple-900/40 text-purple-300 text-xs rounded font-mono">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

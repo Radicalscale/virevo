@@ -9354,6 +9354,11 @@ set_learning_db(db)  # Inject database connection
 api_router.include_router(qc_learning_router)  # Include under /api prefix
 logger.info("✅ QC learning router loaded")
 
+# ============ VOICE LIBRARY ROUTER (Maya TTS Voice Cloning) ============
+from voice_library_router import voice_library_router, load_voice_sample
+api_router.include_router(voice_library_router)  # Include under /api prefix
+logger.info("✅ Voice library router loaded")
+
 # Debug endpoint to test post-call automation
 @api_router.post("/debug/test-post-call-automation/{call_id}")
 async def test_post_call_automation(call_id: str, current_user: dict = Depends(get_current_user)):

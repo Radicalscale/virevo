@@ -446,12 +446,18 @@ class TelnyxService:
                     try:
                         # Special handling for Maya TTS
                         if tts_provider == "maya":
-                            # Get voice_ref from agent settings first (default fallback)
-                            voice_ref = settings.get("maya_settings", {}).get("voice_ref", "default")
+                            # Get all Maya settings from agent config
+                            maya_settings = settings.get("maya_settings", {})
+                            voice_ref = maya_settings.get("voice_ref", "default")
+                            temperature = maya_settings.get("temperature", 0.35)
+                            seed = maya_settings.get("seed", 0)
+                            top_p = maya_settings.get("top_p", 0.9)
+                            repetition_penalty = maya_settings.get("repetition_penalty", 1.1)
+                            speaker_wav_id = maya_settings.get("speaker_wav_id")  # Voice library reference
                             
                             # ---------------------------------------------------------
-                            # ✨ Maya Dynamic Voice Steering & Streaming
-                            # Check if text starts with (instruction) to override
+                            # ✨ Maya Dynamic Voice Steering
+                            # Check if text starts with (instruction) to override voice
                             # ---------------------------------------------------------
                             import re
                             match = re.search(r'^\s*\(([^)]{1,60})\)\s*(.*)', text, re.DOTALL)
@@ -462,16 +468,34 @@ class TelnyxService:
                                 voice_ref = instruction  # Override with inline instruction
                                 text = content
                             
-                            logger.info(f"🎤 Maya TTS with voice_ref: '{voice_ref[:50]}...'")
+                            logger.info(f"🎤 Maya TTS: voice='{voice_ref[:50]}...', temp={temperature}, seed={seed}")
+
+                            # Load speaker_wav from voice library if specified
+                            speaker_wav = None
+                            if speaker_wav_id:
+                                try:
+                                    from server import load_voice_sample
+                                    speaker_wav = await load_voice_sample(speaker_wav_id)
+                                    logger.info(f"🎭 Using voice cloning sample: {speaker_wav_id}")
+                                except Exception as e:
+                                    logger.warning(f"⚠️ Could not load voice sample {speaker_wav_id}: {e}")
 
                             # Use streaming implementation for lower latency
-                            result = await self._speak_text_maya_streaming(call_control_id, text, voice_ref)
+                            result = await self._speak_text_maya_streaming(
+                                call_control_id, text, voice_ref,
+                                temperature=temperature, seed=seed, top_p=top_p,
+                                repetition_penalty=repetition_penalty, speaker_wav=speaker_wav
+                            )
                             if result.get("success"):
                                 return result
                             
                             # Fallback (shouldn't happen if streaming works)
                             maya_service = MayaTTSService()
-                            audio_bytes = await maya_service.generate_speech(text, voice_ref=voice_ref)
+                            audio_bytes = await maya_service.generate_speech(
+                                text, voice_ref=voice_ref, temperature=temperature,
+                                seed=seed, top_p=top_p, repetition_penalty=repetition_penalty,
+                                speaker_wav=speaker_wav
+                            )
                         else:
                             from server import generate_tts_audio
                             # Generate audio using configured provider
@@ -563,25 +587,48 @@ class TelnyxService:
         self,
         call_control_id: str,
         text: str,
-        voice_ref: str
+        voice_ref: str,
+        temperature: float = 0.35,
+        seed: int = 0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.1,
+        speaker_wav: bytes = None
     ) -> Dict[str, Any]:
         """
         Stream audio from Maya TTS (HTTP Chunked) for lower latency.
         Collects chunks and plays them.
+        
+        Args:
+            call_control_id: Telnyx call control ID
+            text: Text to speak
+            voice_ref: Voice description
+            temperature: Randomness control (0.3-0.7, lower = more consistent)
+            seed: Random seed for reproducibility
+            top_p: Nucleus sampling diversity
+            repetition_penalty: Prevents audio artifacts
+            speaker_wav: Optional reference audio for voice cloning
         """
         try:
             import time
             import hashlib
             import os
-            from server import MayaTTSService # Assuming MayaTTSService is defined in server.py
+            from maya_tts_service import MayaTTSService
             
-            logger.info(f"🚀 Starting Maya TTS Stream for: '{text[:30]}...'")
+            logger.info(f"🚀 Maya TTS Stream: '{text[:30]}...' (temp={temperature}, seed={seed})")
             tts_start = time.time()
             
             maya_service = MayaTTSService()
             
-            # Create a generator
-            stream_gen = maya_service.stream_speech(text, voice_ref=voice_ref)
+            # Create a generator with all parameters
+            stream_gen = maya_service.stream_speech(
+                text, 
+                voice_ref=voice_ref,
+                temperature=temperature,
+                seed=seed,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty,
+                speaker_wav=speaker_wav
+            )
             
             audio_chunks = []
             first_chunk_time = None
@@ -603,16 +650,14 @@ class TelnyxService:
             total_time = time.time() - tts_start
             logger.info(f"✅ Maya Generation Complete: {len(full_audio)} bytes in {total_time:.2f}s")
             
-            # Save to file
-            audio_hash = hashlib.md5(text.encode()).hexdigest()
-            audio_filename = f"tts_maya_{audio_hash}.wav" # Maya outputs WAV by default usually, or we check content
+            # Save to file with unique hash (include seed for cache busting if needed)
+            content_hash = hashlib.md5(f"{text}_{seed}".encode()).hexdigest()
+            audio_filename = f"tts_maya_{content_hash}.wav"
             audio_path = f"/tmp/{audio_filename}"
             
             with open(audio_path, 'wb') as f:
                 f.write(full_audio)
                 
-            # backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
-            # For local/runpod testing, ensure this is correct
             backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
             audio_url = f"{backend_url}/api/tts-audio/{audio_filename}"
             
