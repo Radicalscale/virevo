@@ -786,9 +786,12 @@ class TelnyxService:
             logger.info(f"✅ Collected {len(audio_chunks)} chunks, total: {len(full_audio_pcm)} bytes")
             
             # Save PCM to temporary file
-            audio_hash = hashlib.md5(text.encode()).hexdigest()
-            pcm_path = f"/tmp/tts_ws_{audio_hash}.pcm"
-            mp3_path = f"/tmp/tts_ws_{audio_hash}.mp3"
+            # 🔥 FIX: Include TTS provider in hash to prevent cross-provider cache collisions
+            tts_provider = agent_config.get('settings', {}).get('tts_provider', 'elevenlabs')
+            combined_string = f"{tts_provider}_{text}"
+            audio_hash = hashlib.md5(combined_string.encode()).hexdigest()
+            pcm_path = f"/tmp/tts_ws_{tts_provider}_{audio_hash}.pcm"
+            mp3_path = f"/tmp/tts_ws_{tts_provider}_{audio_hash}.mp3"
             
             with open(pcm_path, 'wb') as f:
                 f.write(full_audio_pcm)
