@@ -1800,7 +1800,13 @@ const AgentForm = () => {
                       </div>
                     </Label>
                     <div className="flex flex-wrap gap-1">
-                      {['<laugh>', '<chuckle>', '<sarcastic>', '<angry>', '<excited>', '<curious>', '<sigh>', '<gasp>'].map(tag => (
+                      {[
+                        '<laugh>', '<laugh_harder>', '<chuckle>', '<giggle>', '<snort>',
+                        '<sigh>', '<gasp>', '<exhale>', '<gulp>',
+                        '<whisper>', '<cry>', '<scream>',
+                        '<angry>', '<rage>', '<excited>', '<curious>', '<disappointed>',
+                        '<sarcastic>', '<mischievous>', '<sing>'
+                      ].map(tag => (
                         <span key={tag} className="px-2 py-0.5 bg-purple-900/40 text-purple-300 text-xs rounded font-mono">
                           {tag}
                         </span>
