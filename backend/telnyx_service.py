@@ -531,7 +531,6 @@ class TelnyxService:
                             
                             # Use Telnyx REST API directly for playback_start
                             import httpx
-                            import os
                             
                             telnyx_api_key = os.environ.get('TELNYX_API_KEY')
                             playback_url = f"https://api.telnyx.com/v2/calls/{call_control_id}/actions/playback_start"
