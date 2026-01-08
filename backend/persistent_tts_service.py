@@ -13,7 +13,11 @@ import subprocess
 import os
 import re
 from typing import Optional, Dict, Callable, Any
+from typing import Optional, Dict, Callable, Any
+import audioop
 from elevenlabs_ws_service import ElevenLabsWebSocketService
+from maya_tts_service import MayaTTSService
+from voice_library_router import load_voice_sample
 
 logger = logging.getLogger(__name__)
 
@@ -952,6 +956,141 @@ class PersistentTTSSession:
         logger.info(f"✅ [Call {self.call_control_id}] Persistent TTS WebSocket closed")
 
 
+class MayaPersistentSession(PersistentTTSSession):
+    """
+    Manages persistent streaming for Maya TTS
+    Uses HTTP Chunked Streaming (not WebSocket) but maintains session interface
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.maya_service = MayaTTSService()
+        
+        # Extract Maya specific settings
+        settings = self.agent_config.get("settings", {})
+        maya_settings = settings.get("maya_settings", {})
+        
+        self.voice_ref = maya_settings.get("voice_ref", "default")
+        self.temperature = maya_settings.get("temperature", 0.35)
+        self.seed = maya_settings.get("seed", 0)
+        self.speaker_wav_id = maya_settings.get("speaker_wav_id")
+        self.speaker_wav = None
+        self.resample_state = None # For 24k -> 8k resampling
+
+    async def connect(self) -> bool:
+        """
+        Mock connection for Maya (since it's HTTP based)
+        But we use this to preload voice sample if needed
+        """
+        logger.info(f"🔌 [Call {self.call_control_id}] Initializing Maya TTS Session...")
+        
+        if self.speaker_wav_id:
+            try:
+                self.speaker_wav = await load_voice_sample(self.speaker_wav_id)
+                logger.info(f"✅ [Call {self.call_control_id}] Loaded voice clone sample: {self.speaker_wav_id}")
+            except Exception as e:
+                logger.warning(f"⚠️ [Call {self.call_control_id}] Failed to load voice sample: {e}")
+        
+        self.connected = True
+        
+        # Start keep-alive loop (Maya doesn't need it but good for consistency)
+        self._keepalive_task = asyncio.create_task(self._keepalive_loop())
+        
+        # Start comfort noise if enabled
+        agent_settings = self.agent_config.get("settings", {})
+        self._enable_comfort_noise = agent_settings.get("enable_comfort_noise", False)
+        if self._enable_comfort_noise and self.telnyx_ws:
+            self._comfort_noise_task = asyncio.create_task(self._comfort_noise_loop())
+            logger.info(f"🔊 [Call {self.call_control_id}] Comfort noise loop started")
+            
+        return True
+
+    async def _keepalive_loop(self):
+        # Maya doesn't need keepalive, but we keep the method to satisfy interface
+        # and maybe send silence to Telnyx to keep that connection alive
+        pass
+
+    async def stream_sentence(
+        self,
+        sentence: str,
+        is_first: bool = False,
+        is_last: bool = False,
+        current_voice_id: str = None
+    ) -> bool:
+        """
+        Stream from Maya TTS -> Convert to Mulaw -> Send to Telnyx WS
+        """
+        # Maya "voice_id" is actually the description or voice_ref
+        # Logic to update voice if needed (omitted for now to keep simple)
+        
+        if is_first:
+            self.interrupted = False
+            self.is_holding_floor = True
+            
+        if self.interrupted:
+            return False
+
+        try:
+            # We don't use 'voice_id' param from args as Maya uses self.voice_ref or self.speaker_wav
+            # But if current_voice_id is passed and differs, we could update self.voice_ref
+            
+            logger.info(f"🎤 [Maya] Streaming sentence: '{sentence[:30]}...'")
+            self.is_speaking = True
+            
+            chunk_count = 0
+            start_time = time.time()
+            
+            stream = self.maya_service.stream_speech(
+                text=sentence,
+                voice_ref=self.voice_ref,
+                temperature=self.temperature,
+                seed=self.seed,
+                speaker_wav=self.speaker_wav
+            )
+            
+            async for chunk in stream:
+                if self.interrupted:
+                    logger.info("🛑 [Maya] Interrupted during streaming")
+                    break
+                    
+                if chunk:
+                    try:
+                        # Convert PCM to Mulaw with Resampling (24k -> 8k)
+                        # We assume Maya outputs 24000Hz 16-bit PCM
+                        
+                        # Resample 24k -> 8k
+                        # chunk, width=2, channels=1, inrate=24000, outrate=8000
+                        fragment, self.resample_state = audioop.ratecv(chunk, 2, 1, 24000, 8000, self.resample_state)
+                        
+                        # Convert to u-law
+                        mulaw_chunk = audioop.lin2ulaw(fragment, 2) 
+                        
+                        payload = base64.b64encode(mulaw_chunk).decode('utf-8')
+                        
+                        if self.telnyx_ws:
+                            msg = {
+                                "event": "media",
+                                "media": {
+                                    "payload": payload
+                                }
+                            }
+                            await self.telnyx_ws.send_text(json.dumps(msg))
+                            chunk_count += 1
+                    except Exception as e:
+                        logger.error(f"Error converting/sending audio: {e}")
+
+            duration = time.time() - start_time
+            logger.info(f"✅ [Maya] Streamed {chunk_count} chunks in {duration:.2f}s")
+
+        except Exception as e:
+            logger.error(f"❌ [Maya] Streaming error: {e}")
+            return False
+        finally:
+            if is_last:
+                self.is_speaking = False
+                self.is_holding_floor = False
+        
+        return True
+
 class PersistentTTSManager:
     """
     Manages persistent TTS sessions across multiple calls
@@ -996,16 +1135,31 @@ class PersistentTTSManager:
             }
             logger.info(f"🎙️ Extracted voice_settings from agent config: {voice_settings}")
         
-        session = PersistentTTSSession(
-            call_control_id=call_control_id,
-            api_key=api_key,
-            voice_id=voice_id,
-            model_id=model_id,
-            telnyx_service=telnyx_service,
-            agent_config=agent_config,
-            telnyx_ws=telnyx_ws,
-            voice_settings=voice_settings
-        )
+        # Check for Maya provider
+        settings = agent_config.get("settings", {}) if agent_config else {}
+        tts_provider = settings.get("tts_provider", "elevenlabs")
+        
+        if tts_provider == "maya":
+            session = MayaPersistentSession(
+                call_control_id=call_control_id,
+                api_key=api_key, # API key handled internally by MayaTTSService env vars
+                voice_id=voice_id, # Handled via maya settings
+                telnyx_service=telnyx_service,
+                agent_config=agent_config,
+                telnyx_ws=telnyx_ws
+            )
+            logger.info(f"✨ Created Maya persistent session for call {call_control_id}")
+        else:
+            session = PersistentTTSSession(
+                call_control_id=call_control_id,
+                api_key=api_key,
+                voice_id=voice_id,
+                model_id=model_id,
+                telnyx_service=telnyx_service,
+                agent_config=agent_config,
+                telnyx_ws=telnyx_ws,
+                voice_settings=voice_settings
+            )
         
         connected = await session.connect()
         

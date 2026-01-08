@@ -476,7 +476,7 @@ class TelnyxService:
                             speaker_wav = None
                             if speaker_wav_id:
                                 try:
-                                    from server import load_voice_sample
+                                    from voice_library_router import load_voice_sample
                                     speaker_wav = await load_voice_sample(speaker_wav_id)
                                     logger.info(f"🎭 Using voice cloning sample: {speaker_wav_id}")
                                 except Exception as e:

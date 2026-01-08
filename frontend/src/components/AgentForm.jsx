@@ -1811,6 +1811,74 @@ const AgentForm = () => {
                     />
                   </div>
 
+                  {/* Reference Audio - CLONING - NEW */}
+                  <div>
+                    <Label className="text-gray-400 text-sm flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        Reference Audio (Voice Cloning)
+                        <div className="relative group">
+                          <Info size={14} className="text-blue-400 cursor-help" />
+                          <div className="absolute z-50 hidden group-hover:block right-0 top-6 w-80 p-3 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-xs text-gray-200">
+                            <strong className="text-blue-400">Voice Cloning Source</strong>
+                            <p className="mt-1">Select an audio sample to clone the voice timbre from. This works in combination with the description above.</p>
+                            <p className="mt-1 text-yellow-400">⚠️ Upload samples in the "Voice Library" section below first.</p>
+                          </div>
+                        </div>
+                      </span>
+                      {formData.settings?.maya_settings?.speaker_wav_id && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({
+                            ...formData,
+                            settings: {
+                              ...formData.settings,
+                              maya_settings: {
+                                ...formData.settings?.maya_settings,
+                                speaker_wav_id: null
+                              }
+                            }
+                          })}
+                          className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                        >
+                          <Trash2 size={12} /> Clear Selection
+                        </button>
+                      )}
+                    </Label>
+                    <Select
+                      value={formData.settings?.maya_settings?.speaker_wav_id || "none"}
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          maya_settings: {
+                            ...formData.settings?.maya_settings,
+                            speaker_wav_id: value === "none" ? null : value
+                          }
+                        }
+                      })}
+                    >
+                      <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
+                        <SelectValue placeholder="Select a voice sample..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 border-gray-700">
+                        <SelectItem value="none" className="text-gray-400 italic">
+                          No reference (Use description only)
+                        </SelectItem>
+                        {voiceLibraryLoading ? (
+                          <SelectItem value="loading" disabled>Loading voices...</SelectItem>
+                        ) : voiceLibrary.length === 0 ? (
+                          <SelectItem value="empty" disabled>No voice samples available</SelectItem>
+                        ) : (
+                          voiceLibrary.map((voice) => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                              {voice.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {/* Voice Consistency Settings */}
                   <div className="bg-gray-800/50 rounded-lg p-4 space-y-4">
                     <Label className="text-gray-300 font-semibold flex items-center gap-2">
