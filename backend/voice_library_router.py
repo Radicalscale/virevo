@@ -9,7 +9,7 @@ Endpoints:
 - GET /voice-library/{id}/audio - Stream audio preview
 """
 
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -54,20 +54,6 @@ class VoiceSampleCreate(BaseModel):
     """Request model for creating a voice sample"""
     name: str
     description: str = ""
-
-
-# ============ DEPENDENCIES ============
-
-async def get_current_user():
-    """Dependency to get current user - import from server.py"""
-    from server import get_current_user as server_get_current_user
-    return server_get_current_user
-
-
-async def get_db():
-    """Get database connection"""
-    from server import db
-    return db
 
 
 # ============ HELPER FUNCTIONS ============
@@ -117,10 +103,13 @@ def validate_audio_file(filename: str, file_size: int) -> tuple[bool, str]:
 # ============ ENDPOINTS ============
 
 @voice_library_router.get("", response_model=List[VoiceSampleResponse])
-async def list_voice_samples(current_user: dict = Depends(get_current_user)):
+async def list_voice_samples(request: Request):
     """List all voice samples for the current user"""
     try:
-        from server import db
+        from server import db, get_current_user
+        
+        # Get current user from request
+        current_user = await get_current_user(request)
         
         samples = await db.voice_library.find(
             {"user_id": current_user['id']}
@@ -138,6 +127,8 @@ async def list_voice_samples(current_user: dict = Depends(get_current_user)):
             )
             for s in samples
         ]
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error listing voice samples: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -145,14 +136,17 @@ async def list_voice_samples(current_user: dict = Depends(get_current_user)):
 
 @voice_library_router.post("", response_model=VoiceSampleResponse)
 async def upload_voice_sample(
+    request: Request,
     file: UploadFile = File(...),
     name: str = Form(...),
-    description: str = Form(""),
-    current_user: dict = Depends(get_current_user)
+    description: str = Form("")
 ):
     """Upload a new voice sample for voice cloning"""
     try:
-        from server import db
+        from server import db, get_current_user
+        
+        # Get current user from request
+        current_user = await get_current_user(request)
         
         # Read file content
         file_content = await file.read()
@@ -226,10 +220,12 @@ async def upload_voice_sample(
 
 
 @voice_library_router.get("/{sample_id}", response_model=VoiceSampleResponse)
-async def get_voice_sample(sample_id: str, current_user: dict = Depends(get_current_user)):
+async def get_voice_sample(sample_id: str, request: Request):
     """Get details of a specific voice sample"""
     try:
-        from server import db
+        from server import db, get_current_user
+        
+        current_user = await get_current_user(request)
         
         sample = await db.voice_library.find_one({
             "id": sample_id,
@@ -257,10 +253,12 @@ async def get_voice_sample(sample_id: str, current_user: dict = Depends(get_curr
 
 
 @voice_library_router.delete("/{sample_id}")
-async def delete_voice_sample(sample_id: str, current_user: dict = Depends(get_current_user)):
+async def delete_voice_sample(sample_id: str, request: Request):
     """Delete a voice sample"""
     try:
-        from server import db
+        from server import db, get_current_user
+        
+        current_user = await get_current_user(request)
         
         result = await db.voice_library.delete_one({
             "id": sample_id,
@@ -282,10 +280,12 @@ async def delete_voice_sample(sample_id: str, current_user: dict = Depends(get_c
 
 
 @voice_library_router.get("/{sample_id}/audio")
-async def get_voice_audio(sample_id: str, current_user: dict = Depends(get_current_user)):
+async def get_voice_audio(sample_id: str, request: Request):
     """Stream the audio file for preview"""
     try:
-        from server import db
+        from server import db, get_current_user
+        
+        current_user = await get_current_user(request)
         
         sample = await db.voice_library.find_one({
             "id": sample_id,
@@ -322,10 +322,14 @@ async def get_voice_audio(sample_id: str, current_user: dict = Depends(get_curre
 
 # ============ HELPER FUNCTION FOR TTS SERVICE ============
 
-async def load_voice_sample(sample_id: str) -> Optional[bytes]:
+async def load_voice_sample(sample_id: str, user_id: str = None) -> Optional[bytes]:
     """
     Load voice sample audio data by ID.
     Called by telnyx_service.py when speaker_wav_id is set.
+    
+    Args:
+        sample_id: The voice sample ID
+        user_id: Optional user ID for security validation
     
     Returns:
         Audio bytes or None if not found
@@ -333,7 +337,12 @@ async def load_voice_sample(sample_id: str) -> Optional[bytes]:
     try:
         from server import db
         
-        sample = await db.voice_library.find_one({"id": sample_id})
+        query = {"id": sample_id}
+        # If user_id provided, also filter by user for security
+        if user_id:
+            query["user_id"] = user_id
+        
+        sample = await db.voice_library.find_one(query)
         
         if sample and 'audio_data' in sample:
             logger.info(f"🎤 Loaded voice sample: {sample.get('name')} ({len(sample['audio_data'])} bytes)")
