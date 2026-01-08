@@ -178,71 +178,69 @@ class PersistentTTSSession:
 
     async def _audio_receiver_loop(self):
         """
-        Background task to receive audio chunks from ElevenLabs.
-        Decoupled from sending to prevent blocking LLM generation.
+        🔥 REWRITTEN: Continuous audio receiver that forwards ALL audio to playback.
+        Does NOT try to match audio to specific sentences - just streams everything through.
+        This fixes the bug where audio from multiple sentences got mixed/lost.
         """
-        logger.info(f"🎧 [Call {self.call_control_id}] Audio Receiver Loop STARTED")
+        logger.info(f"🎧 [Call {self.call_control_id}] Continuous Audio Receiver STARTED")
+        chunk_count = 0
+        is_first_chunk = True
+        
         try:
-            while self.connected and self.ws_service:
-                # Wait for a pending sentence (metadata)
+            while self.connected and self.ws_service and self.ws_service.connected:
                 try:
-                    # Wait for next sentence metadata
-                    current_sentence_meta = await self.pending_sentences.get()
+                    # Receive audio continuously - don't wait for sentence metadata
+                    # Just forward everything to playback as it arrives
+                    message = await asyncio.wait_for(
+                        self.ws_service.websocket.recv(),
+                        timeout=5.0  # Longer timeout - we're always listening
+                    )
                     
-                    sentence_text = current_sentence_meta['text']
-                    sentence_num = current_sentence_meta['sentence_num']
-                    is_first = current_sentence_meta['is_first']
-                    send_timestamp = current_sentence_meta.get('timestamp', 0)
+                    import json
+                    import base64
+                    data = json.loads(message)
                     
-                    # 📊 DIAGNOSTIC: Queue latency (time from send to receive start)
-                    queue_latency_ms = int((time.time() - send_timestamp) * 1000) if send_timestamp else 0
-                    pending_count = self.pending_sentences.qsize()
-                    audio_queue_count = self.audio_queue.qsize()
-                    
-                    logger.info(f"🎧 [Call {self.call_control_id}] Receiver processing sentence #{sentence_num}: '{sentence_text[:30]}...'")
-                    logger.info(f"📊 [Call {self.call_control_id}] DIAGNOSTIC: queue_latency={queue_latency_ms}ms, pending_sentences={pending_count}, audio_queue={audio_queue_count}, interrupted={self.interrupted}")
-                    
-                    chunk_count = 0
-                    
-                    # Receive audio chunks for this sentence
-                    async for audio_chunk in self.ws_service.receive_audio_chunks():
+                    # Check for audio data
+                    if "audio" in data and data["audio"]:
+                        audio_bytes = base64.b64decode(data["audio"])
                         chunk_count += 1
                         
-                        # Stop processing chunks if interrupted
-                        if self.interrupted:
-                            logger.info(f"🛑 [Call {self.call_control_id}] Receiver discarding chunk for sentence #{sentence_num} (INTERRUPTED)")
-                            continue
-
-                        # Add to playback queue
-                        await self.audio_queue.put({
-                            'sentence': sentence_text,
-                            'audio_data': audio_chunk,
-                            'format': 'mulaw',
-                            'sentence_num': sentence_num,
-                            'is_first': is_first and chunk_count == 1
-                        })
+                        # Forward to playback queue immediately (unless interrupted)
+                        if not self.interrupted:
+                            await self.audio_queue.put({
+                                'sentence': '',  # Don't track sentences
+                                'audio_data': audio_bytes,
+                                'format': 'mulaw',
+                                'sentence_num': chunk_count,
+                                'is_first': is_first_chunk
+                            })
+                            is_first_chunk = False
+                        else:
+                            logger.debug(f"🛑 [Call {self.call_control_id}] Discarding audio chunk (interrupted)")
                     
-                    if chunk_count > 0:
-                        total_receive_time_ms = int((time.time() - send_timestamp) * 1000) if send_timestamp else 0
-                        logger.info(f"✅ [Call {self.call_control_id}] Receiver finished sentence #{sentence_num}: {chunk_count} chunks in {total_receive_time_ms}ms")
-                    else:
-                        logger.warning(f"⚠️ [Call {self.call_control_id}] Receiver got 0 chunks for sentence #{sentence_num}! interrupted={self.interrupted}")
+                    # Check for errors/signals from ElevenLabs
+                    if "error" in data:
+                        logger.debug(f"📍 ElevenLabs signal: {data.get('error')}")
+                        # Reset for next response
+                        is_first_chunk = True
                     
-                    # Mark sentence as done in queue
-                    self.pending_sentences.task_done()
-                    
+                except asyncio.TimeoutError:
+                    # No audio for 5s - that's fine, keep listening
+                    continue
                 except asyncio.CancelledError:
-                    logger.info(f"🛑 [Call {self.call_control_id}] Audio Receiver Loop CANCELLED")
+                    logger.info(f"🛑 [Call {self.call_control_id}] Audio Receiver CANCELLED")
                     break
                 except Exception as e:
-                    logger.error(f"❌ [Call {self.call_control_id}] Error in Audio Receiver Loop: {e}")
-                    # Brief sleep to prevent tight loops on error
+                    if "ConnectionClosed" in str(type(e).__name__):
+                        logger.info(f"🔌 [Call {self.call_control_id}] WebSocket closed, stopping receiver")
+                        break
+                    logger.error(f"❌ [Call {self.call_control_id}] Audio receiver error: {e}")
                     await asyncio.sleep(0.1)
-                
+                    
         except Exception as e:
-            logger.error(f"❌ [Call {self.call_control_id}] Audio Receiver Loop CRASHED: {e}")
+            logger.error(f"❌ [Call {self.call_control_id}] Audio Receiver CRASHED: {e}")
         finally:
-            logger.info(f"👋 [Call {self.call_control_id}] Audio Receiver Loop STOPPED")
+            logger.info(f"👋 [Call {self.call_control_id}] Audio Receiver STOPPED (received {chunk_count} chunks total)")
 
         
     async def connect(self) -> bool:
