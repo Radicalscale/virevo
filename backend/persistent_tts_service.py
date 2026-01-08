@@ -423,13 +423,18 @@ class PersistentTTSSession:
                     flush=False
                 )
                 
-                # Send empty string to signal end of input and trigger final generation
-                # This is required by ElevenLabs to prevent 20-second timeout
-                await self.ws_service.send_text(
-                    text="",
-                    try_trigger_generation=False,
-                    flush=True
-                )
+                # 🔥 CRITICAL FIX: Only flush on the LAST sentence!
+                # Flushing after each sentence causes ElevenLabs to send audio for all sentences
+                # mixed together, but our receiver only processes one at a time, causing audio loss.
+                # By only flushing on is_last=True, we batch sentences together properly.
+                if is_last:
+                    # Send empty string to signal end of input and trigger final generation
+                    await self.ws_service.send_text(
+                        text="",
+                        try_trigger_generation=False,
+                        flush=True
+                    )
+                    logger.info(f"🔚 [Call {self.call_control_id}] FLUSH sent (is_last=True)")
                 
                 # 🚀 DECOUPLED: Push to pending queue and return IMMEDIATELY
                 # The _audio_receiver_loop will handle the reception in background
@@ -437,6 +442,7 @@ class PersistentTTSSession:
                     'text': sentence,
                     'sentence_num': sentence_num,
                     'is_first': is_first,
+                    'is_last': is_last,  # Pass this through
                     'timestamp': time.time()
                 })
                 
