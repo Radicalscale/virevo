@@ -448,15 +448,8 @@ class PersistentTTSSession:
                         })
                 
                 receive_time_ms = int((time.time() - stream_start) * 1000)
-                logger.info(f"✅ [Call {self.call_control_id}] Sentence #{sentence_num} received: {len(sentence_audio_chunks)} chunks in {receive_time_ms}ms")
+                logger.info(f"✅ [Call {self.call_control_id}] Sentence #{sentence_num}: {len(sentence_audio_chunks)} chunks received in {receive_time_ms}ms")
                 
-                # 📊 DIAGNOSTIC: Show queue state on send
-                pending_count = self.pending_sentences.qsize()
-                audio_queue_count = self.audio_queue.qsize()
-                send_time_ms = int((time.time() - stream_start) * 1000)
-                
-                logger.info(f"🚀 [Call {self.call_control_id}] Sent sentence #{sentence_num} (NON-BLOCKING) in {send_time_ms}ms")
-                logger.info(f"📊 [Call {self.call_control_id}] DIAGNOSTIC: pending_sentences={pending_count}, audio_queue={audio_queue_count}, is_first={is_first}, is_last={is_last}")
                 return True
                 
             except Exception as e:
