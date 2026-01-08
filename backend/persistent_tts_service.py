@@ -423,28 +423,32 @@ class PersistentTTSSession:
                     flush=False
                 )
                 
-                # 🔥 CRITICAL FIX: Only flush on the LAST sentence!
-                # Flushing after each sentence causes ElevenLabs to send audio for all sentences
-                # mixed together, but our receiver only processes one at a time, causing audio loss.
-                # By only flushing on is_last=True, we batch sentences together properly.
-                if is_last:
-                    # Send empty string to signal end of input and trigger final generation
-                    await self.ws_service.send_text(
-                        text="",
-                        try_trigger_generation=False,
-                        flush=True
-                    )
-                    logger.info(f"🔚 [Call {self.call_control_id}] FLUSH sent (is_last=True)")
+                # Send empty string to signal end of input and trigger final generation
+                # This is required by ElevenLabs to prevent 20-second timeout
+                await self.ws_service.send_text(
+                    text="",
+                    try_trigger_generation=False,
+                    flush=True
+                )
                 
-                # 🚀 DECOUPLED: Push to pending queue and return IMMEDIATELY
-                # The _audio_receiver_loop will handle the reception in background
-                await self.pending_sentences.put({
-                    'text': sentence,
-                    'sentence_num': sentence_num,
-                    'is_first': is_first,
-                    'is_last': is_last,  # Pass this through
-                    'timestamp': time.time()
-                })
+                # 🔥 CRITICAL FIX: Wait for audio reception BEFORE returning
+                # This prevents the next sentence from being sent before this one's audio is received.
+                # Without this, multiple sentences' audio gets mixed on the WebSocket and lost.
+                sentence_audio_chunks = []
+                async for audio_chunk in self.ws_service.receive_audio_chunks():
+                    sentence_audio_chunks.append(audio_chunk)
+                    # Send chunk immediately to playback queue
+                    if not self.interrupted:
+                        await self.audio_queue.put({
+                            'sentence': sentence,
+                            'audio_data': audio_chunk,
+                            'format': 'mulaw',
+                            'sentence_num': sentence_num,
+                            'is_first': is_first and len(sentence_audio_chunks) == 1
+                        })
+                
+                receive_time_ms = int((time.time() - stream_start) * 1000)
+                logger.info(f"✅ [Call {self.call_control_id}] Sentence #{sentence_num} received: {len(sentence_audio_chunks)} chunks in {receive_time_ms}ms")
                 
                 # 📊 DIAGNOSTIC: Show queue state on send
                 pending_count = self.pending_sentences.qsize()
