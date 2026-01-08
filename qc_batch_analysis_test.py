@@ -31,7 +31,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
 
 class QCBatchAnalysisTester:
     def __init__(self):

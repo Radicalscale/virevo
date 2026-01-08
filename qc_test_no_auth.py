@@ -9,7 +9,7 @@ import json
 import sys
 import os
 
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
 
 async def test_qc_endpoints_no_auth():
     """Test QC endpoints without authentication to see what's available"""

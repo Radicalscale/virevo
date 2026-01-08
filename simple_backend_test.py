@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com/api"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com/api"
 
 async def test_basic_connectivity():
     """Test basic backend connectivity"""

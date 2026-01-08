@@ -14,7 +14,7 @@ BACKEND_URL=https://api.li-ai.org
 
 ### Frontend .env (Original)
 ```
-REACT_APP_BACKEND_URL=https://tts-guardian.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://voice-overlap-debug.preview.emergentagent.com
 ```
 
 ---
@@ -24,7 +24,7 @@ REACT_APP_BACKEND_URL=https://tts-guardian.preview.emergentagent.com
 ### Change 7: BACKEND_URL for Telnyx Webhooks (ACTIVE)
 - **File**: `/app/backend/.env`
 - **Original Value**: `BACKEND_URL=https://api.li-ai.org`
-- **New Value**: `BACKEND_URL=https://tts-guardian.preview.emergentagent.com`
+- **New Value**: `BACKEND_URL=https://voice-overlap-debug.preview.emergentagent.com`
 - **Reason**: Telnyx webhooks and WebSocket audio streams were being sent to production server instead of this preview environment. This prevented call transcripts from being captured and auto-QC from running properly.
 - **Impact**: 
   - Telnyx call webhooks will now be sent to this preview environment
@@ -32,7 +32,7 @@ REACT_APP_BACKEND_URL=https://tts-guardian.preview.emergentagent.com
   - Call transcripts will be captured locally
   - Auto-QC will run on this environment
 - **Date**: 2025-12-02
-- **TO REVERSE**: Change `BACKEND_URL=https://tts-guardian.preview.emergentagent.com` back to `BACKEND_URL=https://api.li-ai.org` in `/app/backend/.env` and restart backend
+- **TO REVERSE**: Change `BACKEND_URL=https://voice-overlap-debug.preview.emergentagent.com` back to `BACKEND_URL=https://api.li-ai.org` in `/app/backend/.env` and restart backend
 
 ### Change 8: Agent "Who Speaks First" Configuration (ACTIVE)
 - **Database**: `test_database.agents` collection

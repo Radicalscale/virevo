@@ -9,7 +9,7 @@ import json
 import sys
 
 # Configuration
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
 TO_NUMBER = "+17708336397"  # User's phone number
 FROM_NUMBER = "+14048000152"  # Telnyx number
 AGENT_ID = None  # Will fetch first available agent

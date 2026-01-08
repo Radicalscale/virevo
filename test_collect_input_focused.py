@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com/api"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com/api"
 
 async def test_collect_input_focused():
     """Test collect input node with proper flow navigation"""

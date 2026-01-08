@@ -17,7 +17,7 @@ import os
 from typing import Dict, List, Optional
 
 # Get backend URL from frontend environment
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com/api"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com/api"
 
 class SpecificFixesTester:
     def __init__(self):

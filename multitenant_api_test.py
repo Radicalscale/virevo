@@ -13,7 +13,7 @@ import uuid
 from typing import Dict, List, Optional
 
 # Backend URL from production environment
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com/api"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com/api"
 
 class MultiTenantAPITester:
     def __init__(self):

@@ -17,10 +17,10 @@
 
 | Line | Old Code | Fixed To |
 |------|----------|----------|
-| 1488 | `"https://tts-guardian.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
-| 2223 | `"https://tts-guardian.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 1488 | `"https://voice-overlap-debug.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 2223 | `"https://voice-overlap-debug.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
 | 4168 | `"wss://airesponder-4.preview.emergentagent.com/..."` | Uses `BACKEND_URL` env var (required) |
-| 4226 | `"https://tts-guardian.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 4226 | `"https://voice-overlap-debug.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
 
 **Why This Matters:**
 - Hardcoded Emergent URLs would fail in external deployment
@@ -49,7 +49,7 @@ Used for:
 
 **Frontend .env still has:**
 ```
-REACT_APP_BACKEND_URL=https://tts-guardian.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://voice-overlap-debug.preview.emergentagent.com
 ```
 
 **This is fine because:**

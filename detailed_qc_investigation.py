@@ -15,7 +15,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from review request
-BACKEND_URL = "https://tts-guardian.preview.emergentagent.com"
+BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
 
 # Test data from review request
 TEST_CREDENTIALS = {

@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 # Configuration - Use production backend URL from .env
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://tts-guardian.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-overlap-debug.preview.emergentagent.com')
 TEST_USER_EMAIL = "kendrickbowman9@gmail.com"
 TEST_USER_PASSWORD = os.environ.get('QC_TEST_PASSWORD', 'password123')
 

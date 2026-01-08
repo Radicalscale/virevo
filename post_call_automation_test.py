@@ -24,7 +24,7 @@ from typing import Dict, Any, List, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Get backend URL from environment
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://tts-guardian.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-overlap-debug.preview.emergentagent.com')
 MONGO_URL = os.environ.get('MONGO_URL')
 DB_NAME = "test_database"
 

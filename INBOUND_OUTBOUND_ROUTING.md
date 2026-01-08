@@ -105,14 +105,14 @@ The `outbound_agent_id` is used when making calls FROM a specific number. This d
 In your Telnyx dashboard, configure your phone number(s) to send webhooks to:
 
 ```
-https://tts-guardian.preview.emergentagent.com/api/telnyx/webhook
+https://voice-overlap-debug.preview.emergentagent.com/api/telnyx/webhook
 ```
 
 **Steps**:
 1. Log in to Telnyx Portal
 2. Go to **Call Control Applications**
 3. Create or edit your application
-4. Set **Webhook URL**: `https://tts-guardian.preview.emergentagent.com/api/telnyx/webhook`
+4. Set **Webhook URL**: `https://voice-overlap-debug.preview.emergentagent.com/api/telnyx/webhook`
 5. Enable these events:
    - `call.initiated` ✅
    - `call.answered` ✅

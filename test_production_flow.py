@@ -12,7 +12,7 @@ import json
 import uuid
 
 # Backend URL
-BACKEND_URL = os.getenv('BACKEND_URL', 'https://tts-guardian.preview.emergentagent.com')
+BACKEND_URL = os.getenv('BACKEND_URL', 'https://voice-overlap-debug.preview.emergentagent.com')
 
 class ProductionFlowTester:
     def __init__(self):
