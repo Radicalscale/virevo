@@ -405,8 +405,6 @@ class PersistentTTSSession:
                 self.sentence_counter += 1
                 sentence_num = self.sentence_counter
                 
-
-                
                 # ⏱️ Track first sentence start time
                 if sentence_num == 1 and self.request_start_time is None:
                     self.request_start_time = time.time()
@@ -423,31 +421,17 @@ class PersistentTTSSession:
                 )
                 
                 # Send empty string to signal end of input and trigger final generation
-                # This is required by ElevenLabs to prevent 20-second timeout
                 await self.ws_service.send_text(
                     text="",
                     try_trigger_generation=False,
                     flush=True
                 )
                 
-                # 🔥 CRITICAL FIX: Wait for audio reception BEFORE returning
-                # This prevents the next sentence from being sent before this one's audio is received.
-                # Without this, multiple sentences' audio gets mixed on the WebSocket and lost.
-                sentence_audio_chunks = []
-                async for audio_chunk in self.ws_service.receive_audio_chunks():
-                    sentence_audio_chunks.append(audio_chunk)
-                    # Send chunk immediately to playback queue
-                    if not self.interrupted:
-                        await self.audio_queue.put({
-                            'sentence': sentence,
-                            'audio_data': audio_chunk,
-                            'format': 'mulaw',
-                            'sentence_num': sentence_num,
-                            'is_first': is_first and len(sentence_audio_chunks) == 1
-                        })
-                
-                receive_time_ms = int((time.time() - stream_start) * 1000)
-                logger.info(f"✅ [Call {self.call_control_id}] Sentence #{sentence_num}: {len(sentence_audio_chunks)} chunks received in {receive_time_ms}ms")
+                # 🚀 NON-BLOCKING: Return immediately after sending
+                # The continuous _audio_receiver_loop will pick up all audio chunks
+                # and forward them to playback. No need to track per-sentence.
+                send_time_ms = int((time.time() - stream_start) * 1000)
+                logger.info(f"🚀 [Call {self.call_control_id}] Sent sentence #{sentence_num} in {send_time_ms}ms (non-blocking)")
                 
                 return True
                 
