@@ -1146,6 +1146,35 @@ Answer (one word only):"""
         if self.knowledge_base:
             system_prompt += f"\n\n=== KNOWLEDGE BASE ===\nYou have access to multiple reference sources below. Each source serves a different purpose.\n\n🧠 HOW TO USE THE KNOWLEDGE BASE:\n1. When user asks a question, FIRST identify which knowledge base source(s) are relevant based on their descriptions\n2. Read ONLY the relevant source(s) to find the answer\n3. Use ONLY information from the knowledge base - do NOT make up or improvise ANY factual details\n4. If the knowledge base doesn't contain the answer, say: \"I don't have that specific information available\"\n5. Different sources contain different types of information - match the user's question to the right source\n\n⚠️ NEVER invent: company names, product names, prices, processes, methodologies, or any factual information not in the knowledge base\n\n{self.knowledge_base}\n=== END KNOWLEDGE BASE ===\n"
         
+        # Add Maya TTS emotion tag instructions when Maya is the TTS provider
+        tts_provider = self.agent_config.get("settings", {}).get("tts_provider", "")
+        if tts_provider == "maya":
+            system_prompt += """
+
+=== EMOTIONAL EXPRESSION (MAYA TTS) ===
+You can make your speech more expressive by using emotional cues. Include these naturally in your responses:
+
+**Laughter/Amusement:**
+- *laughs* or *chuckles* - When something is genuinely funny
+- *giggles* - For lighter, playful moments
+
+**Breathing/Reactions:**
+- *sighs* - For empathy, understanding, or mild frustration
+- *gasps* - For surprise or excitement
+
+**Emotions:**
+- *excitedly* - When sharing good news or enthusiasm
+- *sarcastically* - For playful teasing (use sparingly)
+
+**Usage Examples:**
+- "*laughs* That's a great question!"
+- "I completely understand. *sighs* Let me help you with that."
+- "*excitedly* Oh, you're going to love this!"
+
+Use these sparingly and naturally - only when they genuinely fit the moment.
+=== END EMOTIONAL EXPRESSION ===
+"""
+        
         messages.append({"role": "system", "content": system_prompt})
         messages.extend(self.conversation_history)
         
