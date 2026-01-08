@@ -2837,46 +2837,101 @@ Your response (just the number):"""
             logger.info(f"⏱️ [{timestamp_str}] 🔀 TRANSITION EVALUATION START - Calling LLM for {len(transition_options)} options")
             transition_start = time.time()
             
-            # 🚀 CRITICAL FIX: Add 2-second timeout to prevent 13-second freezes
+            # 🚀 OPTIMIZATION: Stream transition LLM and act on first valid token
+            # This saves ~300-500ms by not waiting for full response finalization
             try:
-                # Call LLM based on provider with timeout wrapper
-                async def call_llm_for_transition():
-                    if llm_provider == "grok" or llm_provider == "gemini":
-                        return await client.create_completion(
-                            messages=[
-                                {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
-                                {"role": "user", "content": eval_prompt}
-                            ],
-                            model=model,
-                            temperature=0,
-                            max_tokens=10,
-                            stream=False
-                        )
-                    else:
-                        return await client.chat.completions.create(
-                            model=model,
-                            messages=[
-                                {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
-                                {"role": "user", "content": eval_prompt}
-                            ],
-                            temperature=0,
-                            max_tokens=10,
-                            stream=False
-                        )
+                # Build valid responses set based on number of options
+                valid_responses = {str(i) for i in range(len(transition_options))}
+                valid_responses.add("-1")  # No match response
                 
-                # Apply 1.5-second timeout (aggressive) - Grok is fast, should complete in < 500ms normally
-                response = await asyncio.wait_for(call_llm_for_transition(), timeout=1.5)
+                async def stream_llm_for_transition():
+                    """Stream LLM response and return as soon as we have a valid transition number"""
+                    buffer = ""
+                    ttft_logged = False
+                    
+                    if llm_provider == "grok" or llm_provider == "gemini":
+                        stream = await client.create_completion(
+                            messages=[
+                                {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
+                                {"role": "user", "content": eval_prompt}
+                            ],
+                            model=model,
+                            temperature=0,
+                            max_tokens=10,
+                            stream=True
+                        )
+                        
+                        async for chunk in stream:
+                            if not ttft_logged:
+                                ttft_ms = int((time.time() - transition_start) * 1000)
+                                logger.info(f"⚡ TRANSITION TTFT: {ttft_ms}ms")
+                                ttft_logged = True
+                            
+                            # Handle different response formats from providers
+                            if hasattr(chunk, 'choices') and chunk.choices:
+                                delta = chunk.choices[0]
+                                if hasattr(delta, 'delta') and hasattr(delta.delta, 'content'):
+                                    token = delta.delta.content or ""
+                                elif hasattr(delta, 'text'):
+                                    token = delta.text or ""
+                                elif hasattr(delta, 'message') and hasattr(delta.message, 'content'):
+                                    token = delta.message.content or ""
+                                else:
+                                    token = ""
+                            else:
+                                token = ""
+                            
+                            buffer += token
+                            cleaned = buffer.strip()
+                            
+                            # Check if we have a valid complete response
+                            if cleaned in valid_responses:
+                                logger.info(f"⚡ TRANSITION STREAM: Got valid response '{cleaned}' - returning immediately")
+                                return cleaned
+                    else:
+                        # OpenAI-style client
+                        stream = await client.chat.completions.create(
+                            model=model,
+                            messages=[
+                                {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
+                                {"role": "user", "content": eval_prompt}
+                            ],
+                            temperature=0,
+                            max_tokens=10,
+                            stream=True
+                        )
+                        
+                        async for chunk in stream:
+                            if not ttft_logged:
+                                ttft_ms = int((time.time() - transition_start) * 1000)
+                                logger.info(f"⚡ TRANSITION TTFT: {ttft_ms}ms")
+                                ttft_logged = True
+                            
+                            if chunk.choices and chunk.choices[0].delta.content:
+                                token = chunk.choices[0].delta.content
+                                buffer += token
+                                cleaned = buffer.strip()
+                                
+                                # Check if we have a valid complete response
+                                if cleaned in valid_responses:
+                                    logger.info(f"⚡ TRANSITION STREAM: Got valid response '{cleaned}' - returning immediately")
+                                    return cleaned
+                    
+                    # If we get here, return whatever we accumulated
+                    return buffer.strip()
+                
+                # Apply 1.5-second timeout
+                ai_response = await asyncio.wait_for(stream_llm_for_transition(), timeout=1.5)
                 
             except asyncio.TimeoutError:
                 # Timeout! STAY on current node - don't auto-transition
-                # Taking the first transition was causing unexpected jumps (e.g., after empty messages)
                 logger.warning(f"⚠️ TRANSITION EVALUATION TIMEOUT (>1.5s) - staying on current node")
                 logger.warning(f"⚠️ This prevents 13-second freezes. User should re-respond to trigger evaluation.")
-                
-                # Return current node to stay in place
                 return current_node
-            
-            ai_response = response.choices[0].message.content.strip()
+            except Exception as e:
+                logger.error(f"❌ Transition streaming error: {e}")
+                # On error, stay on current node
+                return current_node
             transition_end = time.time()
             transition_latency_ms = int((transition_end - transition_start) * 1000)
             timestamp_str = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
