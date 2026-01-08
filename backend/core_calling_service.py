@@ -2850,6 +2850,10 @@ Your response (just the number):"""
                     ttft_logged = False
                     
                     if llm_provider == "grok" or llm_provider == "gemini":
+                        # Log when we START the API call
+                        api_start = time.time()
+                        logger.info(f"⚡ TRANSITION: Calling {llm_provider} API...")
+                        
                         stream = await client.create_completion(
                             messages=[
                                 {"role": "system", "content": "You are an expert at understanding conversation flow and user intent in phone calls. You analyze what users say and match it to transition conditions intelligently."},
@@ -2860,6 +2864,10 @@ Your response (just the number):"""
                             max_tokens=10,
                             stream=True
                         )
+                        
+                        # Log when stream object is returned
+                        api_time = int((time.time() - api_start) * 1000)
+                        logger.info(f"⚡ TRANSITION: API call returned stream in {api_time}ms")
                         
                         async for chunk in stream:
                             if not ttft_logged:
