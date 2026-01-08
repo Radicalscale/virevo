@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Upload, Link as LinkIcon, Trash2, FileText, ExternalLink, Info } from 'lucide-react';
-import { agentAPI, kbAPI } from '../services/api';
+import { agentAPI, kbAPI, voiceLibraryAPI } from '../services/api';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -37,6 +37,12 @@ const AgentForm = () => {
   const [addingUrl, setAddingUrl] = useState(false);
   const [urlInput, setUrlInput] = useState('');
 
+  // Voice Library state (Maya TTS voice cloning)
+  const [voiceLibrary, setVoiceLibrary] = useState([]);
+  const [voiceLibraryLoading, setVoiceLibraryLoading] = useState(false);
+  const [uploadingVoice, setUploadingVoice] = useState(false);
+  const [voiceName, setVoiceName] = useState('');
+
   useEffect(() => {
     if (isEdit) {
       fetchAgent();
@@ -44,6 +50,8 @@ const AgentForm = () => {
     } else {
       setLoading(false);
     }
+    // Always fetch voice library (for new and edit)
+    fetchVoiceLibrary();
   }, [id]);
 
   const fetchAgent = async () => {
@@ -80,6 +88,100 @@ const AgentForm = () => {
       console.error('Error fetching KB items:', error);
     } finally {
       setKbLoading(false);
+    }
+  };
+
+  // Fetch voice library for Maya TTS voice cloning
+  const fetchVoiceLibrary = async () => {
+    try {
+      setVoiceLibraryLoading(true);
+      const response = await voiceLibraryAPI.list();
+      setVoiceLibrary(response.data || []);
+    } catch (error) {
+      console.error('Error fetching voice library:', error);
+    } finally {
+      setVoiceLibraryLoading(false);
+    }
+  };
+
+  // Upload voice sample for Maya TTS voice cloning
+  const handleVoiceUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    const validExtensions = ['wav', 'mp3', 'flac', 'ogg', 'm4a'];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    if (!validExtensions.includes(fileExt)) {
+      toast({
+        title: "Invalid file type",
+        description: "Only WAV, MP3, FLAC, OGG, and M4A files are supported",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const name = voiceName.trim() || file.name.replace(/\.[^/.]+$/, '');
+
+    try {
+      setUploadingVoice(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('name', name);
+      formData.append('description', '');
+
+      await voiceLibraryAPI.upload(formData);
+      toast({
+        title: "Voice Uploaded",
+        description: `"${name}" added to your voice library`
+      });
+      setVoiceName('');
+      fetchVoiceLibrary();
+    } catch (error) {
+      console.error('Error uploading voice:', error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Failed to upload voice sample",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingVoice(false);
+      e.target.value = '';
+    }
+  };
+
+  // Delete voice sample
+  const handleVoiceDelete = async (voiceId, voiceName) => {
+    if (!confirm(`Delete voice "${voiceName}"?`)) return;
+
+    try {
+      await voiceLibraryAPI.delete(voiceId);
+      toast({
+        title: "Deleted",
+        description: `Voice "${voiceName}" removed`
+      });
+      fetchVoiceLibrary();
+
+      // Clear selection if this voice was selected
+      if (formData.settings?.maya_settings?.speaker_wav_id === voiceId) {
+        setFormData({
+          ...formData,
+          settings: {
+            ...formData.settings,
+            maya_settings: {
+              ...formData.settings?.maya_settings,
+              speaker_wav_id: null
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting voice:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete voice",
+        variant: "destructive"
+      });
     }
   };
 
@@ -1812,6 +1914,102 @@ const AgentForm = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Voice Library (Voice Cloning) */}
+                  <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-600/50 rounded-lg p-4 space-y-4">
+                    <Label className="text-gray-300 font-semibold flex items-center gap-2">
+                      🎤 Voice Cloning Library
+                      <span className="text-xs font-normal text-gray-500">(Clone voices from audio samples)</span>
+                    </Label>
+
+                    {/* Select Voice */}
+                    <div>
+                      <Label className="text-gray-400 text-sm">Select Cloned Voice</Label>
+                      <Select
+                        value={formData.settings?.maya_settings?.speaker_wav_id || 'none'}
+                        onValueChange={(value) => setFormData({
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            maya_settings: {
+                              ...formData.settings?.maya_settings,
+                              speaker_wav_id: value === 'none' ? null : value
+                            }
+                          }
+                        })}
+                      >
+                        <SelectTrigger className="bg-gray-900 border-gray-700 text-white mt-1">
+                          <SelectValue placeholder="None - Use description only" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-900 border-gray-700">
+                          <SelectItem value="none">🎭 None - Use description only</SelectItem>
+                          {voiceLibrary.map(voice => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                              🎤 {voice.name} ({voice.duration_seconds?.toFixed(1)}s)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Select a cloned voice as the base, then use description to refine style
+                      </p>
+                    </div>
+
+                    {/* Upload New Voice */}
+                    <div className="border-t border-gray-700/50 pt-4">
+                      <Label className="text-gray-400 text-sm mb-2 block">Upload New Voice Sample</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          value={voiceName}
+                          onChange={(e) => setVoiceName(e.target.value)}
+                          placeholder="Voice name (e.g., 'Sarah Professional')"
+                          className="bg-gray-900 border-gray-700 text-white flex-1"
+                        />
+                        <label className="cursor-pointer inline-block">
+                          <input
+                            type="file"
+                            accept=".wav,.mp3,.flac,.ogg,.m4a"
+                            onChange={handleVoiceUpload}
+                            className="hidden"
+                          />
+                          <span className="inline-flex items-center px-4 py-2 border border-purple-600 text-purple-400 rounded-md hover:bg-purple-900/30 cursor-pointer text-sm">
+                            {uploadingVoice ? 'Uploading...' : '📁 Upload'}
+                          </span>
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Upload 5-30 second WAV or MP3. Clear audio, single speaker, no background noise.
+                      </p>
+                    </div>
+
+                    {/* Voice Library List */}
+                    {voiceLibrary.length > 0 && (
+                      <div className="border-t border-gray-700/50 pt-4">
+                        <Label className="text-gray-400 text-sm mb-2 block">Your Voice Library ({voiceLibrary.length}/20)</Label>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {voiceLibrary.map(voice => (
+                            <div key={voice.id} className="flex items-center justify-between bg-gray-900/50 rounded px-3 py-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-purple-400">🎤</span>
+                                <span className="text-white text-sm">{voice.name}</span>
+                                <span className="text-gray-500 text-xs">
+                                  {voice.duration_seconds?.toFixed(1)}s • {(voice.file_size / 1024).toFixed(0)}KB
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleVoiceDelete(voice.id, voice.name)}
+                                className="text-red-400 hover:text-red-300 p-1"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
