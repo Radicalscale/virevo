@@ -7026,9 +7026,89 @@ async def generate_tts_audio(text: str, agent_config: dict) -> bytes:
                 logger.error(f"❌ Sesame WebSocket error: {e}")
                 logger.warning("⚠️ Falling back to ElevenLabs")
                 audio_bytes = await generate_audio_elevenlabs(text, settings, user_id)
+
+        elif tts_provider == "maya":
+            # Use Maya TTS for expressive voice with emotion tags
+            try:
+                from maya_tts_service import MayaTTSService
+                
+                maya_settings = settings.get("maya_settings", {})
+                voice_ref = maya_settings.get("voice_ref", "A warm, professional female voice")
+                temperature = maya_settings.get("temperature", 0.35)
+                seed = maya_settings.get("seed", 0)
+                speaker_wav_id = maya_settings.get("speaker_wav_id")
+                
+                logger.info(f"🎤 Maya TTS: voice='{voice_ref[:50]}...', temp={temperature}, seed={seed}")
+                
+                # Load cloned voice if specified
+                speaker_wav_data = None
+                if speaker_wav_id:
+                    try:
+                        from voice_library_router import load_voice_sample
+                        speaker_wav_data = await load_voice_sample(speaker_wav_id, user_id)
+                        if speaker_wav_data:
+                            logger.info(f"🎤 Using cloned voice from library: {speaker_wav_id}")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to load voice sample: {e}")
+                
+                # Generate audio
+                maya_service = MayaTTSService()
+                audio_bytes = await maya_service.generate_speech(
+                    text=text,
+                    voice_ref=voice_ref,
+                    temperature=temperature,
+                    seed=seed,
+                    speaker_wav=speaker_wav_data,
+                    output_format="wav"
+                )
+                
+                if audio_bytes:
+                    logger.info(f"✅ Maya TTS generated {len(audio_bytes)} bytes")
+                    
+                    # Convert WAV to MP3 for Telnyx compatibility
+                    import tempfile
+                    import subprocess
+                    
+                    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as wav_file:
+                        wav_path = wav_file.name
+                        wav_file.write(audio_bytes)
+                    
+                    mp3_path = wav_path.replace('.wav', '.mp3')
+                    result = subprocess.run([
+                        'ffmpeg', '-y',
+                        '-i', wav_path,
+                        '-ar', '8000',  # Resample to 8kHz for Telnyx
+                        '-ac', '1',     # Mono
+                        '-b:a', '64k',  # 64kbps bitrate
+                        mp3_path
+                    ], capture_output=True, text=True)
+                    
+                    if result.returncode == 0:
+                        with open(mp3_path, 'rb') as f:
+                            audio_bytes = f.read()
+                        logger.info(f"✅ Maya audio converted to MP3: {len(audio_bytes)} bytes")
+                        os.unlink(wav_path)
+                        os.unlink(mp3_path)
+                    else:
+                        logger.error(f"❌ ffmpeg conversion failed: {result.stderr}")
+                        os.unlink(wav_path)
+                        audio_bytes = None
+                else:
+                    logger.warning("⚠️ Maya TTS returned no audio")
+                    audio_bytes = None
+                    
+            except Exception as e:
+                logger.error(f"❌ Maya TTS error: {e}")
+                audio_bytes = None
+            
+            # Fallback to ElevenLabs if Maya failed
+            if not audio_bytes:
+                logger.warning("⚠️ Maya TTS failed, falling back to ElevenLabs")
+                audio_bytes = await generate_audio_elevenlabs(text, settings, user_id)
+
         else:
             # Default to ElevenLabs
-            audio_bytes = await generate_audio_elevenlabs(text, settings, user_id)
+            audio_bytes = await generate_audio_elevenlabs_streaming(text, settings, user_id)
         
         # NOTE: Comfort noise is now handled as continuous background overlay (started at call beginning)
         # No need to mix into each TTS chunk - cleaner and more natural
