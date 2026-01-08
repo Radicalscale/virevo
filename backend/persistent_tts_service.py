@@ -270,10 +270,9 @@ class PersistentTTSSession:
                 # Start playback consumer
                 self.playback_task = asyncio.create_task(self._playback_consumer())
                 
-                # 🔥 DISABLED: _audio_receiver_loop - now receiving audio inline in stream_sentence()
-                # This fixes the bug where multiple sentences' audio got mixed/lost
-                # self._audio_receiver_task = asyncio.create_task(self._audio_receiver_loop())
-                # logger.info(f"🎧 [Call {self.call_control_id}] Audio receiver loop started")
+                # 🔥 RE-ENABLED: Continuous audio receiver (rewrote to fix audio loss bug)
+                self._audio_receiver_task = asyncio.create_task(self._audio_receiver_loop())
+                logger.info(f"🎧 [Call {self.call_control_id}] Continuous audio receiver started")
                 
                 # 💓 Start keep-alive loop to prevent 20-second timeout
                 self._keepalive_task = asyncio.create_task(self._keepalive_loop())
