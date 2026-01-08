@@ -7068,6 +7068,7 @@ async def generate_tts_audio(text: str, agent_config: dict) -> bytes:
                     # Convert WAV to MP3 for Telnyx compatibility
                     import tempfile
                     import subprocess
+                    import os  # Fix: Import os locally
                     
                     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as wav_file:
                         wav_path = wav_file.name
@@ -7087,17 +7088,26 @@ async def generate_tts_audio(text: str, agent_config: dict) -> bytes:
                         with open(mp3_path, 'rb') as f:
                             audio_bytes = f.read()
                         logger.info(f"✅ Maya audio converted to MP3: {len(audio_bytes)} bytes")
-                        os.unlink(wav_path)
-                        os.unlink(mp3_path)
+                        try:
+                            os.unlink(wav_path)
+                            os.unlink(mp3_path)
+                        except Exception as e:
+                            logger.warning(f"⚠️ Failed to cleanup temp files: {e}")
                     else:
                         logger.error(f"❌ ffmpeg conversion failed: {result.stderr}")
-                        os.unlink(wav_path)
+                        try:
+                            os.unlink(wav_path)
+                        except:
+                            pass
                         audio_bytes = None
                 else:
                     logger.warning("⚠️ Maya TTS returned no audio")
                     audio_bytes = None
                     
             except Exception as e:
+                logger.error(f"❌ Maya TTS error: {e}")
+                # Don't fallback to ElevenLabs to avoid using old voice settings
+                audio_bytes = None
                 logger.error(f"❌ Maya TTS error: {e}")
                 audio_bytes = None
             

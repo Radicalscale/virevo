@@ -443,6 +443,7 @@ class TelnyxService:
                 # Try to use external TTS if provider is set (REST API)
                 if tts_provider in ["elevenlabs", "hume", "sesame", "cartesia", "maya"]:
                     logger.info(f"🎙️ Attempting {tts_provider} TTS (REST)")
+                    tts_start = time.time()  # Fix: Initialize tts_start
                     
                     try:
                         # Special handling for Maya TTS
