@@ -219,15 +219,17 @@ class RealtimeVoiceAgent:
             # 1. Process text through middleware to handle [H]/[S] tags and strategy
             from natural_delivery_middleware import NaturalDeliveryMiddleware
             
-            # Determine model_id from session config if available, default to flash
-            # Safe default
-            model_id = "eleven_flash_v2_5" 
+            # Get model_id and TTS provider from session config
+            model_id = "eleven_flash_v2_5"  # Safe default
+            tts_provider = "elevenlabs"  # Default
+            
             if hasattr(self.session, "agent_config"):
                 settings = self.session.agent_config.get("settings", {})
                 model_id = settings.get("elevenlabs_settings", {}).get("model", "eleven_flash_v2_5")
+                tts_provider = settings.get("tts_provider", "elevenlabs")
             
-            # Dual-Stream Processing
-            clean_text, audio_payload = self.delivery_middleware.process(text, model_id)
+            # Dual-Stream Processing - now with TTS provider awareness
+            clean_text, audio_payload = self.delivery_middleware.process(text, model_id, tts_provider)
             
             # 2. Logic Stream: Save CLEAN text to transcript (no [H] tags)
             await self.db.call_logs.update_one(
@@ -241,19 +243,20 @@ class RealtimeVoiceAgent:
                 }}
             )
             
-            # 3. Audio Stream: Speak using rich payload (SSML or Voice Settings)
-            # Unpack payload
+            # 3. Audio Stream: Speak using rich payload (SSML/Emotion Tags or Voice Settings)
             tts_text = audio_payload["text"]
             voice_settings = audio_payload["voice_settings"]
             
-            # Log transformation if payload changed or non-default settings used
-            # Default stability is 0.5 (Neutral). If distinct, we log it.
+            # Log transformation
             is_active_delivery = (tts_text != clean_text) or (voice_settings.get("stability") != 0.5)
             
             if is_active_delivery:
-                logger.info(f"🎭 Natural Delivery: '{clean_text}' -> '{tts_text}' (Settings: {voice_settings})")
+                if tts_provider == "maya":
+                    logger.info(f"🎭 Maya Emotion: '{clean_text}' -> '{tts_text}'")
+                else:
+                    logger.info(f"🎭 Natural Delivery: '{clean_text}' -> '{tts_text}' (Settings: {voice_settings})")
             else:
-                logger.debug(f"🎭 Natural Delivery (Neutral): '{clean_text}' (Settings: {voice_settings})")
+                logger.debug(f"🎭 Natural Delivery (Neutral): '{clean_text}'")
             
             await self.telnyx_service.speak_text(
                 self.call_control_id, 
