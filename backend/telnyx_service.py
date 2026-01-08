@@ -508,8 +508,11 @@ class TelnyxService:
                         
                         if audio_bytes and len(audio_bytes) > 1000:
                             # Save audio to temporary file
-                            audio_hash = hashlib.md5(text.encode()).hexdigest()
-                            audio_filename = f"tts_{audio_hash}.mp3"
+                            # 🔥 FIX: Include TTS provider in hash to prevent cross-provider cache collisions
+                            tts_provider = agent_config.get('settings', {}).get('tts_provider', 'unknown')
+                            combined_string = f"{tts_provider}_{text}"
+                            audio_hash = hashlib.md5(combined_string.encode()).hexdigest()
+                            audio_filename = f"tts_{tts_provider}_{audio_hash}.mp3"
                             audio_path = f"/tmp/{audio_filename}"
                             
                             with open(audio_path, 'wb') as f:
