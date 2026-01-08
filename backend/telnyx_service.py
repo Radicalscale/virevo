@@ -843,7 +843,7 @@ class TelnyxService:
             
             # Get backend URL for serving the audio
             backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
-            audio_url = f"{backend_url}/api/tts-audio/tts_ws_{audio_hash}.mp3"
+            audio_url = f"{backend_url}/api/tts-audio/tts_ws_{tts_provider}_{audio_hash}.mp3"
             
             logger.info(f"🔗 WebSocket audio URL: {audio_url}")
             
