@@ -4004,7 +4004,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 
                 # 🔥 FIRST PRIORITY: Clear WebSocket TTS audio IMMEDIATELY
                 # This sends the clear event to Telnyx to flush the audio buffer
-                from persistent_tts_service import persistent_tts_manager
+                # Note: persistent_tts_manager is imported at top of file (line 41)
                 persistent_tts_session = persistent_tts_manager.get_session(call_control_id)
                 if persistent_tts_session:
                     await persistent_tts_session.clear_audio()
@@ -4221,8 +4221,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 
                 # Stream callback: Generate TTS IMMEDIATELY as sentences arrive
                 async def stream_sentence_to_tts(sentence):
-                    # Import inside callback to avoid closure scoping issues when called from calling_service
-                    from persistent_tts_service import persistent_tts_manager as tts_manager
+                    # Note: persistent_tts_manager is imported at top of file (line 41)
+                    # Using closure to access the global import
+                    tts_manager = persistent_tts_manager
                     
                     nonlocal current_playback_ids, first_sentence_played, full_response_text, tts_start_time
                     nonlocal first_tts_started, tts_tasks, sentence_queue
@@ -4426,7 +4427,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 
                 # 🔄 CRITICAL: Reset TTS interrupt flag before generating new response
                 # This ensures we can speak again after an interruption
-                from persistent_tts_service import persistent_tts_manager
+                # Note: persistent_tts_manager is imported at top of file (line 41)
                 tts_session = persistent_tts_manager.get_session(call_control_id)
                 if tts_session and tts_session.interrupted:
                     tts_session.reset_interrupt_flag()
@@ -4805,7 +4806,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         # 🚦 INTERRUPTION DETECTION: Check if agent audio is actively playing
         # For WebSocket streaming, use tts_is_speaking as primary source of truth
         # For HTTP playback, use current_playback_ids as backup
-        from persistent_tts_service import persistent_tts_manager
+        # Note: persistent_tts_manager is imported at top of file (line 41)
         tts_session = persistent_tts_manager.get_session(call_control_id) if call_control_id else None
         tts_is_speaking = tts_session.is_speaking if tts_session else False
         
