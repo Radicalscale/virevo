@@ -1625,19 +1625,63 @@ Use these sparingly and naturally - only when they genuinely fit the moment.
                                 # 🚀 MERGED TRANSITION + CONTENT GENERATION
                                 # Instead of two sequential LLM calls, do both in ONE call
                                 timestamp_str = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-                                logger.info(f"⏱️ [{timestamp_str}] 🚀 Using MERGED transition+response for: {user_message[:30]}...")
-                                logger.info(f"Evaluating transitions from {current_node.get('label')} for message: {user_message}")
+                                logger.info(f"⏱️ [{timestamp_str}] 🚀 Checking special cases before merged transition+response...")
                                 
-                                # ⏱️ TIMING: Merged call start
+                                # ⏱️ TIMING: Start
                                 transition_start = time.time()
                                 
                                 # Check for special cases that should use old method
                                 node_data_check = current_node.get("data", {})
                                 is_function_node = current_node.get("type") == "function"
-                                has_webhook_context = False  # Would be set if we have webhook response
+                                transitions = node_data_check.get("transitions", [])
                                 
-                                # Use merged approach for normal conversation nodes
-                                if not is_function_node:
+                                # SPECIAL CASE 1: auto_transition_after_response (instant transition after user speaks)
+                                auto_transition_after_response_node_id = node_data_check.get("auto_transition_after_response")
+                                if auto_transition_after_response_node_id:
+                                    logger.info(f"🎤 AUTO-TRANSITION AFTER RESPONSE - user spoke, transitioning to: {auto_transition_after_response_node_id}")
+                                    selected_node = self._get_node_by_id(auto_transition_after_response_node_id, flow_nodes)
+                                    if selected_node:
+                                        logger.info(f"✅ Auto-transitioned (after response) to: {selected_node.get('label', 'unnamed')}")
+                                        self.last_transition_time_ms = 0
+                                        # Continue to normal content generation
+                                    else:
+                                        logger.warning(f"⚠️ Auto-transition target not found, falling back to merged evaluation")
+                                        selected_node = None
+                                
+                                # SPECIAL CASE 2: Hello=Yes override on Greeting nodes
+                                if selected_node is None and transitions:
+                                    node_label = current_node.get("label", "")
+                                    if user_message and (node_label == "Greeting" or "greeting" in node_label.lower()):
+                                        cleaned_msg = user_message.strip().lower().rstrip('.!?,')
+                                        logger.info(f"🔍 Checking 'Hello=Yes' override for msg='{cleaned_msg}' on node='{node_label}'")
+                                        
+                                        override_triggers = ["speaking", "this is", "yeah", "yes", "sure", "yep", "uh huh", "that's me"]
+                                        is_override = False
+                                        if cleaned_msg in override_triggers:
+                                            is_override = True
+                                        elif any(cleaned_msg.startswith(t) for t in ["this is", "it is", "it's", "speaking", "yes", "yeah"]):
+                                            is_override = True
+                                        
+                                        if is_override:
+                                            logger.info(f"⚡ OVERRIDE TRIGGERED: '{user_message}' on Greeting node -> Forcing Transition 0")
+                                            first_trans = transitions[0]
+                                            next_node_id = first_trans.get("nextNode")
+                                            selected_node = self._get_node_by_id(next_node_id, flow_nodes) or current_node
+                                            self.last_transition_time_ms = 0
+                                
+                                # SPECIAL CASE 3: Function nodes need webhook evaluation
+                                if selected_node is None and is_function_node:
+                                    logger.info(f"📡 Function node detected - using standard transition evaluation")
+                                    selected_node = await self._follow_transition(current_node, user_message, flow_nodes)
+                                    transition_ms = int((time.time() - transition_start) * 1000)
+                                    self.last_transition_time_ms = transition_ms
+                                    logger.info(f"⏱️ [TIMING] TRANSITION_EVAL: {transition_ms}ms")
+                                
+                                # DEFAULT: Use merged transition + content for normal conversation nodes
+                                if selected_node is None:
+                                    logger.info(f"⏱️ Using MERGED transition+response for: {user_message[:30]}...")
+                                    logger.info(f"Evaluating transitions from {current_node.get('label')} for message: {user_message}")
+                                    
                                     selected_node, merged_response = await self._merged_transition_and_response(
                                         current_node, user_message, flow_nodes, stream_callback
                                     )
@@ -1659,13 +1703,6 @@ Use these sparingly and naturally - only when they genuinely fit the moment.
                                         })
                                         
                                         return merged_response
-                                else:
-                                    # Function nodes need webhook evaluation - use old method
-                                    logger.info(f"📡 Function node detected - using standard transition evaluation")
-                                    selected_node = await self._follow_transition(current_node, user_message, flow_nodes)
-                                    transition_ms = int((time.time() - transition_start) * 1000)
-                                    self.last_transition_time_ms = transition_ms
-                                    logger.info(f"⏱️ [TIMING] TRANSITION_EVAL: {transition_ms}ms")
                 else:
                     selected_node = await self._get_first_conversation_node(flow_nodes)
             
