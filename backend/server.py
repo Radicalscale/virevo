@@ -3850,7 +3850,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             # Also update Redis for cross-worker visibility
             # Use update_call_data to merge instead of overwrite (prevents data loss)
             try:
-                redis_svc.update_call_data(call_control_id, {"user_has_spoken": True})
+                redis_service.update_call_data(call_control_id, {"user_has_spoken": True})
             except Exception as e:
                 logger.warning(f"Failed to update user_has_spoken in Redis: {e}")
         
