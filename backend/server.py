@@ -3828,6 +3828,14 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         if text.strip() and not session.user_speaking:
             session.mark_user_speaking_start()
             
+            # 🔥 CRITICAL FIX: Clear audio queue when user starts speaking
+            # This ensures we don't have old audio blocking new responses
+            # Fixes the ~3 second hidden latency caused by stale audio in the queue
+            persistent_tts_session = persistent_tts_manager.get_session(call_control_id)
+            if persistent_tts_session:
+                await persistent_tts_session.clear_audio()
+                logger.info(f"📊 [REAL TIMING] AUDIO QUEUE CLEARED (user started speaking)")
+            
             # 🔥 FIX: Mark globally that user has spoken to prevent race condition with greeting
             # This is critical for preventing "Double Speaking" (Agent Greeting + Agent Reply overlap)
             if call_control_id in active_telnyx_calls:
