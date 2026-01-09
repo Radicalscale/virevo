@@ -60,11 +60,15 @@ def get_openai_client():
 async def get_llm_client(provider: str = "openai", api_key: str = None, session=None):
     """Get LLM client based on provider (openai, grok, or gemini)
     
+    Uses cached clients with shared HTTP/2 connection pool for lower latency.
+    
     Args:
         provider: "openai", "grok", or "gemini"
         api_key: Optional API key (if not provided, retrieves from session)
         session: CallSession instance (used to retrieve user API keys)
     """
+    global _grok_client, _gemini_client
+    
     if provider == "grok":
         # Use OpenAI library with xAI base URL for Grok
         try:
@@ -86,20 +90,15 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
                 logger.error("Grok API key not found")
                 return None
             
-            # Create httpx client with HTTP/2 for lower latency streaming
-            import httpx
-            http_client = httpx.AsyncClient(
-                http2=True,  # Enable HTTP/2 for multiplexing and lower latency
-                timeout=httpx.Timeout(60.0, connect=5.0),
-                limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
-            )
-            
-            # Create OpenAI client with xAI base URL and optimized HTTP client
-            client = openai.AsyncOpenAI(
-                api_key=grok_key,
-                base_url="https://api.x.ai/v1",
-                http_client=http_client
-            )
+            # 🚀 Use cached client with shared HTTP/2 connection pool
+            if _grok_client is None:
+                http_client = get_global_http_client()
+                _grok_client = openai.AsyncOpenAI(
+                    api_key=grok_key,
+                    base_url="https://api.x.ai/v1",
+                    http_client=http_client
+                )
+                logger.info("🚀 Created cached Grok client with HTTP/2")
             
             # Create a wrapper to match our interface
             class GrokClient:
