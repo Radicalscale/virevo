@@ -710,10 +710,18 @@ class PersistentTTSSession:
             
             first_chunk_sent = False
             send_start_time = time.time()
-            for i in range(0, len(mulaw_data), chunk_size):
+            
+            # 🔥 PACED SENDING: Send chunks at near-real-time pace to minimize Telnyx buffer
+            # This prevents building up a large audio backlog that can't be cleared on interruption
+            # Each chunk is 20ms at 8kHz, so we pace at ~18ms to stay slightly ahead
+            CHUNK_DURATION_MS = 20  # 160 bytes at 8kHz = 20ms
+            PACE_INTERVAL_MS = 18   # Send slightly faster than real-time to avoid underruns
+            BURST_CHUNKS = 10       # Send first N chunks immediately for quick startup
+            
+            for chunk_num, i in enumerate(range(0, len(mulaw_data), chunk_size)):
                 # 🔥 CHECK INTERRUPTED FLAG - stop immediately if user interrupted
                 if self.interrupted:
-                    logger.info(f"🛑 [Call {self.call_control_id}] Audio sending STOPPED at chunk {i//chunk_size}/{total_chunks} due to interruption")
+                    logger.info(f"🛑 [Call {self.call_control_id}] Audio sending STOPPED at chunk {chunk_num}/{total_chunks} due to interruption")
                     # Mark agent as NOT speaking since we stopped
                     self.is_speaking = False
                     logger.info(f"🔇 [Call {self.call_control_id}] AGENT STOPPED SPEAKING (interrupted, is_speaking=False)")
@@ -739,6 +747,11 @@ class PersistentTTSSession:
                     first_chunk_time = time.time()
                     logger.info(f"📊 [REAL TIMING] FIRST AUDIO CHUNK SENT TO TELNYX at {first_chunk_time:.3f} (chunk 1/{total_chunks}, {len(chunk)} bytes)")
                     first_chunk_sent = True
+                
+                # 🔥 PACING: After initial burst, pace the sending to prevent buffer buildup
+                # This ensures we never have more than ~200ms of audio queued at Telnyx
+                if chunk_num >= BURST_CHUNKS:
+                    await asyncio.sleep(PACE_INTERVAL_MS / 1000.0)
             
             # 🔥 TIMING: Log when ALL chunks are sent
             send_end_time = time.time()
