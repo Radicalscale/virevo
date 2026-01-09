@@ -4184,8 +4184,12 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 first_sentence_played = False
                 full_response_text = ""
                 
+                # 🔥 TIMING: Mark LLM request start
+                latency_tracker["llm_request_start"] = llm_start_time
+                
                 # Log when user stopped speaking
                 logger.info(f"⏱️  USER STOPPED SPEAKING at T=0ms")
+                logger.info(f"📊 [REAL TIMING] Processing start: {int((llm_start_time - latency_tracker.get('user_audio_end', llm_start_time)) * 1000)}ms after user audio end")
                 
                 # 🚦 CRITICAL: Set flags BEFORE LLM starts (enables interruption detection)
                 is_agent_speaking = True
