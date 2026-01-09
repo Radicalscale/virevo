@@ -30,9 +30,26 @@ DEEPGRAM_API_KEY = os.environ.get('DEEPGRAM_API_KEY')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 ELEVEN_API_KEY = os.environ.get('ELEVEN_API_KEY')
 
+# 🚀 GLOBAL HTTP CLIENT with HTTP/2 for connection reuse
+# This is shared across all LLM calls to avoid TCP/TLS handshake overhead
+_global_http_client = None
+
+def get_global_http_client():
+    """Get or create the global HTTP/2 client for LLM API calls"""
+    global _global_http_client
+    if _global_http_client is None:
+        _global_http_client = httpx.AsyncClient(
+            http2=True,
+            timeout=httpx.Timeout(60.0, connect=5.0),
+            limits=httpx.Limits(max_keepalive_connections=10, max_connections=20)
+        )
+        logger.info("🚀 Created global HTTP/2 client for LLM calls")
+    return _global_http_client
+
 # Initialize OpenAI client lazily
 _openai_client = None
 _grok_client = None
+_gemini_client = None
 
 def get_openai_client():
     global _openai_client
