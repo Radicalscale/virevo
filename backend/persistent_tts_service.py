@@ -438,7 +438,8 @@ class PersistentTTSSession:
                 # The continuous _audio_receiver_loop will pick up all audio chunks
                 # and forward them to playback. No need to track per-sentence.
                 send_time_ms = int((time.time() - stream_start) * 1000)
-                logger.info(f"🚀 [Call {self.call_control_id}] Sent sentence #{sentence_num} in {send_time_ms}ms (non-blocking)")
+                logger.info(f"🚀 [Call {self.call_control_id}] Sent sentence #{sentence_num} to ElevenLabs in {send_time_ms}ms (non-blocking)")
+                logger.info(f"📊 [REAL TIMING] TEXT SENT TO ELEVENLABS: '{sentence[:50]}...'")
                 
                 return True
                 
@@ -452,6 +453,7 @@ class PersistentTTSSession:
         This ensures seamless playback without gaps between sentences
         """
         logger.info(f"🎵 [Call {self.call_control_id}] Playback consumer started")
+        first_playback = True
         
         try:
             while True:
@@ -462,6 +464,13 @@ class PersistentTTSSession:
                     # Shutdown signal
                     logger.info(f"🛑 [Call {self.call_control_id}] Playback consumer shutting down")
                     break
+                
+                # 🔥 TIMING: Log when we start playing first chunk
+                if first_playback:
+                    received_at = audio_item.get('received_at', time.time())
+                    queue_latency = int((time.time() - received_at) * 1000)
+                    logger.info(f"📊 [REAL TIMING] PLAYBACK CONSUMER: First chunk arrived, queue latency: {queue_latency}ms")
+                    first_playback = False
                 
                 # Play immediately
                 await self._play_audio_chunk(
