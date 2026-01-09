@@ -4042,7 +4042,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
     
     # Callback for endpoint detection (when Soniox detects end of utterance)
     async def on_endpoint_detected():
-        nonlocal accumulated_transcript, last_audio_received_time, is_agent_speaking, agent_generating_response, current_playback_ids, call_ending, stt_start_time, verbose_interruption_triggered, current_utterance_word_count
+        nonlocal accumulated_transcript, last_audio_received_time, is_agent_speaking, agent_generating_response, current_playback_ids, call_ending, stt_start_time, verbose_interruption_triggered, current_utterance_word_count, latency_tracker
+        
+        # 🔥 TIMING: Mark when we receive the transcript from STT
+        latency_tracker["stt_transcript_received"] = time.time()
+        latency_tracker["user_audio_end"] = last_audio_received_time  # Use the last audio packet time
         
         # Reset verbose tracking for next utterance
         verbose_interruption_triggered = False
@@ -4058,6 +4062,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         if current_task and current_task.cancelled():
             logger.info(f"⏹️ Endpoint processing cancelled - new user input received")
             return  # Exit gracefully instead of raising
+        
+        # Log STT latency
+        if last_audio_received_time and latency_tracker["stt_transcript_received"]:
+            stt_latency = int((latency_tracker["stt_transcript_received"] - last_audio_received_time) * 1000)
+            logger.info(f"📊 [REAL TIMING] STT: User audio end → Transcript received: {stt_latency}ms")
         
         logger.info(f"🎤 Endpoint detected by Soniox - processing transcript: {accumulated_transcript}")
         
