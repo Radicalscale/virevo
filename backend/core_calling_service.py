@@ -2957,13 +2957,13 @@ Your response (just the number):"""
                     # If we get here, return whatever we accumulated
                     return buffer.strip()
                 
-                # Apply 1.5-second timeout
-                ai_response = await asyncio.wait_for(stream_llm_for_transition(), timeout=1.5)
+                # Apply 3-second timeout (increased from 1.5s to account for API variability)
+                ai_response = await asyncio.wait_for(stream_llm_for_transition(), timeout=3.0)
                 
             except asyncio.TimeoutError:
                 # Timeout! STAY on current node - don't auto-transition
-                logger.warning(f"⚠️ TRANSITION EVALUATION TIMEOUT (>1.5s) - staying on current node")
-                logger.warning(f"⚠️ This prevents 13-second freezes. User should re-respond to trigger evaluation.")
+                logger.warning(f"⚠️ TRANSITION EVALUATION TIMEOUT (>3s) - staying on current node")
+                logger.warning(f"⚠️ This prevents long freezes. User should re-respond to trigger evaluation.")
                 return current_node
             except Exception as e:
                 logger.error(f"❌ Transition streaming error: {e}")
