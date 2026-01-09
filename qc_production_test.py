@@ -10,7 +10,7 @@ import sys
 import os
 import time
 
-BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
+BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
 
 async def test_qc_production():
     """Test QC with production backend"""

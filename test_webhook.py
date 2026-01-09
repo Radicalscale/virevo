@@ -5,7 +5,7 @@ This helps debug if the webhook handler is working correctly
 import requests
 import json
 
-BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
+BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
 
 # Simulate an incoming call webhook from Telnyx
 test_webhook_payload = {

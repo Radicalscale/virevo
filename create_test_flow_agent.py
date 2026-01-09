@@ -6,7 +6,7 @@ import requests
 import json
 import uuid
 
-BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com"
+BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
 
 def create_call_flow_agent():
     """Create a call flow agent with 2 paths"""

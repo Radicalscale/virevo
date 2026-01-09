@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Get backend URL from environment
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-overlap-debug.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-ai-perf.preview.emergentagent.com')
 
 class WebhookTesterValidator:
     def __init__(self):

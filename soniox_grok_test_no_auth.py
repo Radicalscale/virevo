@@ -12,7 +12,7 @@ import os
 from typing import Dict, List, Optional
 
 # Backend URL from review request
-BACKEND_URL = "https://voice-overlap-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com/api"
 
 # API Keys from review request
 SONIOX_API_KEY = "b999f22d7b6989eb2d1f1b7badfd0f77a1d110d238906afee7b6dab97ada01d7"
