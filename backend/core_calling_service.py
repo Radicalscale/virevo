@@ -3326,6 +3326,11 @@ Your response:"""
                     if sentence_end:
                         sentence = buffer[:sentence_end].strip()
                         buffer = buffer[sentence_end:].strip()
+                        
+                        # 🔧 Replace variables in sentence before streaming
+                        for var_name, var_value in self.session_variables.items():
+                            sentence = sentence.replace(f"{{{{{var_name}}}}}", str(var_value))
+                        
                         if sentence and stream_callback:
                             await stream_callback(sentence)
                             full_response += sentence + " "
