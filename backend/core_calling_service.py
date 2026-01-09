@@ -1622,17 +1622,50 @@ Use these sparingly and naturally - only when they genuinely fit the moment.
                                     self.last_transition_time_ms = transition_ms
                                     logger.info(f"⏱️ [TIMING] TRANSITION_EVAL: {transition_ms}ms")
                             else:
-                                # Normal transition evaluation with LLM
+                                # 🚀 MERGED TRANSITION + CONTENT GENERATION
+                                # Instead of two sequential LLM calls, do both in ONE call
                                 timestamp_str = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-                                logger.info(f"⏱️ [{timestamp_str}] 🔀 About to call _follow_transition() for: {user_message[:30]}...")
+                                logger.info(f"⏱️ [{timestamp_str}] 🚀 Using MERGED transition+response for: {user_message[:30]}...")
                                 logger.info(f"Evaluating transitions from {current_node.get('label')} for message: {user_message}")
                                 
-                                # ⏱️ TIMING: Transition evaluation start
+                                # ⏱️ TIMING: Merged call start
                                 transition_start = time.time()
-                                selected_node = await self._follow_transition(current_node, user_message, flow_nodes)
-                                transition_ms = int((time.time() - transition_start) * 1000)
-                                self.last_transition_time_ms = transition_ms  # Store for QC analysis
-                                logger.info(f"⏱️ [TIMING] TRANSITION_EVAL: {transition_ms}ms")
+                                
+                                # Check for special cases that should use old method
+                                node_data_check = current_node.get("data", {})
+                                is_function_node = current_node.get("type") == "function"
+                                has_webhook_context = False  # Would be set if we have webhook response
+                                
+                                # Use merged approach for normal conversation nodes
+                                if not is_function_node:
+                                    selected_node, merged_response = await self._merged_transition_and_response(
+                                        current_node, user_message, flow_nodes, stream_callback
+                                    )
+                                    transition_ms = int((time.time() - transition_start) * 1000)
+                                    self.last_transition_time_ms = transition_ms
+                                    logger.info(f"⏱️ [TIMING] MERGED_TRANSITION_RESPONSE: {transition_ms}ms")
+                                    
+                                    # If merged method returned a response, we're done
+                                    if merged_response:
+                                        # Update node tracking
+                                        self.current_node_id = selected_node.get("id")
+                                        self.current_node_label = selected_node.get("label", selected_node.get("id", "Unknown"))
+                                        
+                                        # Add to conversation history
+                                        self.conversation_history.append({
+                                            "role": "assistant",
+                                            "content": merged_response,
+                                            "_node_id": self.current_node_id
+                                        })
+                                        
+                                        return merged_response
+                                else:
+                                    # Function nodes need webhook evaluation - use old method
+                                    logger.info(f"📡 Function node detected - using standard transition evaluation")
+                                    selected_node = await self._follow_transition(current_node, user_message, flow_nodes)
+                                    transition_ms = int((time.time() - transition_start) * 1000)
+                                    self.last_transition_time_ms = transition_ms
+                                    logger.info(f"⏱️ [TIMING] TRANSITION_EVAL: {transition_ms}ms")
                 else:
                     selected_node = await self._get_first_conversation_node(flow_nodes)
             
