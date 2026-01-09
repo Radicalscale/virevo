@@ -3040,6 +3040,256 @@ Your response (just the number):"""
             logger.error(f"Error following transition: {e}")
             return current_node
     
+    async def _merged_transition_and_response(
+        self, 
+        current_node: dict, 
+        user_message: str, 
+        flow_nodes: list, 
+        stream_callback=None
+    ) -> tuple:
+        """
+        🚀 MERGED TRANSITION + CONTENT GENERATION
+        
+        Instead of two sequential LLM calls (transition evaluation → content generation),
+        this method does BOTH in a single LLM call, cutting latency nearly in half.
+        
+        The LLM outputs: "[T:X] <response content>"
+        Where X is the transition index (0, 1, 2, etc.) or -1 for no match.
+        
+        Returns:
+            tuple: (selected_node, response_text)
+        """
+        import re
+        
+        try:
+            node_data = current_node.get("data", {})
+            transitions = node_data.get("transitions", [])
+            
+            if not transitions:
+                logger.info(f"No transitions from {current_node.get('label')}, staying on current node")
+                return current_node, None
+            
+            # Get LLM client
+            llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
+            model = self.agent_config.get("model", "gpt-4")
+            
+            if llm_provider == "grok" or llm_provider == "gemini":
+                client = await self.get_llm_client_for_session(llm_provider)
+            else:
+                client = await self.get_llm_client_for_session("openai")
+            
+            if not client:
+                logger.warning("No LLM client available for merged transition+response")
+                return current_node, None
+            
+            # Build transition options with their next node content
+            transition_options = []
+            for i, trans in enumerate(transitions):
+                condition = trans.get("condition", "")
+                next_node_id = trans.get("nextNode", "")
+                check_variables = trans.get("check_variables", [])
+                
+                # Skip transitions with missing required variables
+                if check_variables:
+                    missing_vars = [v for v in check_variables 
+                                  if v not in self.session_variables or self.session_variables[v] is None]
+                    if missing_vars:
+                        logger.info(f"⏸️ Skipping transition {i} - missing required variables: {missing_vars}")
+                        continue
+                
+                if condition and next_node_id:
+                    next_node = self._get_node_by_id(next_node_id, flow_nodes)
+                    if next_node:
+                        next_node_data = next_node.get("data", {})
+                        next_content = next_node_data.get("script", "") or next_node_data.get("content", "")
+                        next_mode = next_node_data.get("mode", "script")
+                        next_goal = next_node_data.get("goal", "")
+                        
+                        # Replace variables in content
+                        for var_name, var_value in self.session_variables.items():
+                            next_content = next_content.replace(f"{{{{{var_name}}}}}", str(var_value))
+                        
+                        transition_options.append({
+                            "index": i,
+                            "condition": condition,
+                            "next_node_id": next_node_id,
+                            "next_node": next_node,
+                            "next_content": next_content,
+                            "next_mode": next_mode,
+                            "next_goal": next_goal
+                        })
+            
+            if not transition_options:
+                logger.info("⏸️ No valid transitions available after variable checks")
+                return current_node, None
+            
+            # Get conversation context
+            full_context = "\n".join([
+                f"{msg['role']}: {msg['content']}"
+                for msg in self.conversation_history[-10:]
+            ])
+            
+            # Build the merged prompt
+            options_text = ""
+            for opt in transition_options:
+                options_text += f"\n[T:{opt['index']}] If user's intent matches: \"{opt['condition']}\"\n"
+                if opt['next_mode'] == 'script':
+                    options_text += f"   → Response: {opt['next_content'][:500]}\n"
+                else:
+                    options_text += f"   → Instructions: {opt['next_content'][:500]}\n"
+            
+            # Add stay-on-node option
+            current_content = node_data.get("script", "") or node_data.get("content", "")
+            current_goal = node_data.get("goal", "")
+            options_text += f"\n[T:-1] If user's response doesn't clearly match any option above\n"
+            if current_goal:
+                options_text += f"   → Guide them toward: {current_goal[:200]}\n"
+            else:
+                options_text += f"   → Acknowledge and re-engage with the current topic\n"
+            
+            merged_prompt = f"""CONVERSATION CONTEXT:
+{full_context}
+
+USER JUST SAID: "{user_message}"
+
+YOUR TASK: Determine which transition matches the user's intent and respond accordingly.
+
+TRANSITION OPTIONS:
+{options_text}
+
+OUTPUT FORMAT:
+Start your response with [T:X] where X is the matching transition number, then immediately provide your response.
+Example: "[T:0] Great to hear that! So let me tell you about..."
+
+RULES:
+1. Choose the transition that BEST matches the user's intent/meaning (not just keywords)
+2. If the user's response is unclear, off-topic, or doesn't match any transition, use [T:-1]
+3. After the [T:X] marker, respond naturally based on the instructions for that transition
+4. Keep your response conversational and concise (1-3 sentences)
+5. Do NOT repeat what you've already said in the conversation
+
+Your response:"""
+
+            # Make the merged LLM call with streaming
+            import datetime
+            timestamp_str = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+            logger.info(f"⏱️ [{timestamp_str}] 🚀 MERGED TRANSITION+RESPONSE START - {len(transition_options)} options")
+            
+            llm_start = time.time()
+            
+            if llm_provider == "grok" or llm_provider == "gemini":
+                response = await client.create_completion(
+                    messages=[
+                        {"role": "system", "content": self._cached_system_prompt},
+                        {"role": "user", "content": merged_prompt}
+                    ],
+                    model=model,
+                    temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
+                    max_tokens=self.agent_config.get("settings", {}).get("max_tokens", 300),
+                    stream=True
+                )
+            else:
+                response = await client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": self._cached_system_prompt},
+                        {"role": "user", "content": merged_prompt}
+                    ],
+                    temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
+                    max_tokens=self.agent_config.get("settings", {}).get("max_tokens", 300),
+                    stream=True
+                )
+            
+            # Stream and parse the response
+            full_response = ""
+            transition_marker = None
+            content_started = False
+            first_token_time = None
+            buffer = ""
+            
+            async for chunk in response:
+                if not first_token_time:
+                    first_token_time = time.time()
+                    ttft_ms = int((first_token_time - llm_start) * 1000)
+                    logger.info(f"⚡ MERGED TTFT: {ttft_ms}ms")
+                
+                # Extract content from chunk
+                if hasattr(chunk, 'choices') and chunk.choices:
+                    delta = chunk.choices[0]
+                    if hasattr(delta, 'delta') and hasattr(delta.delta, 'content'):
+                        chunk_content = delta.delta.content or ""
+                    elif hasattr(delta, 'text'):
+                        chunk_content = delta.text or ""
+                    elif hasattr(delta, 'message') and hasattr(delta.message, 'content'):
+                        chunk_content = delta.message.content or ""
+                    else:
+                        chunk_content = ""
+                else:
+                    chunk_content = ""
+                
+                if not chunk_content:
+                    continue
+                
+                buffer += chunk_content
+                
+                # Parse transition marker from the start
+                if transition_marker is None:
+                    # Look for [T:X] pattern
+                    match = re.match(r'\[T:(-?\d+)\]\s*', buffer)
+                    if match:
+                        transition_marker = int(match.group(1))
+                        # Remove the marker from buffer, keep the rest
+                        buffer = buffer[match.end():]
+                        content_started = True
+                        logger.info(f"⚡ MERGED: Transition marker [T:{transition_marker}] detected")
+                
+                # Stream content to TTS as soon as we have the marker
+                if content_started and buffer:
+                    # Stream sentence by sentence for TTS
+                    # Check for sentence boundaries
+                    sentence_end = None
+                    for i, char in enumerate(buffer):
+                        if char in '.!?' and (i + 1 >= len(buffer) or buffer[i + 1] in ' \n'):
+                            sentence_end = i + 1
+                            break
+                    
+                    if sentence_end:
+                        sentence = buffer[:sentence_end].strip()
+                        buffer = buffer[sentence_end:].strip()
+                        if sentence and stream_callback:
+                            await stream_callback(sentence)
+                            full_response += sentence + " "
+                            logger.info(f"📤 Streamed: {sentence[:50]}...")
+            
+            # Stream any remaining content
+            if buffer.strip() and stream_callback:
+                await stream_callback(buffer.strip())
+                full_response += buffer.strip()
+            
+            total_ms = int((time.time() - llm_start) * 1000)
+            logger.info(f"⏱️ MERGED TRANSITION+RESPONSE COMPLETE - took {total_ms}ms")
+            
+            # Determine selected node based on transition marker
+            selected_node = current_node  # Default to staying
+            
+            if transition_marker is not None and transition_marker >= 0:
+                # Find the transition option with this index
+                for opt in transition_options:
+                    if opt["index"] == transition_marker:
+                        selected_node = opt["next_node"]
+                        logger.info(f"✅ MERGED: Transitioning to {selected_node.get('label', 'unknown')}")
+                        break
+            else:
+                logger.info(f"⚠️ MERGED: No transition matched (marker={transition_marker}), staying on current node")
+            
+            return selected_node, full_response.strip()
+            
+        except Exception as e:
+            logger.error(f"❌ Error in merged transition+response: {e}")
+            import traceback
+            traceback.print_exc()
+            return current_node, None
+    
     def _get_node_by_id(self, node_id: str, flow_nodes: list) -> dict:
         """Find node by ID"""
         for node in flow_nodes:
