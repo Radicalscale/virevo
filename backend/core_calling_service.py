@@ -134,10 +134,19 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
                 logger.error("Gemini API key not found")
                 return None
             
+            # Create httpx client with HTTP/2 for lower latency streaming
+            import httpx
+            http_client = httpx.AsyncClient(
+                http2=True,  # Enable HTTP/2 for multiplexing and lower latency
+                timeout=httpx.Timeout(60.0, connect=5.0),
+                limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+            )
+            
             # Create OpenAI client with Google's OpenAI-compatible base URL
             client = openai.AsyncOpenAI(
                 api_key=gemini_key,
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+                http_client=http_client
             )
             
             # Create a wrapper to match our interface
