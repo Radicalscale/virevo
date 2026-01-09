@@ -528,19 +528,10 @@ class CallSession:
         # This ensures we don't have old audio blocking new responses
         # The barge-in logic wasn't always triggered because playback_expected_end_time 
         # could be inaccurate, leaving stale audio in the queue
-        if hasattr(self, '_persistent_tts_session') and self._persistent_tts_session:
-            asyncio.create_task(self._clear_audio_on_user_speak())
+        # NOTE: The actual clearing happens in server.py where persistent_tts_manager is accessible
+        self._user_started_speaking_at = time.time()
         
         logger.info(f"👤 User started speaking for call {self.call_id}")
-    
-    async def _clear_audio_on_user_speak(self):
-        """Clear audio queue when user starts speaking"""
-        try:
-            if self._persistent_tts_session:
-                await self._persistent_tts_session.clear_audio()
-                logger.info(f"🔇 [Call {self.call_id}] Audio queue CLEARED (user started speaking)")
-        except Exception as e:
-            logger.error(f"Error clearing audio on user speak: {e}")
     
     def mark_user_speaking_end(self):
         """Mark that user has stopped speaking"""
