@@ -756,9 +756,9 @@ class PersistentTTSSession:
             # 🔥 TIMING: Log when ALL chunks are sent
             send_end_time = time.time()
             send_duration_ms = int((send_end_time - send_start_time) * 1000)
-            logger.info(f"📊 [REAL TIMING] ALL {total_chunks} CHUNKS SENT TO TELNYX in {send_duration_ms}ms (audio duration: {actual_duration_seconds:.1f}s)")
+            logger.info(f"📊 [REAL TIMING] ALL {total_chunks} CHUNKS SENT TO TELNYX in {send_duration_ms}ms (audio duration: {actual_duration_seconds:.1f}s, paced after {BURST_CHUNKS} chunks)")
             
-            logger.info(f"✅ Sent {total_chunks} audio chunks via WebSocket")
+            logger.info(f"✅ Sent {total_chunks} audio chunks via WebSocket (paced sending enabled)")
             
             # 🔊 Schedule automatic is_speaking=False when audio playback is expected to finish
             # Use playback_expected_end_time as source of truth (accounts for ALL queued audio)
