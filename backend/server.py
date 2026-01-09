@@ -3642,6 +3642,60 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
     last_audio_received_time = None
     stt_start_time = None
     
+    # 🔥 COMPREHENSIVE LATENCY TRACKING - Track EVERY stage of the pipeline
+    latency_tracker = {
+        "user_audio_start": None,      # When user starts speaking (first audio packet with voice)
+        "user_audio_end": None,        # When user stops speaking (last audio packet)
+        "stt_transcript_received": None, # When Soniox gives us the transcript
+        "llm_request_start": None,     # When we start LLM call
+        "llm_first_token": None,       # When LLM returns first token
+        "llm_complete": None,          # When LLM finishes
+        "tts_request_start": None,     # When we send text to ElevenLabs
+        "tts_first_chunk": None,       # When ElevenLabs returns first audio chunk
+        "tts_audio_sent": None,        # When we send audio to Telnyx WebSocket
+    }
+    
+    def log_latency_breakdown():
+        """Log comprehensive latency breakdown"""
+        if not latency_tracker["user_audio_end"]:
+            return
+        
+        t0 = latency_tracker["user_audio_end"]
+        breakdown = ["📊 REAL LATENCY BREAKDOWN:"]
+        
+        if latency_tracker["stt_transcript_received"]:
+            stt_ms = int((latency_tracker["stt_transcript_received"] - t0) * 1000)
+            breakdown.append(f"   STT (user done → transcript): {stt_ms}ms")
+        
+        if latency_tracker["llm_request_start"]:
+            llm_start_ms = int((latency_tracker["llm_request_start"] - t0) * 1000)
+            breakdown.append(f"   Processing → LLM start: {llm_start_ms}ms")
+        
+        if latency_tracker["llm_first_token"] and latency_tracker["llm_request_start"]:
+            llm_ttft_ms = int((latency_tracker["llm_first_token"] - latency_tracker["llm_request_start"]) * 1000)
+            breakdown.append(f"   LLM TTFT: {llm_ttft_ms}ms")
+        
+        if latency_tracker["tts_request_start"] and latency_tracker["llm_first_token"]:
+            to_tts_ms = int((latency_tracker["tts_request_start"] - latency_tracker["llm_first_token"]) * 1000)
+            breakdown.append(f"   LLM token → TTS request: {to_tts_ms}ms")
+        
+        if latency_tracker["tts_first_chunk"] and latency_tracker["tts_request_start"]:
+            tts_ttfb_ms = int((latency_tracker["tts_first_chunk"] - latency_tracker["tts_request_start"]) * 1000)
+            breakdown.append(f"   TTS TTFB (request → first audio): {tts_ttfb_ms}ms")
+        
+        if latency_tracker["tts_audio_sent"] and latency_tracker["tts_first_chunk"]:
+            send_ms = int((latency_tracker["tts_audio_sent"] - latency_tracker["tts_first_chunk"]) * 1000)
+            breakdown.append(f"   TTS chunk → Telnyx send: {send_ms}ms")
+        
+        if latency_tracker["tts_audio_sent"]:
+            total_ms = int((latency_tracker["tts_audio_sent"] - t0) * 1000)
+            breakdown.append(f"   ═══════════════════════════")
+            breakdown.append(f"   TOTAL (user done → audio sent): {total_ms}ms")
+            breakdown.append(f"   + Phone network latency: ~200-500ms (not measured)")
+        
+        for line in breakdown:
+            logger.info(line)
+    
     # 🚦 INTERRUPTION HANDLING: Track agent speaking state locally
     is_agent_speaking = False
     agent_generating_response = False
