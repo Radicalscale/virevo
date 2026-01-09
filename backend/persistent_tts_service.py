@@ -185,6 +185,7 @@ class PersistentTTSSession:
         logger.info(f"🎧 [Call {self.call_control_id}] Continuous Audio Receiver STARTED")
         chunk_count = 0
         is_first_chunk = True
+        first_chunk_time = None
         
         try:
             while self.connected and self.ws_service and self.ws_service.connected:
@@ -205,6 +206,11 @@ class PersistentTTSSession:
                         audio_bytes = base64.b64decode(data["audio"])
                         chunk_count += 1
                         
+                        # 🔥 TIMING: Log when first audio chunk arrives from ElevenLabs
+                        if is_first_chunk:
+                            first_chunk_time = time.time()
+                            logger.info(f"📊 [REAL TIMING] ElevenLabs FIRST AUDIO CHUNK received (chunk #{chunk_count}, {len(audio_bytes)} bytes)")
+                        
                         # Forward to playback queue immediately (unless interrupted)
                         if not self.interrupted:
                             await self.audio_queue.put({
@@ -212,7 +218,8 @@ class PersistentTTSSession:
                                 'audio_data': audio_bytes,
                                 'format': 'mulaw',
                                 'sentence_num': chunk_count,
-                                'is_first': is_first_chunk
+                                'is_first': is_first_chunk,
+                                'received_at': time.time()  # Track when chunk was received
                             })
                             is_first_chunk = False
                         else:
@@ -223,6 +230,7 @@ class PersistentTTSSession:
                         logger.debug(f"📍 ElevenLabs signal: {data.get('error')}")
                         # Reset for next response
                         is_first_chunk = True
+                        first_chunk_time = None
                     
                 except asyncio.TimeoutError:
                     # No audio for 5s - that's fine, keep listening
