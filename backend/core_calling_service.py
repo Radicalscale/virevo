@@ -121,7 +121,7 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
                         logger.error(f"Error with Grok API: {e}")
                         return None
                         
-            return GrokClient(client)
+            return GrokClient(_grok_client)
             
         except ImportError as e:
             logger.error(f"OpenAI library not available: {e}")
