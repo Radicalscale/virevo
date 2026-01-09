@@ -709,6 +709,7 @@ class PersistentTTSSession:
                 logger.info(f"⏱️ EXTEND playback_expected_end_time: +{actual_duration_seconds:.1f}s (total: {time_until_end:.1f}s from now)")
             
             first_chunk_sent = False
+            send_start_time = time.time()
             for i in range(0, len(mulaw_data), chunk_size):
                 # 🔥 CHECK INTERRUPTED FLAG - stop immediately if user interrupted
                 if self.interrupted:
@@ -735,8 +736,14 @@ class PersistentTTSSession:
                 
                 # 🔥 TIMING: Log when FIRST chunk is sent to Telnyx
                 if not first_chunk_sent:
-                    logger.info(f"📊 [REAL TIMING] FIRST AUDIO CHUNK SENT TO TELNYX (chunk 1/{total_chunks})")
+                    first_chunk_time = time.time()
+                    logger.info(f"📊 [REAL TIMING] FIRST AUDIO CHUNK SENT TO TELNYX at {first_chunk_time:.3f} (chunk 1/{total_chunks}, {len(chunk)} bytes)")
                     first_chunk_sent = True
+            
+            # 🔥 TIMING: Log when ALL chunks are sent
+            send_end_time = time.time()
+            send_duration_ms = int((send_end_time - send_start_time) * 1000)
+            logger.info(f"📊 [REAL TIMING] ALL {total_chunks} CHUNKS SENT TO TELNYX in {send_duration_ms}ms (audio duration: {actual_duration_seconds:.1f}s)")
             
             logger.info(f"✅ Sent {total_chunks} audio chunks via WebSocket")
             
