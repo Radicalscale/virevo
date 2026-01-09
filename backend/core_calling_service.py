@@ -69,10 +69,19 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
                 logger.error("Grok API key not found")
                 return None
             
-            # Create OpenAI client with xAI base URL
+            # Create httpx client with HTTP/2 for lower latency streaming
+            import httpx
+            http_client = httpx.AsyncClient(
+                http2=True,  # Enable HTTP/2 for multiplexing and lower latency
+                timeout=httpx.Timeout(60.0, connect=5.0),
+                limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+            )
+            
+            # Create OpenAI client with xAI base URL and optimized HTTP client
             client = openai.AsyncOpenAI(
                 api_key=grok_key,
-                base_url="https://api.x.ai/v1"
+                base_url="https://api.x.ai/v1",
+                http_client=http_client
             )
             
             # Create a wrapper to match our interface
