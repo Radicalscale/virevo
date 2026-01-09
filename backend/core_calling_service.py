@@ -3338,8 +3338,12 @@ Your response:"""
             
             # Stream any remaining content
             if buffer.strip() and stream_callback:
-                await stream_callback(buffer.strip())
-                full_response += buffer.strip()
+                # 🔧 Replace variables in remaining content
+                remaining = buffer.strip()
+                for var_name, var_value in self.session_variables.items():
+                    remaining = remaining.replace(f"{{{{{var_name}}}}}", str(var_value))
+                await stream_callback(remaining)
+                full_response += remaining
             
             total_ms = int((time.time() - llm_start) * 1000)
             logger.info(f"⏱️ MERGED TRANSITION+RESPONSE COMPLETE - took {total_ms}ms")
