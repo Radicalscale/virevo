@@ -5141,6 +5141,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                         is_agent_active = True
                                         if user_actively_speaking:
                                             logger.info(f"🎯 User speaking while TTS is_speaking=True - INTERRUPTION POSSIBLE")
+                                    elif tts_session and getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
+                                        # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
+                                        # This covers the ~500ms gap between LLM done and audio start
+                                        is_agent_active = True
+                                        logger.info(f"🛡️ Agent active (waiting for audio) - 1-word filter ENABLED")
                                     elif time_until_audio_done > 0:
                                         # Audio expected to still be playing by timer
                                         is_agent_active = True
@@ -5193,6 +5198,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                     user_actively_speaking = session and session.user_speaking
                                     
                                     if tts_is_speaking:
+                                        is_agent_active = True
+                                    elif tts_session and getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
+                                        # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
                                         is_agent_active = True
                                     elif time_until_audio_done > 0:
                                         is_agent_active = True

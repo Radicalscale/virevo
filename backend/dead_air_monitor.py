@@ -121,7 +121,7 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                         continue
                         
                     # Also check if generation is still in progress (multi-sentence)
-                    if not tts_session.generation_complete:
+                    if not getattr(tts_session, 'generation_complete', True):
                         # Agent is still generating/streaming a multi-sentence response
                         if int(time.time()) % 5 == 0:
                             logger.info(f"🔇 MONITOR: Skipping silence check - response generation still in progress")
