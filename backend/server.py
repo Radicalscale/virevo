@@ -5146,8 +5146,8 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                         # This covers the ~500ms gap between LLM done and audio start
                                         is_agent_active = True
                                         logger.info(f"🛡️ Agent active (waiting for audio) - 1-word filter ENABLED")
-                                    elif time_until_audio_done > 0:
-                                        # Audio expected to still be playing by timer
+                                    elif time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                                        # Audio expected to still be playing (including network latency buffer)
                                         is_agent_active = True
                                     elif is_generating:
                                         # LLM is generating response
@@ -5198,6 +5198,17 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                     user_actively_speaking = session and session.user_speaking
                                     
                                     if tts_is_speaking:
+                                        # TTS session explicitly says agent is speaking
+                                        is_agent_active = True
+                                        if user_actively_speaking:
+                                            logger.info(f"🎯 User speaking while TTS is_speaking=True - INTERRUPTION POSSIBLE")
+                                    elif tts_session and getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
+                                        # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
+                                        # This covers the ~500ms gap between LLM done and audio start
+                                        is_agent_active = True
+                                    elif time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                                        # Audio expected to still be playing by timer (including latency buffer)
+                                        is_agent_active = True
                                         is_agent_active = True
                                     elif tts_session and getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
                                         # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
@@ -5821,6 +5832,11 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
             await deepgram_ws.close()
         logger.info(f"🔌 Telnyx WebSocket disconnected")
 
+
+
+# buffer to account for network propagation delay (Server -> Telnyx -> Carrier -> Handset)
+# This prevents the agent from thinking it's done speaking while the user is still hearing the last words
+NETWORK_PROPAGATION_DELAY = 1.5
 
 @api_router.websocket("/telnyx/audio-stream/{call_control_id}")
 async def telnyx_audio_stream(websocket: WebSocket, call_control_id: str):

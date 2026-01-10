@@ -8,6 +8,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# buffer to account for network propagation delay (Server -> Telnyx -> Carrier -> Handset)
+# This prevents premature "mark as done" while user is still hearing audio
+NETWORK_PROPAGATION_DELAY = 1.5
+
 
 async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_callback, telnyx_service, redis_service):
     """
@@ -93,10 +97,10 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                     # This prevents false "are you still there" triggers during webhook wait periods
                     executing_webhook = getattr(session, 'executing_webhook', False)
                     
-                    # If playback time has passed AND no pending playbacks in Redis AND generation is complete AND not executing webhook
-                    if playback_expected_end > 0 and current_time > playback_expected_end and playback_count == 0 and not generation_in_progress and not executing_webhook:
+                    # If playback time has passed (plus buffer) AND no pending playbacks in Redis AND generation is complete AND not executing webhook
+                    if playback_expected_end > 0 and current_time > (playback_expected_end + NETWORK_PROPAGATION_DELAY) and playback_count == 0 and not generation_in_progress and not executing_webhook:
                         time_since_end = current_time - playback_expected_end
-                        logger.info(f"⏱️ Playback expected end time passed ({time_since_end:.1f}s ago), marking agent as done speaking")
+                        logger.info(f"⏱️ Playback expected end time passed ({time_since_end:.1f}s ago + {NETWORK_PROPAGATION_DELAY}s buffer), marking agent as done speaking")
                         session.mark_agent_speaking_end()
                         # Clear the expected end time to prevent repeated triggers
                         call_states[call_control_id]["playback_expected_end_time"] = 0
@@ -132,8 +136,11 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                 current_time = time.time()
                 time_until_audio_done = playback_expected_end - current_time if playback_expected_end > 0 else 0
                 
-                if time_until_audio_done > 0.5:
-                    # Audio is still expected to be playing - skip silence check
+                time_until_audio_done = playback_expected_end - current_time if playback_expected_end > 0 else 0
+                
+                # Check against negative buffer (allow monitoring only after buffer expires)
+                if time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                    # Audio is still expected to be playing (or in buffer window) - skip silence check
                     if int(time.time()) % 5 == 0:
                         logger.info(f"🔇 MONITOR: Skipping silence check - audio playing ({time_until_audio_done:.1f}s left)")
                     await asyncio.sleep(0.5)
