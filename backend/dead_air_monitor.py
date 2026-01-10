@@ -65,6 +65,14 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                 session.mark_agent_speaking_end()
                 redis_service.delete_flag(call_control_id, "agent_done_speaking")
             
+            # 🔥 FIX: Skip monitoring if agent is processing/thinking
+            # This prevents race conditions where agent logic is working but audio hasn't started
+            if getattr(session, 'is_processing', False):
+                if int(time.time()) % 5 == 0:
+                    logger.info(f"🔇 MONITOR: Paused - agent is processing/thinking")
+                await asyncio.sleep(0.5)
+                continue
+            
             # 🔥 FIX FOR WEBSOCKET STREAMING: Check playback_expected_end_time
             # With WebSocket audio streaming, we don't get media.playback.ended webhooks
             # So we need to check if the expected playback time has passed

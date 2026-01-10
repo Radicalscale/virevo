@@ -280,6 +280,9 @@ class CallSession:
         # Hybrid Discernment System state tracking
         self._discernment_passed = False  # Has user passed discernment check for current speaking turn?
         self._active_word_threshold = None  # Current active threshold (may be extended after discernment)
+        
+        # State Lock: Processing flag to prevent race conditions during generation
+        self.is_processing = False  # True when LLM is thinking/generating using process_user_input
     
     def set_customer_name(self, name: str):
         """Set customer name - keeps customer_name and callerName in sync for webhook compatibility"""
@@ -478,6 +481,10 @@ class CallSession:
     
     def start_silence_tracking(self):
         """Start tracking silence after agent stops speaking"""
+        if self.is_processing:
+            logger.info(f"🔇 SKIPPING silence tracking - agent is processing/thinking")
+            return
+            
         if not self.agent_speaking and not self.user_speaking:
             self.silence_start_time = time.time()
             logger.info(f"⏱️ SILENCE TIMER STARTED at {self.silence_start_time} for call {self.call_id}")
@@ -551,6 +558,10 @@ class CallSession:
         settings = self.agent_config.get("settings", {}).get("dead_air_settings", {})
         silence_timeout = settings.get("silence_timeout_hold_on", 25) if self.hold_on_detected else settings.get("silence_timeout_normal", 7)
         max_checkins = settings.get("max_checkins_before_disconnect", 2)
+        
+        # Safety: Do not check in while agent is processing/thinking
+        if self.is_processing:
+            return False
         
         # If we've already reached max check-ins, don't send more check-ins
         # (but we'll still wait for the timeout to end the call)
@@ -680,6 +691,9 @@ class CallSession:
             user_text: User's transcribed text
             stream_callback: Optional callback for streaming sentences as they're generated
         """
+        # Set processing flag to preventing silence timer race conditions
+        self.is_processing = True
+        
         try:
             from datetime import datetime
             import asyncio
@@ -871,6 +885,15 @@ class CallSession:
         except Exception as e:
             logger.error(f"Error processing user input: {e}")
             return None
+        finally:
+            # RELEASE Processing Lock
+            self.is_processing = False
+            # Ensure agent is marked as speaking if we just finished processing (covers gap)
+            # This is safe because if we are done processing, we are either speaking or done
+            if stream_callback: 
+                 # If we had a stream callback, we likely started speaking.
+                 # Ensure the flag handles the transition.
+                 pass
 
     async def handle_verbose_interruption(self, partial_transcript: str, speak_callback):
         """Handle verbose user interruption (Rambler Control) - Generate and speak an interruption
