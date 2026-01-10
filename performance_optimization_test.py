@@ -32,7 +32,7 @@ else:
     print(f"⚠️ Backend .env file not found at {backend_env_path}")
 
 # Get backend URL from environment
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-ai-perf.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://missed-variable.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class PerformanceTestResults:

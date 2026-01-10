@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com/api"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com/api"
 
 async def test_basic_connectivity():
     """Test basic backend connectivity"""

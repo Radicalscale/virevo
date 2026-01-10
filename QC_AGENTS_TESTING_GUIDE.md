@@ -29,7 +29,7 @@ sudo supervisorctl status backend
 Check that 3 QC agent configs are created for your user:
 ```bash
 # Via API (replace with your backend URL)
-curl -X GET "https://voice-ai-perf.preview.emergentagent.com/api/crm/qc-config" \
+curl -X GET "https://missed-variable.preview.emergentagent.com/api/crm/qc-config" \
   --cookie "access_token=YOUR_TOKEN"
 
 # Expected: 3 configs (commitment_detector, conversion_pathfinder, excellence_replicator)
@@ -38,7 +38,7 @@ curl -X GET "https://voice-ai-perf.preview.emergentagent.com/api/crm/qc-config" 
 ### 3. Lead Exists (Optional but Recommended)
 Create a test lead to track QC scores:
 ```bash
-curl -X POST "https://voice-ai-perf.preview.emergentagent.com/api/crm/leads" \
+curl -X POST "https://missed-variable.preview.emergentagent.com/api/crm/leads" \
   -H "Content-Type: application/json" \
   --cookie "access_token=YOUR_TOKEN" \
   -d '{
@@ -65,7 +65,7 @@ curl -X POST "https://voice-ai-perf.preview.emergentagent.com/api/crm/leads" \
 
 **Option B: Via API (Outbound Call)**
 ```bash
-curl -X POST "https://voice-ai-perf.preview.emergentagent.com/api/telnyx/call/outbound" \
+curl -X POST "https://missed-variable.preview.emergentagent.com/api/telnyx/call/outbound" \
   -H "Content-Type: application/json" \
   --cookie "access_token=YOUR_TOKEN" \
   -d '{
@@ -107,7 +107,7 @@ db.call_analytics.find().sort({created_at: -1}).limit(1).pretty()
 **Via API:**
 ```bash
 # Get analytics for a specific call
-curl -X GET "https://voice-ai-perf.preview.emergentagent.com/api/crm/analytics/call/CALL_ID" \
+curl -X GET "https://missed-variable.preview.emergentagent.com/api/crm/analytics/call/CALL_ID" \
   --cookie "access_token=YOUR_TOKEN"
 ```
 
@@ -116,7 +116,7 @@ If you linked the call to a lead, verify scores are updated:
 
 ```bash
 # Get lead details
-curl -X GET "https://voice-ai-perf.preview.emergentagent.com/api/crm/leads/LEAD_ID" \
+curl -X GET "https://missed-variable.preview.emergentagent.com/api/crm/leads/LEAD_ID" \
   --cookie "access_token=YOUR_TOKEN"
 
 # Check for:
@@ -403,7 +403,7 @@ import asyncio
 import httpx
 import json
 
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 async def test_qc_system():

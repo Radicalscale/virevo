@@ -17,10 +17,10 @@
 
 | Line | Old Code | Fixed To |
 |------|----------|----------|
-| 1488 | `"https://voice-ai-perf.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
-| 2223 | `"https://voice-ai-perf.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 1488 | `"https://missed-variable.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 2223 | `"https://missed-variable.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
 | 4168 | `"wss://airesponder-4.preview.emergentagent.com/..."` | Uses `BACKEND_URL` env var (required) |
-| 4226 | `"https://voice-ai-perf.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
+| 4226 | `"https://missed-variable.preview.emergentagent.com"` | Uses `BACKEND_URL` env var (required) |
 
 **Why This Matters:**
 - Hardcoded Emergent URLs would fail in external deployment
@@ -49,7 +49,7 @@ Used for:
 
 **Frontend .env still has:**
 ```
-REACT_APP_BACKEND_URL=https://voice-ai-perf.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://missed-variable.preview.emergentagent.com
 ```
 
 **This is fine because:**

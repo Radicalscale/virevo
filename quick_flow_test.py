@@ -5,7 +5,7 @@ Quick test of the flow agent
 import requests
 import time
 
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 AGENT_ID = "5d2764ba-fb80-4487-bd85-0deeb722ff39"
 TO_NUMBER = "+17708336397"
 FROM_NUMBER = "+14048000152"

@@ -15,7 +15,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from review request
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 
 # Test data from review request
 TEST_CREDENTIALS = {

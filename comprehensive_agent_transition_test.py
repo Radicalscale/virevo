@@ -17,7 +17,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 
 class ComprehensiveAgentTransitionTester:
     def __init__(self):

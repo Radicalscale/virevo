@@ -6,7 +6,7 @@ import requests
 import time
 import json
 
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 TO_NUMBER = "+17708336397"
 FROM_NUMBER = "+14048000152"
 

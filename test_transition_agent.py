@@ -5,7 +5,7 @@ Test the Transitioner Strawbanana agent
 import requests
 import time
 
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 AGENT_ID = "25b0f437-9164-4e55-b925-43b2d81e3ed9"
 TO_NUMBER = "+17708336397"
 FROM_NUMBER = "+14048000152"

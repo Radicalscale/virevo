@@ -12,7 +12,7 @@ import os
 from typing import Dict, List, Optional
 
 # Get backend URL from environment
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com/api"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com/api"
 
 class SonioxGrokIntegrationTester:
     def __init__(self):

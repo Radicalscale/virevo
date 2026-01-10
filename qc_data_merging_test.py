@@ -9,7 +9,7 @@ Tests the QC data merging fix for campaign analysis as specified in the review r
 4. Verify data merging from call_logs when campaign_calls has empty results
 5. Check for backend logs showing "Merged script_qc_results from call_logs" message
 
-Backend URL: https://voice-ai-perf.preview.emergentagent.com
+Backend URL: https://missed-variable.preview.emergentagent.com
 Credentials: kendrickbowman9@gmail.com / B!LL10n$$
 Campaign ID: b7bd9ce7-2722-4c61-a2fc-ca1fb127d7b8
 Test Call IDs: 
@@ -25,7 +25,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Backend URL from review request
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 
 # Test data from review request
 TEST_CREDENTIALS = {

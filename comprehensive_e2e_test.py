@@ -12,7 +12,7 @@ import os
 from typing import Dict, List, Optional
 
 # Get backend URL from frontend environment
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com/api"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com/api"
 
 class ComprehensiveE2ETester:
     def __init__(self):

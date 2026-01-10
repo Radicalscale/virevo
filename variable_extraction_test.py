@@ -9,7 +9,7 @@ Tests the variable extraction system with calculations for the income qualificat
 4. Test logic split node (ID: 1763180018981) that evaluates if amount_reference > 8000
 
 Agent ID: bbeda238-e8d9-4d8c-b93b-1b7694581adb
-Backend URL: https://voice-ai-perf.preview.emergentagent.com (from frontend/.env)
+Backend URL: https://missed-variable.preview.emergentagent.com (from frontend/.env)
 """
 
 import asyncio
@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Get backend URL from frontend/.env
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 AGENT_ID = "bbeda238-e8d9-4d8c-b93b-1b7694581adb"
 LOGIC_SPLIT_NODE_ID = "1763180018981"
 

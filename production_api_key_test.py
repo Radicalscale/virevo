@@ -13,7 +13,7 @@ import uuid
 from typing import Dict, List, Optional
 
 # Backend URL from production environment
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com/api"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com/api"
 
 class ProductionAPIKeyTester:
     def __init__(self):

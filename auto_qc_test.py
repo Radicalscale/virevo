@@ -27,7 +27,7 @@ Test Flow:
 Credentials:
 - Email: test@preview.emergentagent.com
 - Password: TestPassword123!
-- Production URL: https://voice-ai-perf.preview.emergentagent.com
+- Production URL: https://missed-variable.preview.emergentagent.com
 """
 
 import httpx
@@ -39,7 +39,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 # Configuration - Use production backend URL as specified in review request
-BACKEND_URL = "https://voice-ai-perf.preview.emergentagent.com"
+BACKEND_URL = "https://missed-variable.preview.emergentagent.com"
 
 # Endpoint paths - QC Enhanced endpoints don't have /api prefix
 QC_ENHANCED_PREFIX = "/qc/enhanced"
