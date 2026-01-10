@@ -5415,25 +5415,27 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         # Handle script vs prompt mode for conversation nodes
         if prompt_type == "script":
             logger.info("📜 Using SCRIPT mode - will speak content directly")
-            # Replace variables in script
+            # Replace variables in script - handle both {{var}} and {var} formats
             script = content
             logger.info(f"🔧 Script before replacement: {script[:100]}")
             logger.info(f"🔧 Session variables: {self.session_variables}")
             for var_name, var_value in self.session_variables.items():
                 logger.info(f"🔧 Replacing {{{{{var_name}}}}} with {var_value}")
-                script = script.replace(f"{{{{{var_name}}}}}", str(var_value))
+                script = script.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                script = script.replace(f"{{{var_name}}}", str(var_value))      # {var}
             logger.info(f"🔧 Script after replacement: {script[:100]}")
             return script
         else:
             logger.info("💭 Using PROMPT mode - will use AI to interpret instructions")
             # Prompt mode - use AI
-            # FIRST replace variables in the content/prompt itself
+            # FIRST replace variables in the content/prompt itself - handle both formats
             prompt_with_vars = content
             logger.info(f"🔧 Prompt before replacement: {prompt_with_vars[:100]}")
             logger.info(f"🔧 Session variables: {self.session_variables}")
             for var_name, var_value in self.session_variables.items():
                 logger.info(f"🔧 Replacing {{{{{var_name}}}}} with {var_value}")
-                prompt_with_vars = prompt_with_vars.replace(f"{{{{{var_name}}}}}", str(var_value))
+                prompt_with_vars = prompt_with_vars.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                prompt_with_vars = prompt_with_vars.replace(f"{{{var_name}}}", str(var_value))      # {var}
             logger.info(f"🔧 Prompt after replacement: {prompt_with_vars[:100]}")
             logger.info(f"📏 Full prompt length: {len(prompt_with_vars)} chars")
             
