@@ -3186,9 +3186,10 @@ Your response (just the number):"""
                         next_mode = next_node_data.get("mode", "script")
                         next_goal = next_node_data.get("goal", "")
                         
-                        # Replace variables in content
+                        # Replace variables in content - handle both {{var}} and {var} formats
                         for var_name, var_value in self.session_variables.items():
-                            next_content = next_content.replace(f"{{{{{var_name}}}}}", str(var_value))
+                            next_content = next_content.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                            next_content = next_content.replace(f"{{{var_name}}}", str(var_value))      # {var}
                         
                         transition_options.append({
                             "index": i,
