@@ -4516,7 +4516,6 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         
                         playback_start = time.time()
                         logger.info(f"⏱️ [TIMING] TELNYX_PLAY_CALL_START: Calling play_audio_url API")
-                                        yield chunk
                         
                         # 🔥 CRITICAL FIX: Mark agent as speaking before playing URL
                         session.mark_agent_speaking_start()
