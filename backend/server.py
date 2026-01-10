@@ -3536,7 +3536,20 @@ async def handle_assemblyai_streaming(websocket: WebSocket, session, call_id: st
         # Agent config already refreshed at call start - no need to refresh again
         telnyx_service = get_telnyx_service()
         agent_config = session.agent_config
-        await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
+        # Helper to speak text
+        async def speak_response(text):
+            if text:
+                # 🔥 CRITICAL FIX: Mark agent as speaking before requesting audio
+                if session:
+                    session.mark_agent_speaking_start()
+                await telnyx_service.speak_text(call_control_id, text, agent_config=agent_config)
+
+        # Handle different response types
+        if response_type == "greeting":
+             # ... existing logic ...
+             pass
+        elif response_type == "response":
+            await speak_response(response_text)
         
         if session.should_end_call:
             logger.info("📞 Ending call...")
@@ -4227,6 +4240,10 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 
                 # Stream callback: Generate TTS IMMEDIATELY as sentences arrive
                 async def stream_sentence_to_tts(sentence):
+                    # 🔥 CRITICAL FIX: Mark agent as speaking IMMEDIATELY when we have a sentence to stream
+                    # This acts as the "Audio-Driven" failsafe. If we are streaming, we are speaking.
+                    session.mark_agent_speaking_start()
+                    
                     # Note: persistent_tts_manager is imported at top of file (line 41)
                     # Using closure to access the global import
                     tts_manager = persistent_tts_manager
@@ -4499,6 +4516,11 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                         
                         playback_start = time.time()
                         logger.info(f"⏱️ [TIMING] TELNYX_PLAY_CALL_START: Calling play_audio_url API")
+                                        yield chunk
+                        
+                        # 🔥 CRITICAL FIX: Mark agent as speaking before playing URL
+                        session.mark_agent_speaking_start()
+                        
                         result = await telnyx_service.play_audio_url(call_control_id, audio_url)
                         playback_time = int((time.time() - playback_start) * 1000)
                         logger.info(f"⏱️ [TIMING] TELNYX_PLAY_CALL_COMPLETE: {playback_time}ms (API call only, audio may not be playing yet)")
@@ -5729,6 +5751,8 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                 # Speak response with agent config for TTS routing
                 telnyx_service = get_telnyx_service()
                 agent_config = session.agent_config
+                # 🔥 CRITICAL FIX: Mark agent as speaking before emitting audio
+                session.mark_agent_speaking_start()
                 await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
                 
                 # Check if we should end call
@@ -6024,6 +6048,10 @@ async def telnyx_audio_stream(websocket: WebSocket, call_control_id: str):
                                 
                                 # Get agent config for TTS routing
                                 agent_config = session.agent_config
+                                
+                                # 🔥 CRITICAL FIX: Mark agent as speaking before emitting audio
+                                session.mark_agent_speaking_start()
+                                await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
                                 
                                 # Speak via Telnyx with agent config for TTS routing
                                 telnyx_service = get_telnyx_service()
@@ -8738,6 +8766,8 @@ async def telnyx_webhook(payload: dict):
                                     else:
                                         logger.warning(f"⚠️ call_states entry missing for {call_control_id}, skipping recent_agent_texts update")
 
+                                    # 🔥 CRITICAL FIX: Mark agent as speaking before emitting audio
+                                    session.mark_agent_speaking_start()
                                     await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
                                     logger.info(f"🔊 Spoke response successfully")
                                 except Exception as speak_error:
@@ -8899,6 +8929,8 @@ async def telnyx_webhook(payload: dict):
                                     logger.info("📞 Ending node reached - hanging up")
                                     telnyx_service = get_telnyx_service()
                                     agent_config = session.agent_config
+                                    # 🔥 CRITICAL FIX: Mark agent as speaking before emitting audio
+                                    session.mark_agent_speaking_start()
                                     await telnyx_service.speak_text(call_control_id, response_text, agent_config=agent_config)
                                     await asyncio.sleep(3)
                                     await telnyx_service.hangup_call(call_control_id)
