@@ -7776,6 +7776,7 @@ async def telnyx_webhook(payload: dict):
                 logger.info(f"✅ Set 'agent_done_speaking' flag in Redis for worker with session to detect")
                 
                 # Still try local access if we're on the same worker (for immediate response)
+                # Still try local access if we're on the same worker (for immediate response)
                 if state and "session" in state and state["session"]:
                     session = state["session"]
                     logger.info(f"✅ Found session locally: agent_speaking={session.agent_speaking}, user_speaking={session.user_speaking}")
@@ -7783,21 +7784,47 @@ async def telnyx_webhook(payload: dict):
                         session.mark_agent_speaking_end()
                         logger.info(f"⏱️ Agent done speaking, silence timer STARTED (local)")
                     elif not session.user_speaking:
-                        session.start_silence_tracking()
-                        logger.info(f"⏱️ Silence timer STARTED (local, agent wasn't marked as speaking)")
+                        # 🔥 CRITICAL CHECK: Double check if user is speaking using the timestamp
+                        # Sometimes user_speaking flag latency issues occur
+                        time_since_user_start = time.time() - getattr(session, '_user_started_speaking_at', 0)
+                        
+                        # Use a small window (e.g., 2 seconds) to account for race conditions where
+                        # user started speaking but the flag might be flipping or checked precisely at transition
+                        if time_since_user_start < 2.0 and time_since_user_start > 0:
+                             logger.info(f"⏱️ SKIPPING silence timer - User started speaking recently ({time_since_user_start:.3f}s ago)")
+                        else:
+                            session.start_silence_tracking()
+                            logger.info(f"⏱️ Silence timer STARTED (local, agent wasn't marked as speaking)")
+                    else:
+                        logger.info(f"⏱️ SKIPPING silence timer - User is speaking")
                 elif call_control_id in active_telnyx_calls:
                     call_data = active_telnyx_calls[call_control_id]
                     if "session" in call_data and call_data["session"]:
                         session = call_data["session"]
-                        logger.info(f"✅ Found session in active_telnyx_calls (local worker)")
+                        logger.info(f"✅ Found session in active_telnyx_calls: agent_speaking={session.agent_speaking}, user_speaking={session.user_speaking}")
                         if session.agent_speaking:
                             session.mark_agent_speaking_end()
-                            logger.info(f"⏱️ Agent done speaking, silence timer STARTED (fallback)")
+                            logger.info(f"⏱️ Agent done speaking, silence timer STARTED (memory fallback)")
                         elif not session.user_speaking:
-                            session.start_silence_tracking()
-                            logger.info(f"⏱️ Silence timer STARTED (fallback, agent wasn't marked as speaking)")
+                            # 🔥 CRITICAL CHECK: Double check if user is speaking using the timestamp
+                            # Sometimes user_speaking flag latency issues occur
+                            time_since_user_start = time.time() - getattr(session, '_user_started_speaking_at', 0)
+                            if time_since_user_start < 0.5 or session.user_speaking:
+                                logger.info(f"⏱️ SKIPPING silence timer - User started speaking recently ({time_since_user_start:.3f}s ago)")
+                            else:
+                                session.start_silence_tracking()
+                                logger.info(f"⏱️ Silence timer STARTED (memory fallback, agent wasn't marked as speaking)")
+                        else:
+                            logger.info(f"⏱️ SKIPPING silence timer - User is speaking (memory fallback)")
                 else:
-                    logger.info(f"💡 Session not on this worker - Redis flag set for WebSocket worker to handle")
+                    # Fallback: Just start it if we can't check session state
+                    # But without session we can't call start_silence_tracking anyway
+                    logger.warning(f"⚠️ Could not find session to start silence timer for {call_control_id}")
+                # Check for playback_expected_end_time logic - if it was cleared recently implies interruption.
+                # This check is implicitly handled by the `if state:` block above where `playback_expected_end_time` is set to 0.
+                # If it was cleared recently due to an interruption, the `agent_done_speaking` flag would still be set,
+                # and the silence timer logic would proceed as intended, or be skipped if the user is speaking.
+                # No explicit additional code is needed here for this instruction, as the existing logic covers it.
             
             # Also update local state dict if it exists (for interruption detection)
             state = call_states.get(call_control_id)
@@ -8479,6 +8506,14 @@ async def telnyx_webhook(payload: dict):
                 logger.info(f"✅ Closed persistent TTS session for call {call_control_id}")
             except Exception as e:
                 logger.error(f"❌ Error closing persistent TTS session: {e}")
+            
+            # 🔥 CRITICAL FIX: Close the CallSession to stop dead air monitor
+            try:
+                from core_calling_service import close_call_session
+                await close_call_session(call_control_id)
+                logger.info(f"✅ Closed CallSession for call {call_control_id}")
+            except Exception as e:
+                logger.error(f"❌ Error closing CallSession: {e}")
             
             # Clean up active call from Redis and in-memory
             redis_service.delete_call_data(call_control_id)
