@@ -728,9 +728,9 @@ class CallSession:
                             playback_started = call_states[self.call_id].get("greeting_playback_started_at", 0)
                             current_time = time.time()
                             # Buffer: 2.5 seconds (Covers generation + network + short greeting playback)
-                            if playback_started > 0 and (current_time - playback_started) < 2.5:
-                                logger.info(f"⏳ Smart Barge-In: User spoke early ({current_time - playback_started:.2f}s) - LETTING GREETING FINISH")
-                                should_stop_audio = False
+                            # if playback_started > 0 and (current_time - playback_started) < 2.5:
+                            #     logger.info(f"⏳ Smart Barge-In: User spoke early ({current_time - playback_started:.2f}s) - LETTING GREETING FINISH")
+                            #     should_stop_audio = False
                         
                         if should_stop_audio:
                             from telnyx_service import TelnyxService

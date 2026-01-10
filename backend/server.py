@@ -5414,7 +5414,7 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                 start_node_data = start_node.get("data", {})
                 who_speaks_first = start_node_data.get("whoSpeaksFirst", "ai")
                 ai_speaks_after_silence = start_node_data.get("aiSpeaksAfterSilence", False)
-                silence_timeout_ms = start_node_data.get("silenceTimeout", 2000)
+                silence_timeout_ms = max(start_node_data.get("silenceTimeout", 2000), 3000) # Force min 3000ms
                 
                 if who_speaks_first == "user" and ai_speaks_after_silence:
                     logger.info(f"⏱️ [WebSocket Worker] Scheduling silence timeout: {silence_timeout_ms}ms")
