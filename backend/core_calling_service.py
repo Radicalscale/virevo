@@ -2275,8 +2275,10 @@ Use these sparingly and naturally - only when they genuinely fit the moment.
                     content = node_data.get("content", "") or node_data.get("script", "")
                 
                 # Replace variables in content BEFORE processing
+                # Handle both {{variable}} and {variable} formats (LLM may output either)
                 for var_name, var_value in self.session_variables.items():
-                    content = content.replace(f"{{{{{var_name}}}}}", str(var_value))
+                    content = content.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                    content = content.replace(f"{{{var_name}}}", str(var_value))      # {var}
                     logger.info(f"🔧 Replaced {{{{{var_name}}}}} with {var_value} in content")
                 
                 # Smart detection of mode: if content is very long or has instructions, it's "prompt" mode
