@@ -109,7 +109,7 @@ async def get_llm_client(provider: str = "openai", api_key: str = None, session=
                     """Create a completion using Grok via xAI API"""
                     try:
                         response = await self.client.chat.completions.create(
-                            model=model or "grok-3",
+                            model=model,
                             messages=messages,
                             temperature=temperature,
                             max_tokens=max_tokens,
@@ -3246,6 +3246,10 @@ RULES:
 5. Do NOT repeat what you've already said in the conversation
 
 Your response:"""
+            
+            # 🚀 PROMPT OPTIMIZATION: Enforce strict start for immediate streaming
+            # By forcing the model to start with [T:, we skip any "thinking" or preamble buffering
+            merged_prompt += "\n[T:"
 
             # Make the merged LLM call with streaming
             import datetime
@@ -3311,8 +3315,9 @@ Your response:"""
                 
                 # Parse transition marker from the start
                 if transition_marker is None:
-                    # Look for [T:X] pattern
-                    match = re.match(r'\[T:(-?\d+)\]\s*', buffer)
+                    # Look for T:X] pattern (since we pre-filled [)
+                    # Or full [T:X] if the model ignored our pre-fill (robustness)
+                    match = re.match(r'(?:\[)?T:(-?\d+)\]\s*', buffer)
                     if match:
                         transition_marker = int(match.group(1))
                         # Remove the marker from buffer, keep the rest

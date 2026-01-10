@@ -3,6 +3,7 @@ Agent Testing Router - API endpoints for testing agents without phone calls
 """
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 import time
@@ -11,6 +12,9 @@ from datetime import datetime, timedelta
 import aiohttp
 import re
 import logging
+import asyncio
+import json
+
 
 from auth_middleware import get_current_user
 from core_calling_service import CallSession
@@ -1280,3 +1284,77 @@ async def delete_auto_test_session(
         'session_id': session_id
     }
 
+
+@router.post("/agents/{agent_id}/test/message/stream")
+async def send_test_message_stream(
+    agent_id: str, 
+    request: TestMessageRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Send a message in an active test session with REAL-TIME STREAMING (SSE)"""
+    
+    db = get_db()
+    session_id = request.session_id
+    
+    if not session_id:
+        raise HTTPException(status_code=404, detail="Test session not found. Please start a new session.")
+    
+    # Get agent config
+    agent_doc = await db.agents.find_one({"id": agent_id, "user_id": current_user['id']})
+    if not agent_doc:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    
+    # Get or recreate session from DB
+    call_session, session_data = await get_or_create_session(
+        session_id, 
+        agent_doc, 
+        current_user['id'],
+        request.start_node_id
+    )
+    
+    if not call_session or not session_data:
+        raise HTTPException(status_code=404, detail="Test session not found.")
+        
+    start_time = time.time()
+    
+    async def event_generator():
+        """Yields SSE events"""
+        try:
+            # We need a queue to capture the stream from process_user_input
+            stream_queue = asyncio.Queue()
+            
+            async def queue_callback(text_chunk):
+                await stream_queue.put(text_chunk)
+            
+            # Run processing in background task
+            processing_task = asyncio.create_task(
+                call_session.process_user_input(request.message, stream_callback=queue_callback)
+            )
+            
+            # Yield initial event
+            yield f"data: {json.dumps({'status': 'started', 'timestamp': time.time()})}\\n\\n"
+            
+            # Consume queue until task is done AND queue is empty
+            while not processing_task.done() or not stream_queue.empty():
+                try:
+                    # Wait for next chunk with short timeout to check task status
+                    # Using wait_for to allow checking task status frequently
+                    chunk = await asyncio.wait_for(stream_queue.get(), timeout=0.1)
+                    if chunk:
+                        yield f"data: {json.dumps({'chunk': chunk, 'timestamp': time.time()})}\\n\\n"
+                except asyncio.TimeoutError:
+                    continue
+            
+            # Get final result and catch any exceptions from the task
+            result = await processing_task
+            
+            total_time = time.time() - start_time
+            
+            # Yield completion event with stats
+            yield f"data: {json.dumps({'status': 'completed', 'total_time': round(total_time, 3), 'full_text': result.get('text', '') if result else ''})}\\n\\n"
+            
+        except Exception as e:
+            logger.error(f"Stream error: {e}")
+            yield f"data: {json.dumps({'status': 'error', 'error': str(e)})}\\n\\n"
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
