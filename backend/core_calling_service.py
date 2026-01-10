@@ -903,7 +903,10 @@ User's current rambling speech (partial): "{partial_transcript}"
 Generate a short, natural interruption phrase (1 sentence only). Start speaking immediately. Do not apologize excessively."""
 
             # 3. Call LLM
-            llm_provider = settings.get("llm_provider", "openai")
+            llm_provider = settings.get("llm_provider")
+            if not llm_provider:
+                llm_provider = "openai"
+                
             client = await self.get_llm_client_for_session(llm_provider)
             model = self.agent_config.get("model", "gpt-4-turbo")
             
@@ -1119,9 +1122,12 @@ Answer (one word only):"""
             
             # Get LLM client
             settings = self.agent_config.get("settings", {})
-            llm_provider = settings.get("llm_provider", "grok")
+            llm_provider = settings.get("llm_provider")
+            if not llm_provider:
+                llm_provider = "openai"
+                
             client = await self.get_llm_client_for_session(llm_provider)
-            model = self.agent_config.get("model", "grok-3")
+            model = self.agent_config.get("model", "gpt-4-turbo")
             
             logger.info(f"🧠 DISCERNMENT CHECK: Evaluating {len(transcript.split())} words against goal: {node_goal[:50]}...")
             
@@ -1451,6 +1457,162 @@ Use these sparingly and naturally - only when they genuinely fit the moment.
                 return full_response
         except Exception as e:
             logger.error(f"Error in single prompt: {e}")
+            return "I apologize, but I'm having trouble processing your request."
+    
+    async def _process_single_prompt_streaming(self, user_message: str, stream_callback=None) -> str:
+        """Process using traditional single system prompt with streaming support"""
+        try:
+            import datetime
+            import re
+            
+            # Reset per-turn timing metrics
+            self.last_transition_time_ms = 0
+            
+            timestamp_str = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+            logger.info(f"⏱️ [{timestamp_str}] 🤖 SINGLE PROMPT STREAMING: Processing '{user_message}'")
+            
+            system_prompt = self.agent_config.get("system_prompt", "You are a helpful AI assistant.")
+            
+            # Add knowledge base to system prompt if available
+            if self.knowledge_base:
+                system_prompt += f"\n\n=== KNOWLEDGE BASE ===\nYou have access to multiple reference sources below. Each source serves a different purpose.\n\n🧠 HOW TO USE THE KNOWLEDGE BASE:\n1. When user asks a question, FIRST identify which knowledge base source(s) are relevant based on their descriptions\n2. Read ONLY the relevant source(s) to find the answer\n3. Use ONLY information from the knowledge base - do NOT make up or improvise ANY factual details\n4. If the knowledge base doesn't contain the answer, say: \"I don't have that specific information available\"\n5. Different sources contain different types of information - match the user's question to the right source\n\n⚠️ NEVER invent: company names, product names, prices, processes, methodologies, or any factual information not in the knowledge base\n\n{self.knowledge_base}\n=== END KNOWLEDGE BASE ===\n"
+            
+            messages = [
+                {"role": "system", "content": system_prompt}
+            ] + self.conversation_history  # Full history with 2M context window
+            
+            # Get LLM provider from agent settings
+            llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
+            if not llm_provider:
+                logger.error("❌ No LLM provider configured for agent")
+                return None
+            model = self.agent_config.get("model", "gpt-4-turbo")
+            
+            # Validate model matches provider and fix if mismatched
+            grok_models = ["grok-4-1-fast-non-reasoning", "grok-4-fast-non-reasoning", "grok-4-fast-reasoning", "grok-3", "grok-2-1212", "grok-beta", "grok-4-fast"]
+            openai_models = ["gpt-4.1-2025-04-14", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"]
+            gemini_models = ["gemini-3-flash-preview", "gemini-3-pro-preview"]
+            
+            if llm_provider == "grok":
+                if model not in grok_models:
+                    logger.warning(f"⚠️  Model '{model}' not valid for Grok, using 'grok-3'")
+                    model = "grok-3"
+            elif llm_provider == "gemini":
+                if model not in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' not valid for Gemini, using 'gemini-3-flash-preview'")
+                    model = "gemini-3-flash-preview"
+            else:
+                if model in grok_models:
+                    logger.warning(f"⚠️  Model '{model}' is a Grok model but provider is OpenAI, using 'gpt-4-turbo'")
+                    model = "gpt-4-turbo"
+                elif model in gemini_models:
+                    logger.warning(f"⚠️  Model '{model}' is a Gemini model but provider is OpenAI, using 'gpt-4-turbo'")
+                    model = "gpt-4-turbo"
+            
+            logger.info(f"🤖 Using LLM provider: {llm_provider}, model: {model}")
+            logger.info(f"🤖 User message: {user_message[:100]}...")
+            
+            # Get appropriate client
+            if llm_provider == "grok":
+                client = await self.get_llm_client_for_session("grok")
+            elif llm_provider == "gemini":
+                client = await self.get_llm_client_for_session("gemini")
+            else:
+                client = await self.get_llm_client_for_session("openai")
+            
+            if not client:
+                raise Exception(f"{llm_provider} client not configured")
+            
+            # ⏱️  Track LLM TTFT (Time-To-First-Token)
+            llm_request_start = time.time()
+            
+            # Use the appropriate client method WITH STREAMING for faster TTFT
+            if llm_provider == "grok" or llm_provider == "gemini":
+                response = await client.create_completion(
+                    messages=messages,
+                    model=model,
+                    temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
+                    max_tokens=self.agent_config.get("settings", {}).get("max_tokens", 500),
+                    stream=True
+                )
+            else:
+                response = await client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
+                    max_tokens=self.agent_config.get("settings", {}).get("max_tokens", 500),
+                    stream=True
+                )
+            
+            # Collect streamed response
+            full_response = ""
+            sentence_buffer = ""
+            first_token_received = False
+            
+            # Sentence delimiters
+            sentence_endings = re.compile(r'([.!?]\s+|[,—;]\s+)')
+            
+            async for chunk in response:
+                if not first_token_received:
+                    ttft_ms = int((time.time() - llm_request_start) * 1000)
+                    timestamp_str = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                    logger.info(f"⏱️ [{timestamp_str}] 💬 LLM FIRST TOKEN: {ttft_ms}ms ({llm_provider} {model})")
+                    first_token_received = True
+                
+                # Extract content
+                content = ""
+                if llm_provider == "grok" or llm_provider == "gemini":
+                    if hasattr(chunk, 'choices') and len(chunk.choices) > 0:
+                        delta = chunk.choices[0].delta
+                        if hasattr(delta, 'content') and delta.content:
+                            content = delta.content
+                else:
+                    if chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                
+                if not content:
+                    continue
+                
+                full_response += content
+                sentence_buffer += content
+                
+                # Check if we have a complete sentence
+                if sentence_endings.search(sentence_buffer):
+                    # Split into sentences
+                    sentences = sentence_endings.split(sentence_buffer)
+                    
+                    # Process complete sentences (leave last incomplete one in buffer)
+                    for i in range(0, len(sentences) - 1, 2):
+                        if i < len(sentences):
+                            sentence = sentences[i]
+                            if i + 1 < len(sentences):
+                                sentence += sentences[i + 1]  # Add delimiter
+                            
+                            sentence = sentence.strip()
+                            if sentence and stream_callback:
+                                # Mark agent as speaking (if not already marked)
+                                self.mark_agent_speaking_start()
+                                # Stream this sentence immediately to TTS
+                                await stream_callback(sentence)
+                                logger.info(f"📤 Streamed sentence: {sentence[:50]}...")
+                    
+                    # Keep the last incomplete part in buffer
+                    sentence_buffer = sentences[-1] if len(sentences) % 2 != 0 else ""
+            
+            # Send any remaining text
+            if sentence_buffer.strip() and stream_callback:
+                # Mark agent as speaking (if not already marked)
+                self.mark_agent_speaking_start()
+                await stream_callback(sentence_buffer.strip())
+                logger.info(f"📤 Streamed final fragment: {sentence_buffer[:50]}...")
+            
+            llm_total_ms = int((time.time() - llm_request_start) * 1000)
+            logger.info(f"⏱️ [TIMING] LLM_TOTAL: {llm_total_ms}ms")
+            
+            return full_response
+            
+        except Exception as e:
+            logger.error(f"Error in single prompt streaming: {e}")
             return "I apologize, but I'm having trouble processing your request."
     
     async def _process_call_flow_streaming(self, user_message: str, stream_callback=None) -> str:
@@ -3351,6 +3513,7 @@ Your response:"""
                             sentence = sentence.replace(f"{{{var_name}}}", str(var_value))      # {var}
                         
                         if sentence and stream_callback:
+                            self.mark_agent_speaking_start()
                             await stream_callback(sentence)
                             full_response += sentence + " "
                             logger.info(f"📤 Streamed: {sentence[:50]}...")
@@ -3846,7 +4009,11 @@ Return ONLY a JSON object with the extracted values. If a value was NOT explicit
                     logger.info(f"📝 Using prompt message: {prompt_message}")
                     
                     # Get LLM to generate natural request based on prompt message
-                    client = await self.get_llm_client_for_session("openai")
+                    settings = self.agent_config.get("settings", {})
+                    llm_provider = settings.get("llm_provider", "openai")
+                    model = self.agent_config.get("model", "gpt-4-turbo")
+                    
+                    client = await self.get_llm_client_for_session(llm_provider)
                     global_prompt = self.agent_config.get("system_prompt", "")
                     
                     generation_prompt = f"""You are having a conversation and need to ask for specific information.
@@ -3862,12 +4029,20 @@ Generate the request:"""
                         {"role": "user", "content": generation_prompt}
                     ]
                     
-                    response = await client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=messages,
-                        temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
-                        max_tokens=150
-                    )
+                    if llm_provider == "grok" or llm_provider == "gemini":
+                        response = await client.create_completion(
+                            model=model,
+                            messages=messages,
+                            temperature=settings.get("temperature", 0.7),
+                            max_tokens=150
+                        )
+                    else:
+                        response = await client.chat.completions.create(
+                            model=model,
+                            messages=messages,
+                            temperature=settings.get("temperature", 0.7),
+                            max_tokens=150
+                        )
                     
                     reprompt_text = response.choices[0].message.content.strip()
                     logger.info(f"✅ Generated reprompt: {reprompt_text[:100]}...")
@@ -3978,26 +4153,23 @@ Return ONLY a JSON object with the extracted values. If a value cannot be determ
                     # Call LLM to extract variables - use temperature=0 for deterministic math
                     try:
                         # Get LLM client
-                        llm_provider = self.agent_config.get("settings", {}).get("llm_provider")
-                        if not llm_provider:
-                            logger.error("❌ No LLM provider configured for agent")
-                            return None
-                        llm_model = self.agent_config.get("settings", {}).get("llm_model", "gpt-4o-mini")
+                        settings = self.agent_config.get("settings", {})
+                        llm_provider = settings.get("llm_provider", "openai")
+                        model = self.agent_config.get("model", "gpt-4-turbo")
                         
-                        if llm_provider == "openai":
-                            client = await self.get_llm_client_for_session("openai")
-                            response = await client.chat.completions.create(
-                                model=llm_model,
+                        client = await self.get_llm_client_for_session(llm_provider)
+                        
+                        if llm_provider == "grok" or llm_provider == "gemini":
+                            response = await client.create_completion(
+                                model=model,
                                 messages=[{"role": "user", "content": extraction_prompt}],
                                 temperature=0.0,
                                 max_tokens=500
                             )
                             extraction_response = response.choices[0].message.content
                         else:
-                            # Fallback to OpenAI
-                            client = await self.get_llm_client_for_session("openai")
                             response = await client.chat.completions.create(
-                                model="gpt-4o-mini",
+                                model=model,
                                 messages=[{"role": "user", "content": extraction_prompt}],
                                 temperature=0.0,
                                 max_tokens=500
@@ -4069,13 +4241,25 @@ Return ONLY a JSON object with the extracted values. If a value cannot be determ
                                     {"role": "user", "content": f"Instruction: {reprompt_text}\n\nConversation context: {' '.join([msg.get('content', '')[:100] for msg in self.conversation_history[-3:]])}\n\nGenerate a natural response asking for the missing information."}
                                 ]
                                 
-                                client = await self.get_llm_client_for_session("openai")
-                                response = await client.chat.completions.create(
-                                    model="gpt-4o-mini",
-                                    messages=context_messages,
-                                    temperature=self.agent_config.get("settings", {}).get("temperature", 0.7),
-                                    max_tokens=150
-                                )
+                                settings = self.agent_config.get("settings", {})
+                                llm_provider = settings.get("llm_provider", "openai")
+                                model = self.agent_config.get("model", "gpt-4-turbo")
+                                client = await self.get_llm_client_for_session(llm_provider)
+
+                                if llm_provider == "grok" or llm_provider == "gemini":
+                                    response = await client.create_completion(
+                                        model=model,
+                                        messages=context_messages,
+                                        temperature=settings.get("temperature", 0.7),
+                                        max_tokens=150
+                                    )
+                                else:
+                                    response = await client.chat.completions.create(
+                                        model=model,
+                                        messages=context_messages,
+                                        temperature=settings.get("temperature", 0.7),
+                                        max_tokens=150
+                                    )
                                 
                                 generated_reprompt = response.choices[0].message.content.strip()
                                 reprompt_messages.append(generated_reprompt)
@@ -5240,6 +5424,8 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
                         
                         sentence = sentence.strip()
                         if sentence and stream_callback:
+                            # Mark agent as speaking (if not already marked)
+                            self.mark_agent_speaking_start()
                             # Stream this sentence immediately to TTS
                             await stream_callback(sentence)
                             logger.info(f"📤 Streamed sentence: {sentence[:50]}...")
@@ -5344,6 +5530,7 @@ Respond naturally to the user based on these instructions. Remember: DO NOT repe
         if prompt_type == "script":
             logger.info("📜 Using SCRIPT mode - will speak content directly")
             if stream_callback:
+                self.mark_agent_speaking_start()
                 await stream_callback(content)
                 logger.info(f"📤 Streamed script content: {content[:50]}...")
             return content

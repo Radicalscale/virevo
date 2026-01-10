@@ -5485,6 +5485,11 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                                 logger.info("⏭️ [WebSocket Worker] User spoke during greeting generation - CANCELLING silence greeting")
                                 return  # Don't speak - user already started the conversation
                             
+                            # Mark agent as speaking BEFORE sending TTS
+                            # This prevents dead air monitor from counting silence during greeting
+                            session.mark_agent_speaking_start()
+                            logger.info("🗣️ [WebSocket Worker] Marked agent as speaking (for initial greeting)")
+                            
                             # Speak the greeting
                             telnyx_svc = get_telnyx_service()
                             await telnyx_svc.speak_text(
