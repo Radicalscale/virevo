@@ -4513,14 +4513,16 @@ Return ONLY a JSON object with the extracted values. If a value cannot be determ
             phone_number = node_data.get("phone_number", "")
             sms_message = node_data.get("sms_message", "")
             
-            # Replace variables in phone number and message
+            # Replace variables in phone number and message - handle both {{var}} and {var} formats
             if phone_number:
                 for var_name, var_value in self.session_variables.items():
-                    phone_number = phone_number.replace(f"{{{{{var_name}}}}}", str(var_value))
+                    phone_number = phone_number.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                    phone_number = phone_number.replace(f"{{{var_name}}}", str(var_value))      # {var}
             
             if sms_message:
                 for var_name, var_value in self.session_variables.items():
-                    sms_message = sms_message.replace(f"{{{{{var_name}}}}}", str(var_value))
+                    sms_message = sms_message.replace(f"{{{{{var_name}}}}}", str(var_value))    # {{var}}
+                    sms_message = sms_message.replace(f"{{{var_name}}}", str(var_value))        # {var}
             
             logger.info(f"📱 Sending SMS to {phone_number}: {sms_message[:50]}...")
             
