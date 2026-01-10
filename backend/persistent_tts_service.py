@@ -77,6 +77,10 @@ class PersistentTTSSession:
         # Defaults to True (fail-safe: if not managed, floor still releases normally)
         self.generation_complete = True
         
+        # 🔥 FIX: Precise state tracking for "gap" between LLM done and Audio start
+        # True when text sent to ElevenLabs but first audio chunk hasn't been sent to Telnyx yet
+        self.is_waiting_for_first_audio_of_response = False
+        
         # 🔥 Interruption flag - when True, stop all audio sending immediately
         self.interrupted = False
         
@@ -418,6 +422,17 @@ class PersistentTTSSession:
                 
                 logger.info(f"🎤 [Call {self.call_control_id}] Streaming sentence #{sentence_num}: {sentence[:50]}...")
                 
+                # 🔥 CRITICAL FIX: Precise state tracking (User Requested)
+                # Mark as waiting for audio immediately. This flag will be checked by dead_air_monitor
+                # effectively causing it to pause checks until audio starts playing.
+                self.is_waiting_for_first_audio_of_response = True
+                
+                # Also set speaking flags to indicate intent
+                self.is_holding_floor = True
+                self.is_speaking = True
+                
+                logger.info(f"🛡️ [Call {self.call_control_id}] ACTIVATE WAIT STATE: is_waiting_for_first_audio_of_response=True")
+                
                 stream_start = time.time()
                 
                 # Send text to ElevenLabs for synthesis
@@ -681,6 +696,11 @@ class PersistentTTSSession:
             # 🔊 SINGLE SOURCE OF TRUTH: Mark agent as speaking BEFORE sending audio
             self.is_speaking = True
             logger.info(f"🎙️ [Call {self.call_control_id}] AGENT IS NOW SPEAKING (is_speaking=True)")
+            
+            # 🔥 CRITICAL FIX: Clear waiting flag now that audio is flowing
+            if self.is_waiting_for_first_audio_of_response:
+                self.is_waiting_for_first_audio_of_response = False
+                logger.info(f"🛡️ [Call {self.call_control_id}] CLEAR WAIT STATE: Audio flow started (is_waiting_for_first_audio_of_response=False)")
             
             # 🔥 CRITICAL FIX: EXTEND playback_expected_end_time instead of overwriting
             # With WebSocket streaming, audio chunks are queued sequentially.

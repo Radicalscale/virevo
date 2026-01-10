@@ -103,12 +103,22 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                 # 🔥 FIX: Also check if TTS is still generating (multi-sentence response)
                 # The generation_complete flag is False while sentences are still being generated
                 tts_session = persistent_tts_manager.get_session(call_control_id) if call_control_id else None
-                if tts_session and not tts_session.generation_complete:
-                    # Agent is still generating/streaming a multi-sentence response
-                    if int(time.time()) % 5 == 0:
-                        logger.info(f"🔇 MONITOR: Skipping silence check - response generation still in progress")
-                    await asyncio.sleep(0.5)
-                    continue
+                if tts_session:
+                    # 🔥 FIX: Check if we are waiting for audio (precise state)
+                    # This covers the "gap" between LLM done and audio start
+                    if getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
+                        if int(time.time()) % 5 == 0:
+                            logger.info(f"🔇 MONITOR: Skipping silence check - waiting for first audio (precise state)")
+                        await asyncio.sleep(0.5)
+                        continue
+                        
+                    # Also check if generation is still in progress (multi-sentence)
+                    if not tts_session.generation_complete:
+                        # Agent is still generating/streaming a multi-sentence response
+                        if int(time.time()) % 5 == 0:
+                            logger.info(f"🔇 MONITOR: Skipping silence check - response generation still in progress")
+                        await asyncio.sleep(0.5)
+                        continue
                 
                 playback_expected_end = call_states.get(call_control_id, {}).get("playback_expected_end_time", 0)
                 current_time = time.time()
