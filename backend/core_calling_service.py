@@ -3353,9 +3353,11 @@ Your response:"""
             # Stream any remaining content
             if buffer.strip() and stream_callback:
                 # 🔧 Replace variables in remaining content
+                # Handle both {{variable}} and {variable} formats (LLM may output either)
                 remaining = buffer.strip()
                 for var_name, var_value in self.session_variables.items():
-                    remaining = remaining.replace(f"{{{{{var_name}}}}}", str(var_value))
+                    remaining = remaining.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                    remaining = remaining.replace(f"{{{var_name}}}", str(var_value))      # {var}
                 await stream_callback(remaining)
                 full_response += remaining
             
