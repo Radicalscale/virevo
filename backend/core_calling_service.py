@@ -4134,10 +4134,14 @@ Return ONLY a JSON object with the extracted values. If a value cannot be determ
                         body_str = webhook_body_template
                         body_str = body_str.replace("{{user_message}}", user_message)
                         body_str = body_str.replace("{{call_id}}", self.call_id)
+                        # Also handle single-brace format
+                        body_str = body_str.replace("{user_message}", user_message)
+                        body_str = body_str.replace("{call_id}", self.call_id)
                         
-                        # Replace session variables
+                        # Replace session variables - handle both {{var}} and {var} formats
                         for var_name, var_value in self.session_variables.items():
-                            body_str = body_str.replace(f"{{{{{var_name}}}}}", str(var_value))
+                            body_str = body_str.replace(f"{{{{{var_name}}}}}", str(var_value))  # {{var}}
+                            body_str = body_str.replace(f"{{{var_name}}}", str(var_value))      # {var}
                         
                         request_body = json.loads(body_str)
                 except Exception as e:
