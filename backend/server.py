@@ -4681,10 +4681,16 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                 
                 # Save assistant transcript to database
                 # Extract node info from response for QC analysis
-                node_id = response.get("node_id", "")
-                node_label = response.get("node_label", "Unknown")
-                transition_time_ms = response.get("transition_time_ms", 0)
-                kb_time_ms = response.get("kb_time_ms", 0)
+                node_id = ""
+                node_label = "Unknown"
+                transition_time_ms = 0
+                kb_time_ms = 0
+                
+                if isinstance(response, dict):
+                    node_id = response.get("node_id", "")
+                    node_label = response.get("node_label", "Unknown")
+                    transition_time_ms = response.get("transition_time_ms", 0)
+                    kb_time_ms = response.get("kb_time_ms", 0)
                 
                 # Calculate TRUE "dead air" latency (time user hears silence):
                 # Dead air = STT processing + LLM processing + first TTS chunk time
