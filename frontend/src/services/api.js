@@ -7,7 +7,7 @@ const API = `${BACKEND_URL}/api`; // Add /api to baseURL
 console.log('🔍 API Service Configuration:');
 console.log('  BACKEND_URL:', BACKEND_URL);
 console.log('  API baseURL:', API);
-console.log('  Expected: https://api.li-ai.org/api');
+console.log('  Expected: https://api.virevo.ai/api');
 
 // Create axios instance with default config
 const apiClient = axios.create({

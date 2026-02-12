@@ -98,6 +98,7 @@ TELNYX_API_KEY = os.environ.get('TELNYX_API_KEY')
 
 ELEVEN_API_KEY = os.environ.get('ELEVEN_API_KEY')
 DAILY_API_KEY = os.environ.get('DAILY_API_KEY')
+SIGNUP_SECRET = os.environ.get('SIGNUP_SECRET')
 
 # Create the main app
 app = FastAPI(title="Retell AI Clone API")
@@ -187,6 +188,14 @@ except Exception as e:
 @api_router.post("/auth/signup", response_model=TokenResponse)
 async def signup(user_data: UserCreate, response: Response, request: Request):
     """Create a new user account"""
+    # Check if SIGNUP_SECRET is enforced
+    if SIGNUP_SECRET:
+        secret_header = request.headers.get("x-signup-secret")
+        # Allow if secret matches, or if coming from internal valid source (optional, but strict for now)
+        if secret_header != SIGNUP_SECRET:
+            logger.warning(f"⚠️ Unauthorized signup attempt: Invalid secret")
+            raise HTTPException(status_code=403, detail="Unauthorized: Invalid signup secret")
+
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
     if existing_user:
@@ -207,14 +216,14 @@ async def signup(user_data: UserCreate, response: Response, request: Request):
     max_age = 30 * 24 * 60 * 60 if user_data.remember_me else 30 * 60  # 30 days or 30 minutes
     
     # Dynamically determine cookie domain based on request origin
-    # For li-ai.org production, set domain to share across subdomains
+    # For virevo.ai production, set domain to share across subdomains
     # For preview/dev environments, don't set domain (allow browser to handle it)
     origin = request.headers.get("origin", "") if hasattr(request, 'headers') else ""
     referer = request.headers.get("referer", "") if hasattr(request, 'headers') else ""
     
-    # Check if request is from li-ai.org domain
-    is_li_ai_domain = "li-ai.org" in origin or "li-ai.org" in referer
-    cookie_domain = ".li-ai.org" if is_li_ai_domain else None
+    # Check if request is from virevo.ai domain
+    is_virevo_domain = "virevo.ai" in origin or "virevo.ai" in referer
+    cookie_domain = ".virevo.ai" if is_virevo_domain else None
     
     cookie_kwargs = {
         "key": "access_token",
@@ -225,7 +234,7 @@ async def signup(user_data: UserCreate, response: Response, request: Request):
         "max_age": max_age,
     }
     
-    # Only set domain for li-ai.org production
+    # Only set domain for virevo.ai production
     if cookie_domain:
         cookie_kwargs["domain"] = cookie_domain
     
@@ -272,14 +281,14 @@ async def login(credentials: UserLogin, response: Response, request: Request):
     max_age = 30 * 24 * 60 * 60 if credentials.remember_me else 30 * 60  # 30 days or 30 minutes
     
     # Dynamically determine cookie domain based on request origin
-    # For li-ai.org production, set domain to share across subdomains
+    # For virevo.ai production, set domain to share across subdomains
     # For preview/dev environments, don't set domain (allow browser to handle it)
     origin = request.headers.get("origin", "")
     referer = request.headers.get("referer", "")
     
-    # Check if request is from li-ai.org domain
-    is_li_ai_domain = "li-ai.org" in origin or "li-ai.org" in referer
-    cookie_domain = ".li-ai.org" if is_li_ai_domain else None
+    # Check if request is from virevo.ai domain
+    is_virevo_domain = "virevo.ai" in origin or "virevo.ai" in referer
+    cookie_domain = ".virevo.ai" if is_virevo_domain else None
     
     cookie_kwargs = {
         "key": "access_token",
@@ -290,7 +299,7 @@ async def login(credentials: UserLogin, response: Response, request: Request):
         "max_age": max_age,
     }
     
-    # Only set domain for li-ai.org production
+    # Only set domain for virevo.ai production
     if cookie_domain:
         cookie_kwargs["domain"] = cookie_domain
     

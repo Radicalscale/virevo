@@ -522,7 +522,7 @@ class TelnyxService:
                             logger.info(f"✅ Generated {len(audio_bytes)} bytes, saved to {audio_path}")
                             
                             # Get backend URL for serving the audio
-                            backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
+                            backend_url = os.environ.get('BACKEND_URL', 'https://api.virevo.ai')
                             audio_url = f"{backend_url}/api/tts-audio/{audio_filename}"
                             
                             logger.info(f"🔗 Using audio URL: {audio_url}")
@@ -663,7 +663,7 @@ class TelnyxService:
             with open(audio_path, 'wb') as f:
                 f.write(full_audio)
                 
-            backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
+            backend_url = os.environ.get('BACKEND_URL', 'https://api.virevo.ai')
             audio_url = f"{backend_url}/api/tts-audio/{audio_filename}"
             
             # Play
@@ -842,7 +842,7 @@ class TelnyxService:
             logger.info(f"⏱️  Total WebSocket TTS: {tts_gen_time*1000:.0f}ms (including conversion)")
             
             # Get backend URL for serving the audio
-            backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
+            backend_url = os.environ.get('BACKEND_URL', 'https://api.virevo.ai')
             audio_url = f"{backend_url}/api/tts-audio/tts_ws_{tts_provider}_{audio_hash}.mp3"
             
             logger.info(f"🔗 WebSocket audio URL: {audio_url}")
@@ -976,7 +976,7 @@ class TelnyxService:
                 return {"success": False, "error": "Audio conversion failed"}
             
             # Upload to S3 or serve locally
-            backend_url = os.environ.get('BACKEND_URL', 'https://api.li-ai.org')
+            backend_url = os.environ.get('BACKEND_URL', 'https://api.virevo.ai')
             audio_url = f"{backend_url}/api/tts-audio/sesame_ws_{audio_hash}.ulaw"
             
             # Copy to web-accessible location
