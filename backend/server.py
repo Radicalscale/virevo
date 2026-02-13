@@ -2921,7 +2921,7 @@ async def webhook_trigger_outbound_call(
     {
       "agent_id": "your-agent-uuid",
       "to_number": "+17701234567",
-      "from_number": "+14048000152",
+      "from_number": "+18722778634",
       "custom_variables": {"name": "John"}
     }
     ```
@@ -2933,7 +2933,7 @@ async def webhook_trigger_outbound_call(
       "first_name": "John",
       "customData": {
         "agent_id": "your-agent-uuid",
-        "from_number": "+14048000152"
+        "from_number": "+18722778634"
       }
     }
     ```
@@ -3009,7 +3009,7 @@ async def webhook_trigger_outbound_call(
             raise HTTPException(status_code=404, detail="Agent not found or not owned by this user")
         
         # Use extracted from_number or default
-        final_from_number = from_number or "+14048000152"
+        final_from_number = from_number or "+18722778634"
         
         # Create webhook URL
         backend_url = os.environ.get("BACKEND_URL")
@@ -3179,7 +3179,7 @@ async def initiate_outbound_call(
             raise HTTPException(status_code=404, detail="Agent not found")
         
         # Get from_number
-        from_number = request.from_number or "+14048000152"
+        from_number = request.from_number or "+18722778634"
         
         # Create webhook URL - use environment variable for deployment flexibility
         backend_url = os.environ.get("BACKEND_URL")

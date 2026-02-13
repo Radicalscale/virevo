@@ -17,7 +17,7 @@ import statistics
 # Configuration
 MONGO_URL = 'mongodb+srv://radicalscale_db_user:BqTnIhsbVjhh01Bq@andramada.rznsqrc.mongodb.net/?appName=Andramada'
 DB_NAME = 'test_database'
-BACKEND_URL = 'https://api.li-ai.org'
+BACKEND_URL = 'https://api.virevo.ai'
 
 class LatencyTester:
     def __init__(self, agent_id: str, agent_name: str, user_id: str = None):
