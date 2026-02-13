@@ -139,7 +139,7 @@ async def monitor_dead_air(session, websocket, call_control_id, stream_sentence_
                 time_until_audio_done = playback_expected_end - current_time if playback_expected_end > 0 else 0
                 
                 # Check against negative buffer (allow monitoring only after buffer expires)
-                if time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                if playback_expected_end > 0 and time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
                     # Audio is still expected to be playing (or in buffer window) - skip silence check
                     if int(time.time()) % 5 == 0:
                         logger.info(f"🔇 MONITOR: Skipping silence check - audio playing ({time_until_audio_done:.1f}s left)")

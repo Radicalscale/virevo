@@ -4253,6 +4253,12 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                     # This acts as the "Audio-Driven" failsafe. If we are streaming, we are speaking.
                     session.mark_agent_speaking_start()
                     
+                    # 🔥 FIX B: Mark that AI has responded to user input
+                    # This tells silence timeout logic that we are NOT silent, even if user_has_spoken was set prematurely
+                    if call_control_id in active_telnyx_calls:
+                        active_telnyx_calls[call_control_id]["ai_has_responded"] = True
+                    redis_service.update_call_data(call_control_id, {"ai_has_responded": True})
+                    
                     # Note: persistent_tts_manager is imported at top of file (line 41)
                     # Using closure to access the global import
                     tts_manager = persistent_tts_manager
@@ -4815,6 +4821,39 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         stt_end_time = time.time()
         stt_latency_ms = int((stt_end_time - last_audio_received_time) * 1000) if last_audio_received_time else 0
         
+        # 🔥 FIX C: Latency protection - Wait for greeting to start playing
+        # If greeting is in-flight (network delay), wait up to 2s for audio to start.
+        # This prevents race conditions where user speaks before audio starts, causing node skips.
+        # fetch current state
+        retry_redis = redis_service.get_call_data(call_control_id) or {}
+        check_mem = active_telnyx_calls.get(call_control_id, {})
+        greeting_in_flight = retry_redis.get("greeting_in_flight") or check_mem.get("greeting_in_flight")
+        
+        if greeting_in_flight:
+            logger.info(f"🛡️ Greeting IN-FLIGHT - Pausing processing for '{text}'...")
+            wait_start = time.time()
+            flag_cleared = False
+            
+            # Poll for flag clear (max 2s)
+            for _ in range(20):
+                await asyncio.sleep(0.1)
+                latest_redis = redis_service.get_call_data(call_control_id) or {}
+                latest_mem = active_telnyx_calls.get(call_control_id, {})
+                if not latest_redis.get("greeting_in_flight") and not latest_mem.get("greeting_in_flight"):
+                    flag_cleared = True
+                    break
+            
+            wait_dur = (time.time() - wait_start) * 1000
+            if flag_cleared:
+                logger.info(f"✅ Greeting delivered! Clean hand-off to user input after {wait_dur:.0f}ms")
+            else:
+                logger.warning(f"⚠️ Greeting in-flight TIMEOUT ({wait_dur:.0f}ms) - Proceeding anyway")
+            
+            # Clear flag to be safe
+            if call_control_id in active_telnyx_calls:
+                active_telnyx_calls[call_control_id]["greeting_in_flight"] = False
+            redis_service.update_call_data(call_control_id, {"greeting_in_flight": False})
+        
         logger.info(f"⏱️ [{timestamp_str}] 📝 FINAL TRANSCRIPT RECEIVED: '{text}'")
         logger.info(f"⏱️ [{timestamp_str}] STT endpoint detection latency: {stt_latency_ms}ms")
         logger.info(f"⏱️ [{timestamp_str}] 🎤 USER STOPPED SPEAKING - Beginning processing pipeline")
@@ -5155,7 +5194,7 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                         # This covers the ~500ms gap between LLM done and audio start
                                         is_agent_active = True
                                         logger.info(f"🛡️ Agent active (waiting for audio) - 1-word filter ENABLED")
-                                    elif time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                                    elif playback_expected_end > 0 and time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
                                         # Audio expected to still be playing (including network latency buffer)
                                         is_agent_active = True
                                     elif is_generating:
@@ -5215,9 +5254,8 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                         # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
                                         # This covers the ~500ms gap between LLM done and audio start
                                         is_agent_active = True
-                                    elif time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
+                                    elif playback_expected_end > 0 and time_until_audio_done > -NETWORK_PROPAGATION_DELAY:
                                         # Audio expected to still be playing by timer (including latency buffer)
-                                        is_agent_active = True
                                         is_agent_active = True
                                     elif tts_session and getattr(tts_session, 'is_waiting_for_first_audio_of_response', False):
                                         # 🔥 FIX: Agent is technically "speaking" (waiting for audio to arrive)
@@ -5455,6 +5493,10 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                 
                 logger.info("✅ Session created in WebSocket worker")
                 
+                # 🔥 FIX D: Start silence tracking immediately so dead air monitor 
+                # has a baseline even if agent never speaks
+                session.start_silence_tracking()
+                
                 # ═══════════════════════════════════════════════════════════════════
                 # SCHEDULE SILENCE TIMEOUT IN THIS WORKER (has the session in memory)
                 # ═══════════════════════════════════════════════════════════════════
@@ -5479,10 +5521,13 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             call_data_check = active_telnyx_calls.get(call_control_id, {})
                             
                             user_has_spoken = redis_data.get("user_has_spoken") or call_data_check.get("user_has_spoken")
+                            ai_has_responded = redis_data.get("ai_has_responded") or call_data_check.get("ai_has_responded")
                             greeting_triggered = redis_data.get("silence_greeting_triggered") or call_data_check.get("silence_greeting_triggered")
                             
-                            if user_has_spoken:
-                                logger.info(f"⏱️ [WebSocket Worker] Silence timeout: User already spoke, skipping greeting")
+                            # 🔥 FIX: Only skip if AI has actually responded (or greeting already triggered)
+                            # Ignore user_has_spoken because it can be true for filtered utterances (uh-huh due to bug or noise)
+                            if ai_has_responded:
+                                logger.info(f"⏱️ [WebSocket Worker] Silence timeout: AI already responded, skipping greeting")
                                 return
                             
                             if greeting_triggered:
@@ -5536,6 +5581,11 @@ async def telnyx_audio_stream_generic(websocket: WebSocket):
                             
                             # Mark agent as speaking BEFORE sending TTS
                             # This prevents dead air monitor from counting silence during greeting
+                            # 🔥 FIX C: Latency protection - Buffer user speech while greeting is starting up
+                            if call_control_id in active_telnyx_calls:
+                                active_telnyx_calls[call_control_id]["greeting_in_flight"] = True
+                            redis_service.update_call_data(call_control_id, {"greeting_in_flight": True})
+                            
                             session.mark_agent_speaking_start()
                             logger.info("🗣️ [WebSocket Worker] Marked agent as speaking (for initial greeting)")
                             
@@ -7764,6 +7814,14 @@ async def telnyx_webhook(payload: dict):
                 
                 return {"status": "ok"}
         
+        # Handle playback started - clear latency protection flag
+        if event_type == "call.playback.started":
+            # 🔥 FIX C: Greeting started playing, release any buffered speech
+            if call_control_id in active_telnyx_calls:
+                active_telnyx_calls[call_control_id]["greeting_in_flight"] = False
+            redis_service.update_call_data(call_control_id, {"greeting_in_flight": False})
+            logger.info(f"🔊 Playback started - Latency protection disabled (greeting_in_flight=False)")
+
         # Handle playback ended - close interruption window when audio finishes
         if event_type == "call.playback.ended":
             playback_id = payload.get("data", {}).get("payload", {}).get("playback_id")
@@ -8425,6 +8483,11 @@ async def telnyx_webhook(payload: dict):
                 
                 if first_text:  # Only speak if there's a greeting
                     agent = session.agent_config
+                    
+                    # 🔥 FIX C: Latency protection - Buffer user speech while greeting is starting up
+                    if call_control_id in active_telnyx_calls:
+                        active_telnyx_calls[call_control_id]["greeting_in_flight"] = True
+                    redis_service.update_call_data(call_control_id, {"greeting_in_flight": True})
                     
                     await telnyx_service.speak_text(
                         call_control_id, 
