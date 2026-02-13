@@ -15,23 +15,23 @@ const OutboundCallTester = () => {
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState('');
   const [toNumber, setToNumber] = useState('');
-  const [fromNumber, setFromNumber] = useState('+14048000152');
+  const [fromNumber, setFromNumber] = useState('+18722778634');
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // QC Tracking
   const [enableQCTracking, setEnableQCTracking] = useState(true);
   const [createLead, setCreateLead] = useState(false);
   const [leadSource, setLeadSource] = useState('test_call');
   const [trackKeywords, setTrackKeywords] = useState('');
   const [expectedCommitment, setExpectedCommitment] = useState('not_specified');
-  
+
   // Call tracking
   const [activeCallId, setActiveCallId] = useState(null);
   const [qcResults, setQcResults] = useState(null);
   const [checkingQC, setCheckingQC] = useState(false);
-  
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -109,14 +109,14 @@ const OutboundCallTester = () => {
       if (data.success) {
         const callId = data.call_id || data.call_control_id; // Backend returns call_id
         setActiveCallId(callId);
-        
+
         toast({
           title: "Call Initiated! 📞",
-          description: enableQCTracking 
+          description: enableQCTracking
             ? `Calling ${toNumber}. QC analysis will run when call ends.`
             : `Calling ${toNumber} from ${data.from_number}`,
         });
-        
+
         // If QC tracking enabled, start polling for results
         if (enableQCTracking && callId) {
           setTimeout(() => checkForQCResults(callId, leadId), 10000); // Check after 10 seconds
@@ -161,11 +161,11 @@ const OutboundCallTester = () => {
         `${BACKEND_URL}/api/crm/analytics/call/${callId}`,
         { withCredentials: true }
       );
-      
+
       if (response.data && response.data.aggregated_scores) {
         setQcResults(response.data);
         setCheckingQC(false);
-        
+
         toast({
           title: "QC Analysis Complete! 🎯",
           description: "Scroll down to see detailed scores and recommendations",
@@ -178,7 +178,7 @@ const OutboundCallTester = () => {
         setTimeout(() => checkForQCResults(callId, leadId, attempts + 1), 10000);
         return;
       }
-      
+
       // Other errors - log and stop
       console.error('Error checking QC results:', error);
       toast({
@@ -245,7 +245,7 @@ const OutboundCallTester = () => {
 
           <div className="border-t border-gray-700 pt-4">
             <h3 className="text-white font-semibold mb-3">Custom Variables (Optional)</h3>
-            
+
             <div className="space-y-3">
               <div>
                 <Label className="text-gray-300">Customer Name</Label>
@@ -277,7 +277,7 @@ const OutboundCallTester = () => {
               <Activity className="text-blue-400" size={20} />
               <h3 className="text-white font-semibold">QC Agent Tracking</h3>
             </div>
-            
+
             <div className="space-y-3">
               {/* Enable QC Tracking */}
               <label className="flex items-center gap-2 cursor-pointer">
@@ -411,20 +411,18 @@ const OutboundCallTester = () => {
             {/* Commitment Score */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <p className="text-gray-400 text-sm mb-1">Commitment Score</p>
-              <p className={`text-3xl font-bold ${
-                (qcResults.aggregated_scores?.commitment_score || 0) >= 75 ? 'text-green-400' :
-                (qcResults.aggregated_scores?.commitment_score || 0) >= 50 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <p className={`text-3xl font-bold ${(qcResults.aggregated_scores?.commitment_score || 0) >= 75 ? 'text-green-400' :
+                  (qcResults.aggregated_scores?.commitment_score || 0) >= 50 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {qcResults.aggregated_scores?.commitment_score || 'N/A'}
               </p>
               <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
                 <div
-                  className={`h-2 rounded-full ${
-                    (qcResults.aggregated_scores?.commitment_score || 0) >= 75 ? 'bg-green-500' :
-                    (qcResults.aggregated_scores?.commitment_score || 0) >= 50 ? 'bg-yellow-500' :
-                    'bg-red-500'
-                  }`}
+                  className={`h-2 rounded-full ${(qcResults.aggregated_scores?.commitment_score || 0) >= 75 ? 'bg-green-500' :
+                      (qcResults.aggregated_scores?.commitment_score || 0) >= 50 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                    }`}
                   style={{ width: `${qcResults.aggregated_scores?.commitment_score || 0}%` }}
                 ></div>
               </div>
@@ -433,20 +431,18 @@ const OutboundCallTester = () => {
             {/* Conversion Score */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <p className="text-gray-400 text-sm mb-1">Conversion Score</p>
-              <p className={`text-3xl font-bold ${
-                (qcResults.aggregated_scores?.conversion_score || 0) >= 75 ? 'text-green-400' :
-                (qcResults.aggregated_scores?.conversion_score || 0) >= 50 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <p className={`text-3xl font-bold ${(qcResults.aggregated_scores?.conversion_score || 0) >= 75 ? 'text-green-400' :
+                  (qcResults.aggregated_scores?.conversion_score || 0) >= 50 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {qcResults.aggregated_scores?.conversion_score || 'N/A'}
               </p>
               <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
                 <div
-                  className={`h-2 rounded-full ${
-                    (qcResults.aggregated_scores?.conversion_score || 0) >= 75 ? 'bg-green-500' :
-                    (qcResults.aggregated_scores?.conversion_score || 0) >= 50 ? 'bg-yellow-500' :
-                    'bg-red-500'
-                  }`}
+                  className={`h-2 rounded-full ${(qcResults.aggregated_scores?.conversion_score || 0) >= 75 ? 'bg-green-500' :
+                      (qcResults.aggregated_scores?.conversion_score || 0) >= 50 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                    }`}
                   style={{ width: `${qcResults.aggregated_scores?.conversion_score || 0}%` }}
                 ></div>
               </div>
@@ -455,20 +451,18 @@ const OutboundCallTester = () => {
             {/* Excellence Score */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <p className="text-gray-400 text-sm mb-1">Excellence Score</p>
-              <p className={`text-3xl font-bold ${
-                (qcResults.aggregated_scores?.excellence_score || 0) >= 75 ? 'text-green-400' :
-                (qcResults.aggregated_scores?.excellence_score || 0) >= 50 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <p className={`text-3xl font-bold ${(qcResults.aggregated_scores?.excellence_score || 0) >= 75 ? 'text-green-400' :
+                  (qcResults.aggregated_scores?.excellence_score || 0) >= 50 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {qcResults.aggregated_scores?.excellence_score || 'N/A'}
               </p>
               <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
                 <div
-                  className={`h-2 rounded-full ${
-                    (qcResults.aggregated_scores?.excellence_score || 0) >= 75 ? 'bg-green-500' :
-                    (qcResults.aggregated_scores?.excellence_score || 0) >= 50 ? 'bg-yellow-500' :
-                    'bg-red-500'
-                  }`}
+                  className={`h-2 rounded-full ${(qcResults.aggregated_scores?.excellence_score || 0) >= 75 ? 'bg-green-500' :
+                      (qcResults.aggregated_scores?.excellence_score || 0) >= 50 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                    }`}
                   style={{ width: `${qcResults.aggregated_scores?.excellence_score || 0}%` }}
                 ></div>
               </div>
@@ -477,19 +471,17 @@ const OutboundCallTester = () => {
             {/* Show-Up Probability */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <p className="text-gray-400 text-sm mb-1">Show-Up Probability</p>
-              <p className={`text-3xl font-bold ${
-                (qcResults.aggregated_scores?.show_up_probability || 0) >= 75 ? 'text-green-400' :
-                (qcResults.aggregated_scores?.show_up_probability || 0) >= 50 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <p className={`text-3xl font-bold ${(qcResults.aggregated_scores?.show_up_probability || 0) >= 75 ? 'text-green-400' :
+                  (qcResults.aggregated_scores?.show_up_probability || 0) >= 50 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {qcResults.aggregated_scores?.show_up_probability || 'N/A'}%
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Risk: <span className={`font-semibold uppercase ${
-                  qcResults.aggregated_scores?.risk_level === 'low' ? 'text-green-400' :
-                  qcResults.aggregated_scores?.risk_level === 'medium' ? 'text-yellow-400' :
-                  'text-red-400'
-                }`}>
+                Risk: <span className={`font-semibold uppercase ${qcResults.aggregated_scores?.risk_level === 'low' ? 'text-green-400' :
+                    qcResults.aggregated_scores?.risk_level === 'medium' ? 'text-yellow-400' :
+                      'text-red-400'
+                  }`}>
                   {qcResults.aggregated_scores?.risk_level || 'N/A'}
                 </span>
               </p>
@@ -501,11 +493,10 @@ const OutboundCallTester = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm mb-1">Overall Quality Score</p>
-                <p className={`text-5xl font-bold ${
-                  (qcResults.aggregated_scores?.overall_quality_score || 0) >= 75 ? 'text-green-400' :
-                  (qcResults.aggregated_scores?.overall_quality_score || 0) >= 50 ? 'text-yellow-400' :
-                  'text-red-400'
-                }`}>
+                <p className={`text-5xl font-bold ${(qcResults.aggregated_scores?.overall_quality_score || 0) >= 75 ? 'text-green-400' :
+                    (qcResults.aggregated_scores?.overall_quality_score || 0) >= 50 ? 'text-yellow-400' :
+                      'text-red-400'
+                  }`}>
                   {qcResults.aggregated_scores?.overall_quality_score || 'N/A'}
                 </p>
               </div>

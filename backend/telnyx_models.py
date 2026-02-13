@@ -34,7 +34,7 @@ class Sentiment(str, Enum):
 
 class PhoneNumberModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    number: str  # E.164 format: +14048000152
+    number: str  # E.164 format: +18722778634
     agent_id: Optional[str] = None
     direction: CallDirection  # inbound or outbound
     is_active: bool = True
