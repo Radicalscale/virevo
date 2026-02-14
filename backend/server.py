@@ -4099,6 +4099,42 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
             logger.info(f"⏹️ Endpoint processing cancelled - new user input received")
             return  # Exit gracefully instead of raising
         
+        # 🔥 FIX: Greeting in-flight check MOVED HERE from on_final_transcript()
+        # Previously this was in on_final_transcript(), which caused a race condition:
+        # on_final_transcript would wait 2s for greeting delivery, delaying its append
+        # to accumulated_transcript, while on_endpoint_detected ran concurrently and
+        # found accumulated_transcript empty. By placing the wait HERE, we ensure
+        # on_final_transcript appends the text immediately, and this function waits
+        # for greeting delivery before processing the already-populated transcript.
+        retry_redis = redis_service.get_call_data(call_control_id) or {}
+        check_mem = active_telnyx_calls.get(call_control_id, {})
+        greeting_in_flight = retry_redis.get("greeting_in_flight") or check_mem.get("greeting_in_flight")
+        
+        if greeting_in_flight:
+            logger.info(f"🛡️ Greeting IN-FLIGHT - Pausing endpoint processing for '{accumulated_transcript}'...")
+            wait_start = time.time()
+            flag_cleared = False
+            
+            # Poll for flag clear (max 2s)
+            for _ in range(20):
+                await asyncio.sleep(0.1)
+                latest_redis = redis_service.get_call_data(call_control_id) or {}
+                latest_mem = active_telnyx_calls.get(call_control_id, {})
+                if not latest_redis.get("greeting_in_flight") and not latest_mem.get("greeting_in_flight"):
+                    flag_cleared = True
+                    break
+            
+            wait_dur = (time.time() - wait_start) * 1000
+            if flag_cleared:
+                logger.info(f"✅ Greeting delivered! Clean hand-off to user input after {wait_dur:.0f}ms")
+            else:
+                logger.warning(f"⚠️ Greeting in-flight TIMEOUT ({wait_dur:.0f}ms) - Proceeding anyway")
+            
+            # Clear flag to be safe
+            if call_control_id in active_telnyx_calls:
+                active_telnyx_calls[call_control_id]["greeting_in_flight"] = False
+            redis_service.update_call_data(call_control_id, {"greeting_in_flight": False})
+        
         # Log STT latency
         if last_audio_received_time and latency_tracker["stt_transcript_received"]:
             stt_latency = int((latency_tracker["stt_transcript_received"] - last_audio_received_time) * 1000)
@@ -4821,38 +4857,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
         stt_end_time = time.time()
         stt_latency_ms = int((stt_end_time - last_audio_received_time) * 1000) if last_audio_received_time else 0
         
-        # 🔥 FIX C: Latency protection - Wait for greeting to start playing
-        # If greeting is in-flight (network delay), wait up to 2s for audio to start.
-        # This prevents race conditions where user speaks before audio starts, causing node skips.
-        # fetch current state
-        retry_redis = redis_service.get_call_data(call_control_id) or {}
-        check_mem = active_telnyx_calls.get(call_control_id, {})
-        greeting_in_flight = retry_redis.get("greeting_in_flight") or check_mem.get("greeting_in_flight")
-        
-        if greeting_in_flight:
-            logger.info(f"🛡️ Greeting IN-FLIGHT - Pausing processing for '{text}'...")
-            wait_start = time.time()
-            flag_cleared = False
-            
-            # Poll for flag clear (max 2s)
-            for _ in range(20):
-                await asyncio.sleep(0.1)
-                latest_redis = redis_service.get_call_data(call_control_id) or {}
-                latest_mem = active_telnyx_calls.get(call_control_id, {})
-                if not latest_redis.get("greeting_in_flight") and not latest_mem.get("greeting_in_flight"):
-                    flag_cleared = True
-                    break
-            
-            wait_dur = (time.time() - wait_start) * 1000
-            if flag_cleared:
-                logger.info(f"✅ Greeting delivered! Clean hand-off to user input after {wait_dur:.0f}ms")
-            else:
-                logger.warning(f"⚠️ Greeting in-flight TIMEOUT ({wait_dur:.0f}ms) - Proceeding anyway")
-            
-            # Clear flag to be safe
-            if call_control_id in active_telnyx_calls:
-                active_telnyx_calls[call_control_id]["greeting_in_flight"] = False
-            redis_service.update_call_data(call_control_id, {"greeting_in_flight": False})
+        # NOTE: greeting_in_flight check was MOVED to on_endpoint_detected() to fix race condition.
+        # Previously, waiting here delayed accumulated_transcript append, causing on_endpoint_detected
+        # to read an empty transcript and skip processing. See on_endpoint_detected() for the check.
         
         logger.info(f"⏱️ [{timestamp_str}] 📝 FINAL TRANSCRIPT RECEIVED: '{text}'")
         logger.info(f"⏱️ [{timestamp_str}] STT endpoint detection latency: {stt_latency_ms}ms")
