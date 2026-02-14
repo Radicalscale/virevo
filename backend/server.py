@@ -5210,8 +5210,9 @@ async def handle_soniox_streaming(websocket: WebSocket, session, call_id: str, c
                                     # ALWAYS filter garbled transcripts (these are echo, not real speech)
                                     if is_garbled:
                                         logger.info(f"🔕 FILTERING garbled/echo '{final_text.strip()}' - NOT calling on_final_transcript")
-                                    # Filter 1-2 word utterances or fillers during agent speech
-                                    elif is_agent_active and (word_count <= 2 or is_filler):
+                                    # Filter 1-2 word utterances or fillers ONLY during active audio playback
+                                    # Relax filter during latency buffer (time < 0) to allow quick turn-taking (e.g. "Yeah", "What's up?")
+                                    elif is_agent_active and time_until_audio_done > 0.2 and (word_count <= 2 or is_filler):
                                         logger.info(f"🔕 FILTERING {word_count}-word/filler '{final_text.strip()}' - NOT calling on_final_transcript")
                                         # Don't call on_final_transcript - skip this entirely
                                     elif on_final_transcript:
